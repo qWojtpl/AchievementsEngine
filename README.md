@@ -116,6 +116,22 @@ achievements:
     - 'say {0} Completed all achievements! ;O'
 ```
 
+## Default configuration:
+
+```yml
+achievements:
+  '0':
+    enabled: true
+    name: §2§lSample Achievement
+    description: §aUse /ae command and get 1 diamond.
+    item: BEDROCK
+    showProgress: false
+    events:
+    - command 1 /ae
+    actions:
+    - give {0} minecraft:diamond 1
+```
+
 </details>
 
 <details><summary>messages.yml</summary>
