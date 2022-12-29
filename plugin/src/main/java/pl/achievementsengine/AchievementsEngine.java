@@ -38,6 +38,7 @@ public final class AchievementsEngine extends JavaPlugin {
     public void LoadConfig() {
         playerAchievements = new HashMap<>();
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
+        getServer().getScheduler().cancelTask(SQLHandler.refreshTask); // Cancel connection refresh scheduler
         loadDatabaseFile(); // Load database
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
@@ -69,6 +70,7 @@ public final class AchievementsEngine extends JavaPlugin {
                 yml.set("sql.username", "username");
                 yml.set("sql.password", "password");
                 yml.set("sql.database", "database");
+                yml.set("sql-settings.refreshConnectionInterval", "600");
                 yml.save(sqlFile);
             } catch (IOException e) {
                 getLogger().info("Cannot create database.yml - exception: " + e);
@@ -81,6 +83,7 @@ public final class AchievementsEngine extends JavaPlugin {
         SQLHandler.username = ReadStringPath("sql.username");
         SQLHandler.password = ReadStringPath("sql.password");
         SQLHandler.database = ReadStringPath("sql.database");
+        SQLHandler.refreshInterval = yml.getInt("sql-settings.refreshConnectionInterval");
     }
 
     private void loadAchievementsFile() {

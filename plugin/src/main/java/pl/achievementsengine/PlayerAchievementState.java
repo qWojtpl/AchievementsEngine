@@ -38,8 +38,8 @@ public class PlayerAchievementState {
     }
 
     public void UpdateProgress(Achievement achievement, int[] progressArray) { // Update progress
-        progress.remove(achievement);
-        progress.put(achievement, progressArray);
+        progress.remove(achievement); // Remove achievement progress
+        progress.put(achievement, progressArray); // Add new achievement progress
     }
 
     public void RemoveAchievement(Achievement achievement) { // Remove achievement from completed achievements
