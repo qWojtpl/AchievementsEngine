@@ -125,8 +125,7 @@ public class GUIHandler {
     }
 
     public static void CloseAllInventories() { // Close all registered inventories
-        List<GUIHandler> guis = new ArrayList<>();
-        guis.addAll(GUIHandler.registeredInventories);
+        List<GUIHandler> guis = new ArrayList<>(GUIHandler.registeredInventories);
         for(GUIHandler handler : guis) {
             handler.player.closeInventory();
         }

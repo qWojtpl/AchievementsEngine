@@ -31,10 +31,6 @@ public class SQLHandler {
                 for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
                     PlayerAchievementState.Create(p);
                 }
-                refreshTask = Bukkit.getScheduler()
-                        .scheduleSyncRepeatingTask(
-                                AchievementsEngine.main, () -> SQLHandler.RefreshConnection(), 0L, 20L*refreshInterval
-                        ); // Schedule connection refresh
             } catch(SQLException e) {
                 AchievementsEngine.main.getLogger().info("Achievements engine throws SQL Exception: " + e);
                 lastException = String.valueOf(e);
@@ -66,6 +62,7 @@ public class SQLHandler {
     }
 
     public static void RefreshConnection() {
+        if(!isConnected()) return;
         try {
             conn.prepareStatement("SELECT * FROM PlayerAchievementState LIMIT 1");
             AchievementsEngine.main.getLogger().info("Refreshed connection.");
@@ -75,6 +72,12 @@ public class SQLHandler {
         }
     }
 
+    public static void ScheduleRefresh() {
+        refreshTask = Bukkit.getScheduler()
+                .scheduleSyncRepeatingTask(
+                        AchievementsEngine.main, () -> SQLHandler.RefreshConnection(), 0L, 20L*refreshInterval
+                ); // Schedule connection refresh
+    }
     public static boolean isConnected() {
         return conn != null;
     }

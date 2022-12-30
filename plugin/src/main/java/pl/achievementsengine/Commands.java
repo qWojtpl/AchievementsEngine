@@ -171,7 +171,7 @@ public class Commands implements CommandExecutor {
         return true;
     }
 
-    public static void ShowHelp(CommandSender sender, int page) {
+    private static void ShowHelp(CommandSender sender, int page) {
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
         switch(page) {
             case 1:

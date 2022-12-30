@@ -40,6 +40,7 @@ public final class AchievementsEngine extends JavaPlugin {
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         getServer().getScheduler().cancelTask(SQLHandler.refreshTask); // Cancel connection refresh scheduler
         loadDatabaseFile(); // Load database
+        SQLHandler.ScheduleRefresh(); // Create new refresh
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
     }
