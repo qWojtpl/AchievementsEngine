@@ -1,8 +1,10 @@
 package pl.achievementsengine;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -13,7 +15,7 @@ import java.util.List;
 
 public final class AchievementsEngine extends JavaPlugin {
 
-    public static AchievementsEngine main;
+    public static AchievementsEngine main; // Main plugin instance
     public FileConfiguration yml; // Current reading yml
     public static List<Achievement> achievements = new ArrayList<>(); // List of all achievements
     public static HashMap<String, PlayerAchievementState> playerAchievements = new HashMap<>(); // List of all player states
@@ -23,24 +25,27 @@ public final class AchievementsEngine extends JavaPlugin {
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new Events(), this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
+        getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         main = this; // Set main as this instance
         LoadConfig(); // Load configuration files
-        SQLHandler.Connect(); // Connect to MySQL
+        SQLHandler.Connect(0); // Connect to MySQL (create structure if not created)
         getLogger().info("Loaded."); // Print to console
+        for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
+            PlayerAchievementState.Create(p);
+        }
     }
 
     @Override
     public void onDisable() {
-        SQLHandler.Disconnect(); // Disconnect from MySQL
+        GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
+        SQLHandler.Disconnect(0);
         getLogger().info("Bye!"); // Print to console
     }
 
     public void LoadConfig() {
         playerAchievements = new HashMap<>();
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        getServer().getScheduler().cancelTask(SQLHandler.refreshTask); // Cancel connection refresh scheduler
         loadDatabaseFile(); // Load database
-        SQLHandler.ScheduleRefresh(); // Create new refresh
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
     }
@@ -71,7 +76,6 @@ public final class AchievementsEngine extends JavaPlugin {
                 yml.set("sql.username", "username");
                 yml.set("sql.password", "password");
                 yml.set("sql.database", "database");
-                yml.set("sql-settings.refreshConnectionInterval", "600");
                 yml.save(sqlFile);
             } catch (IOException e) {
                 getLogger().info("Cannot create database.yml - exception: " + e);
@@ -84,7 +88,6 @@ public final class AchievementsEngine extends JavaPlugin {
         SQLHandler.username = ReadStringPath("sql.username");
         SQLHandler.password = ReadStringPath("sql.password");
         SQLHandler.database = ReadStringPath("sql.database");
-        SQLHandler.refreshInterval = yml.getInt("sql-settings.refreshConnectionInterval");
     }
 
     private void loadAchievementsFile() {

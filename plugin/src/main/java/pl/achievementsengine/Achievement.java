@@ -48,7 +48,8 @@ public class Achievement {
         state.getPlayer().playSound(state.getPlayer().getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f); // Play sound
         state.completedAchievements.add(this); // Add this achievement to player's completed achievements
         for (String action : actions) { // Trigger all achievement commands
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name));
+            Bukkit.getScheduler().callSyncMethod(AchievementsEngine.main, () ->
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name)));
         }
         SQLHandler.addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (SQL)
         Achievement.Check(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement

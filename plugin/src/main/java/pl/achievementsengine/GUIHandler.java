@@ -50,7 +50,10 @@ public class GUIHandler {
         }
         int current = currentStart/28+1; // Current page
         int max = AchievementsEngine.achievements.size()/28+1; // Max pages
-        inventory = Bukkit.createInventory(null, size, MessageFormat.format(AchievementsEngine.ReadLanguage("gui-title"), current, max)); // Create inventory
+        PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
+        float c = (float) state.completedAchievements.size() / (float) AchievementsEngine.achievements.size() * 100.0F; // Get completed percent
+        int completed = Math.round(c); // Round percent to integer
+        inventory = Bukkit.createInventory(null, size, MessageFormat.format(AchievementsEngine.ReadLanguage("gui-title") + " " + completed + "%", current, max)); // Create inventory
         for(int i = 0; i < size; i++) { // Create black background
             AddItem(i, Material.BLACK_STAINED_GLASS_PANE, 1, " ", " ", false);
         }
@@ -79,7 +82,6 @@ public class GUIHandler {
             if(i > 43) break; // If achievement slot is higher than 43, then break loop. (43 is last slot before border.)
             String desc = a.description; // Set item description to achievement description
             boolean glow = false; // Mark if item is glowing
-            PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
             if(a.showProgress) { // If achievement has turned on showProgress
                 desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress"); // Add "Progress:" to description
                 for (int k = 0; k < a.events.size(); k++) { // Loop through events

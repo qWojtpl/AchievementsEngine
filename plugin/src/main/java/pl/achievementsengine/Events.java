@@ -54,19 +54,19 @@ public class Events implements Listener {
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
         if(event.getEntity() instanceof Player) {
-            //for(int i = 0; i < event.getItem().getItemStack().getAmount(); i++) {
+            for(int i = 0; i < event.getItem().getItemStack().getAmount(); i++) {
                 Achievement.Check((Player) event.getEntity(), "pickup " + event.getItem().getItemStack().getType()
                         + " named " + event.getItem().getItemStack().getItemMeta().getDisplayName());
-            //}
+            }
         }
     }
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        //for(int i = 0; i < event.getItemDrop().getItemStack().getAmount(); i++) {
+        for(int i = 0; i < event.getItemDrop().getItemStack().getAmount(); i++) {
             Achievement.Check(event.getPlayer(), "drop " + event.getItemDrop().getItemStack().getType()
                     + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
-        //}
+        }
     }
 
     @EventHandler

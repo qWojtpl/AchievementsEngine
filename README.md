@@ -182,7 +182,7 @@ YOU MUST CONNECT DATABASE TO SAVE ANY DATA.<br>
 ## YML Fields:
 
 <b>
-Every field must be child of "sql"<br>
+Below fields must be child of "sql"<br>
 Database structure will be created automaticlly.<br>
 </b>
 <br>
