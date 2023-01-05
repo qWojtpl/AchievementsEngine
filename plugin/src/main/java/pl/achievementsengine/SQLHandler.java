@@ -15,19 +15,23 @@ public class SQLHandler {
     public static String password; // SQL password
     public static String database; // SQL database
     public static String lastException = "None! :)"; // Last saved exception. Can be seen in-game by typing /ae connection
-    public static HashMap<Integer, Connection> connections = new HashMap<>();
+    public static SQLHandler mainConnection;
+    public Connection connection;
 
-    public static void Connect(int connectionID) {
+    public SQLHandler Connect() {
         try {
             Properties prop = new Properties();
             prop.setProperty("user", username);
             prop.setProperty("password", password);
-            connections.put(connectionID, DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, prop)); // Connect to MySQL
-            if(connectionID == 0) TryCreateStructure(); // Create database structure
-        } catch(SQLException e) {
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, prop); // Connect to MySQL
+            if (SQLHandler.mainConnection == this) {
+                TryCreateStructure(); // Create database structure
+            }
+        } catch (SQLException e) {
             AchievementsEngine.main.getLogger().info("SQL Exception: " + e);
             lastException = String.valueOf(e);
         }
+        return this;
     }
 
     public static void TryCreateStructure() throws SQLException {
@@ -35,42 +39,27 @@ public class SQLHandler {
         "CREATE TABLE IF NOT EXISTS CompletedAchievements (id_user INT, achievement_key VARCHAR(64), FOREIGN KEY (id_user) REFERENCES PlayerAchievementState(id_user), PRIMARY KEY (id_user, achievement_key));",
         "CREATE TABLE IF NOT EXISTS Progress (id_user INT, achievement_key VARCHAR(64), id_event INT, value INT, FOREIGN KEY (id_user) REFERENCES PlayerAchievementState(id_user), PRIMARY KEY (id_user, achievement_key, id_event));"};
         for (String statement : structure) { // Loop through structure commands
-            PreparedStatement ps = connections.get(0).prepareStatement(statement);
+            PreparedStatement ps = SQLHandler.mainConnection.connection.prepareStatement(statement);
             ps.executeUpdate();
         }
     }
 
-    public static void Disconnect(int connectionID) {
+    public void Disconnect() {
         try {
-            connections.get(connectionID).close(); // Close connection
-            if(connections.containsKey(connectionID)) connections.remove(connectionID); // Remove from connection list
+            this.connection.close(); // Close connection
         } catch(SQLException e) {
             AchievementsEngine.main.getLogger().info("SQL Exception: " + e);
             lastException = String.valueOf(e);
         }
     }
 
-    public static boolean isConnected(int connectionID) {
-        return connections.containsKey(connectionID);
-    }
-
-    public static int getFreeID() {
-        for(int i = 0; i < connections.size(); i++) {
-            if(!connections.containsKey(i)) {
-                return i;
-            }
-        }
-        return !connections.containsKey(connections.size() + 1) ? connections.size() + 1 : 0;
-    }
-
     public static void createPlayerAchievementState(Player p) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
             try {
-                int connectionID = getFreeID();
-                SQLHandler.Connect(connectionID);
-                Connection conn = connections.get(connectionID);
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
                 String name = p.getName(); // Get player nickname
-                PlayerAchievementState state = AchievementsEngine.playerAchievements.get(name); // Get state
+                PlayerAchievementState state = AchievementsEngine.playerStates.get(name); // Get state
                 PreparedStatement ps = conn.prepareStatement("SELECT name FROM PlayerAchievementState WHERE name=?"); // Check if player is in database
                 ps.setString(1, name); // Set ? to player's nickname
                 ResultSet result = ps.executeQuery(); // Get results
@@ -125,7 +114,7 @@ public class SQLHandler {
                     state.openGUI = false;
                     Bukkit.getScheduler().scheduleSyncDelayedTask(AchievementsEngine.main, () -> GUIHandler.New(state.getPlayer(), 0));
                 }
-                SQLHandler.Disconnect(connectionID);
+                handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to create PlayerAchievementState: " + e);
                 lastException = String.valueOf(e);
@@ -133,32 +122,29 @@ public class SQLHandler {
         });
     }
 
-    public static boolean addCompletedAchievement(PlayerAchievementState state, Achievement achievement) { // Add achievement to player's completed achievements
+    public static void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) { // Add achievement to player's completed achievements
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
             try {
-                int connectionID = getFreeID();
-                SQLHandler.Connect(connectionID);
-                Connection conn = connections.get(connectionID);
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
                 String name = state.getPlayer().getName();
                 PreparedStatement ps = conn.prepareStatement("INSERT INTO CompletedAchievements VALUES((SELECT id_user FROM PlayerAchievementState WHERE name=?), ?)");
                 ps.setString(1, name);
                 ps.setString(2, achievement.ID);
                 ps.executeUpdate();
-                SQLHandler.Disconnect(connectionID);
+                handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to add completed achievement: " + e);
                 lastException = String.valueOf(e);
             }
         });
-        return true;
     }
 
-    public static boolean removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) { // Remove achievement from player's completed achievements
+    public static void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) { // Remove achievement from player's completed achievements
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
             try {
-                int connectionID = getFreeID();
-                SQLHandler.Connect(connectionID);
-                Connection conn = connections.get(connectionID);
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
                 String name = state.getPlayer().getName();
                 PreparedStatement ps = conn.prepareStatement("DELETE FROM CompletedAchievements WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) AND achievement_key=?");
                 ps.setString(1, name);
@@ -168,21 +154,19 @@ public class SQLHandler {
                 ps2.setString(1, name);
                 ps2.setString(2, achievement.ID);
                 ps2.executeUpdate();
-                SQLHandler.Disconnect(connectionID);
+                handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to remove completed achievement: " + e);
                 lastException = String.valueOf(e);
             }
         });
-        return true;
     }
 
-    public static boolean transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
+    public static void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
             try {
-                int connectionID = getFreeID();
-                SQLHandler.Connect(connectionID);
-                Connection conn = connections.get(connectionID);
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
                 String name1 = state1.getPlayer().getName();
                 String name2 = state2.getPlayer().getName();
                 PreparedStatement ps = conn.prepareStatement("DELETE FROM CompletedAchievements WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
@@ -199,32 +183,29 @@ public class SQLHandler {
                 ps4.setString(1, name2);
                 ps4.setString(2, name1);
                 ps4.executeUpdate();
-                SQLHandler.Disconnect(connectionID);
+                handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to transfer achievements: " + e);
                 lastException = String.valueOf(e);
             }
         });
-        return true;
     }
 
-    public static boolean addProgress(PlayerAchievementState state, Achievement achievement, int id_event) { // Add 1 to player's achievement event progress
+    public static void addProgress(PlayerAchievementState state, Achievement achievement, int id_event) { // Add 1 to player's achievement event progress
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
             try {
-                int connectionID = getFreeID();
-                SQLHandler.Connect(connectionID);
-                Connection conn = connections.get(connectionID);
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
                 PreparedStatement ps = conn.prepareStatement("INSERT INTO Progress VALUES((SELECT id_user FROM PlayerAchievementState WHERE name=?), ?, ?, 1) ON DUPLICATE KEY UPDATE value=value+1");
                 ps.setString(1, state.getPlayer().getName());
                 ps.setString(2, achievement.ID);
                 ps.setString(3, String.valueOf(id_event));
                 ps.executeUpdate();
-                SQLHandler.Disconnect(connectionID);
+                handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to update progress: " + e);
                 lastException = String.valueOf(e);
             }
         });
-        return true;
     }
 }

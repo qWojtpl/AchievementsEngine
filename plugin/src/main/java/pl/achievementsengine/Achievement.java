@@ -60,11 +60,7 @@ public class Achievement {
             Achievement a = AchievementsEngine.achievements.get(i);
             if(a.enabled) { // Check if achievement is enabled
                 PlayerAchievementState playerState;
-                if(AchievementsEngine.playerAchievements.get(p.getName()) == null) { // Check if player has state, if not - create it
-                    playerState = PlayerAchievementState.Create(p);
-                } else {
-                    playerState = AchievementsEngine.playerAchievements.get(p.getName());
-                }
+                playerState = PlayerAchievementState.Create(p); // Create player's state
                 if(!playerState.initialized) { // If player state is not initialized, then add this checkable to queue
                     playerState.checkQueue.add(checkable);
                     return;
@@ -74,7 +70,7 @@ public class Achievement {
                 for(int j = 0; j < a.events.size(); j++) { // Loop through all events from achievement
                     String[] events = a.events.get(j).split(" "); // Split one event into pieces eg. [kill] [1] [player]
                     String[] givenEvents = checkable.split(" "); // Split checkable into pieces eg. [kill] [player]
-                    if(events[0].equalsIgnoreCase(givenEvents[0]) && events[2].equalsIgnoreCase(givenEvents[1])) { // Check if events[0] equals givenEvents[0] ([kill] = [kill]) and events[2] equals givenEvents[1] ([Player] = [Player]), events[1] is a number
+                    if(events[0].equalsIgnoreCase(givenEvents[0]) && (events[2].equalsIgnoreCase("*") || events[2].equalsIgnoreCase(givenEvents[1]))) { // Check if events[0] equals givenEvents[0] ([kill] = [kill]) and events[2] equals (* - any) or givenEvents[1] ([Player] = [Player]), events[1] is a number
                         boolean match = false; // Mark if all external things (name, chat string) matches
                         if(events.length > 4) { // Check if event length is larger than 4 (event contains named or chat with space) - pickup 1 bedrock named BEDDI (at least 4 arguments)
                             if (events[3].equals("named") && givenEvents[2].equals("named")) { // Check if third argument is named and second argument of given event is "named" (checks if event provides named too)

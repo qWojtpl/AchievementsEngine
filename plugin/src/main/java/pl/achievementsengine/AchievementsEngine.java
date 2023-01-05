@@ -18,7 +18,7 @@ public final class AchievementsEngine extends JavaPlugin {
     public static AchievementsEngine main; // Main plugin instance
     public FileConfiguration yml; // Current reading yml
     public static List<Achievement> achievements = new ArrayList<>(); // List of all achievements
-    public static HashMap<String, PlayerAchievementState> playerAchievements = new HashMap<>(); // List of all player states
+    public static HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
     public static HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
 
     @Override
@@ -28,7 +28,8 @@ public final class AchievementsEngine extends JavaPlugin {
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         main = this; // Set main as this instance
         LoadConfig(); // Load configuration files
-        SQLHandler.Connect(0); // Connect to MySQL (create structure if not created)
+        SQLHandler.mainConnection = new SQLHandler(); // Connect to MySQL (create structure if not created)
+        SQLHandler.mainConnection.Connect();
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
             PlayerAchievementState.Create(p);
@@ -38,12 +39,13 @@ public final class AchievementsEngine extends JavaPlugin {
     @Override
     public void onDisable() {
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        SQLHandler.Disconnect(0);
+        SQLHandler.mainConnection.Disconnect();
         getLogger().info("Bye!"); // Print to console
     }
 
     public void LoadConfig() {
-        playerAchievements = new HashMap<>();
+        playerStates = new HashMap<>(); // Reset player states list
+        achievements = new ArrayList<>(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         loadDatabaseFile(); // Load database
         loadAchievementsFile(); // Load achievements
@@ -114,7 +116,6 @@ public final class AchievementsEngine extends JavaPlugin {
             }
         }
         yml = YamlConfiguration.loadConfiguration(achFile);
-        achievements = new ArrayList<>();
         ConfigurationSection section = yml.getConfigurationSection("achievements");
         for (String key : section.getKeys(false)) {
             if (yml.getString("achievements." + key + ".name") != null) {

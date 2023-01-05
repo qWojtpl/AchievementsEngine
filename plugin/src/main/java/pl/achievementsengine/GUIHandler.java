@@ -31,7 +31,7 @@ public class GUIHandler {
 
     public static void New(Player p, int start) {
         PlayerAchievementState state = PlayerAchievementState.Create(p); // Create or get state
-        if(!state.initialized) { // If state is not initialized (data is not downloaded) then mark GUI as "will be opened when data will be downloaded"
+        if(!state.initialized) { // If state is not initialized (data is not downloaded) then mark GUI as "will be opened as soon as data will be downloaded"
             state.openGUI = true;
             return;
         }

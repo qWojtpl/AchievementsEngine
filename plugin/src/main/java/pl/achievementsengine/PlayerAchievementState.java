@@ -19,18 +19,18 @@ public class PlayerAchievementState {
 
 
     public static PlayerAchievementState Create(Player p) { // Create state. If is already created, return exist one
-        if(!AchievementsEngine.playerAchievements.containsKey(p.getName())) {
+        if(!AchievementsEngine.playerStates.containsKey(p.getName())) {
             PlayerAchievementState state = new PlayerAchievementState(); // Create object
             state.player = p; // Save player
             state.uuid = p.getUniqueId(); // Save UUID
             state.completedAchievements = new ArrayList<>(); // Create completed achievements
-            AchievementsEngine.playerAchievements.put(p.getName(), state); // Put state to all states
+            AchievementsEngine.playerStates.put(p.getName(), state); // Put state to all states
             SQLHandler.createPlayerAchievementState(p); // Create state (SQL)
             return state;
         } else {
-            AchievementsEngine.playerAchievements.get(p.getName()).player = p; // Update player object
+            AchievementsEngine.playerStates.get(p.getName()).player = p; // Update player object
         }
-        return AchievementsEngine.playerAchievements.get(p.getName());
+        return AchievementsEngine.playerStates.get(p.getName());
     }
 
     public Player getPlayer() { // Return player

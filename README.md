@@ -22,6 +22,9 @@ DO NOT CHANGE ACHIEVEMENT KEY AND EVENTS COUNT AFTER INSERTING FIRST DATA TO DAT
 REMEMBER THAT EDITING RECORDS MANUALLY CAN CAUSE ERRORS.<br>
 </b>
 
+`* means anything, eg. kill 10 * (means kill 10 any entity), drop 64 * (means drop 64 of any item)`
+<br>
+
 ## Supported events:
 
 ```java
@@ -30,14 +33,16 @@ REMEMBER THAT EDITING RECORDS MANUALLY CAN CAUSE ERRORS.<br>
 - interact    // Interact block event, eg. interact 50 stone_button
 - break       // Break block event, eg. break 64 dirt
 - place       // Place block event, eg. place 128 spruce_log
-- pickup*     // Pickup (how many times, not how many items) item event, eg. pickup 32 slime_ball
-- drop*       // Drop (how many times, not how many items) item event, eg. drop 64 stone
+- pickup*     // Pickup (how many items, not how many times) item event, eg. pickup 32 slime_ball
+- T_pickup*   // Pickup (how many times, not how many items) item event, eg. T_pickup 5 dirt
+- drop*       // Drop (how many items, not how many times) item event, eg. drop 64 stone
+- T_drop*     // Drop (how many times, not how many items) item event, eg. T_drop 10 diamond_sword
 - craft       // Craft item event, eg. craft 1 cake
 - enchant*    // Enchant item event, eg. enchant 1 diamond_sword named Magic sword!
 - fish        // Fish (using fishing rod) event, eg. fish 64 pufferfish
 - catch       // Catch (using fishing rod) entity, eg. catch 10 wolf
 - shoot*      // Shoot event, eg. shoot 20 bow
-- command     // Send command event, eg. command 30 /ae
+- command     // Send command event (without arguments), eg. command 30 /ae
 - chat        // Send chat message event, eg. chat 10 Wiggle-Wiggle
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
 ```

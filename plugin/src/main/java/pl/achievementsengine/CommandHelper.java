@@ -9,7 +9,6 @@ import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class CommandHelper implements TabCompleter {
 
@@ -50,6 +49,7 @@ public class CommandHelper implements TabCompleter {
                     for(Achievement a : state.completedAchievements) {
                         completions.add(a.ID);
                     }
+                    completions.add("*");
                 }
             } else if(args[0].equalsIgnoreCase("transfer")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {

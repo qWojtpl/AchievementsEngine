@@ -6,6 +6,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Commands implements CommandExecutor {
 
     @Override
@@ -41,12 +44,7 @@ public class Commands implements CommandExecutor {
             } else if(args[0].equalsIgnoreCase("connection")) {
                 sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
                 String connectionStatus = "§cNot connected";
-                if(SQLHandler.isConnected(0)) {
-                    connectionStatus = "§aConnected!";
-                }
                 sender.sendMessage("§eConnection status: " + connectionStatus);
-                sender.sendMessage("§eOpened connections: §6" + SQLHandler.connections.size());
-                sender.sendMessage("§eNext connection ID: §6" + SQLHandler.getFreeID());
                 sender.sendMessage("§eLast exception: §c" + SQLHandler.lastException);
                 sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
             } else if(args[0].equalsIgnoreCase("checkstate")) {
@@ -57,9 +55,9 @@ public class Commands implements CommandExecutor {
                 sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
                 String state = "§cNOT FOUND";
                 String downloaded = "§cNOT INITIALIZED";
-                if(AchievementsEngine.playerAchievements.containsKey(args[1])) {
+                if(AchievementsEngine.playerStates.containsKey(args[1])) {
                     state = "§aOK!";
-                    if(AchievementsEngine.playerAchievements.get(args[1]).initialized) {
+                    if(AchievementsEngine.playerStates.get(args[1]).initialized) {
                         downloaded = "§aINITIALIZED";
                     }
                 }
@@ -81,8 +79,8 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
                     return true;
                 }
-                if (!AchievementsEngine.playerAchievements.get(args[1]).completedAchievements.contains(a)) {
-                    a.Complete(AchievementsEngine.playerAchievements.get(args[1]));
+                if (!AchievementsEngine.playerStates.get(args[1]).completedAchievements.contains(a)) {
+                    a.Complete(AchievementsEngine.playerStates.get(args[1]));
                     sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aAdded " + args[2]
                             + "§a to " + args[1] + "'s completed achievements!");
                 } else {
@@ -98,19 +96,28 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
                     return true;
                 }
-                Achievement a = checkIfAchievementExists(args[2]);
-                if(a == null) {
-                    sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
-                    return true;
-                }
-                PlayerAchievementState state = AchievementsEngine.playerAchievements.get(args[1]);
-                if (state.completedAchievements.contains(a)) {
-                    state.RemoveAchievement(a);
-                    sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aRemoved " + args[2] +
-                            "§a from " + args[1] + "'s completed achievements!");
+                PlayerAchievementState state = AchievementsEngine.playerStates.get(args[1]);
+                if(!args[2].equalsIgnoreCase("*")) {
+                    Achievement a = checkIfAchievementExists(args[2]);
+                    if (a == null) {
+                        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
+                        return true;
+                    }
+
+                    if (state.completedAchievements.contains(a)) {
+                        state.RemoveAchievement(a);
+                        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aRemoved " + args[2] +
+                                "§a from " + args[1] + "'s completed achievements!");
+                    } else {
+                        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cPlayer " + args[1] +
+                                " §cdon't have achievement " + args[2] + " §ccompleted!");
+                    }
                 } else {
-                    sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cPlayer " + args[1] +
-                            " §cdon't have achievement " + args[2] + " §ccompleted!");
+                    List<Achievement> completed = new ArrayList<>(state.completedAchievements);
+                    for(Achievement a : completed) {
+                        state.RemoveAchievement(a);
+                    }
+                    sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aRemoved all " + args[1] + "'s completed achievements!");
                 }
             } else if(args[0].equalsIgnoreCase("transfer")) {
                 if(args.length != 3 || args[1].equals(args[2])) {
@@ -121,7 +128,7 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCannot found player(s)..");
                     return true;
                 }
-                SQLHandler.transferAchievements(AchievementsEngine.playerAchievements.get(args[1]), AchievementsEngine.playerAchievements.get(args[2]));
+                SQLHandler.transferAchievements(AchievementsEngine.playerStates.get(args[1]), AchievementsEngine.playerStates.get(args[2]));
                 sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aTransferred all achievements from " + args[1] + "§a to " + args[2] + "§a!");
             } else {
                 ShowHelp(sender, 1);

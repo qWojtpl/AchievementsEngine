@@ -58,6 +58,8 @@ public class Events implements Listener {
                 Achievement.Check((Player) event.getEntity(), "pickup " + event.getItem().getItemStack().getType()
                         + " named " + event.getItem().getItemStack().getItemMeta().getDisplayName());
             }
+            Achievement.Check((Player) event.getEntity(), "T_pickup " + event.getItem().getItemStack().getType()
+                    + " named " + event.getItem().getItemStack().getItemMeta().getDisplayName());
         }
     }
 
@@ -67,6 +69,8 @@ public class Events implements Listener {
             Achievement.Check(event.getPlayer(), "drop " + event.getItemDrop().getItemStack().getType()
                     + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
         }
+        Achievement.Check(event.getPlayer(), "T_drop " + event.getItemDrop().getItemStack().getType()
+                + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
     }
 
     @EventHandler
