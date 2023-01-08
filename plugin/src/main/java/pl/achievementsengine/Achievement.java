@@ -123,4 +123,13 @@ public class Achievement {
             }
         }
     }
+
+    public static Achievement checkIfAchievementExists(String name) {
+        for (Achievement a : AchievementsEngine.achievements) {
+            if (a.ID.equals(name)) {
+                return a;
+            }
+        }
+        return null;
+    }
 }

@@ -148,15 +148,15 @@ Every field must be child of "messages"<br>
 </b>
 <br>
 
-`prefix` - Commands prefix. Default: `'§2[§6AchievementsEngine§2]'`<br>
-`gui-title` - GUI title. Default: `Achievements (Page {0}/{1})`<br>
-`gui-next` - Next GUI page. Default: `§f§lNext page`<br>
-`gui-previous` - Previous GUI page. Default: `§f§lPrevious page`<br>
-`complete-message` - Complete achievement chat message. {0} is achievement name. Default: `'§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked: {0}%nl%%nl%§6§k--------------'`<br>
-`progress-message` - Progress achievement chat message. {0} is achievement name. Default: `§aYou made progress in achievement {0}§a!`<br>
-`progress` - Progress (text in GUI). Default: `'§6§lProgress:'`<br>
-`progress-field-prefix`: Prefix in GUI progress list. Default: `§7§l- §b`<br>
-`completed` - Completed (text in GUI). Default: `'%nl%§aCOMPLETED!'`<br>
+`prefix` - Commands prefix.<br>
+`gui-title` - GUI title<br>
+`gui-next` - Next GUI page<br>
+`gui-previous` - Previous GUI page<br>
+`complete-message` - Complete achievement chat message. {0} is achievement name<br>
+`progress-message` - Progress achievement chat message. {0} is achievement name<br>
+`progress` - Progress (text in GUI)<br>
+`progress-field-prefix`: Prefix in GUI progress list<br>
+`completed` - Completed (text in GUI)<br>
 
 ## Default configuration:
 

@@ -3,6 +3,7 @@ package pl.achievementsengine;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -17,6 +18,13 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 
 public class Events implements Listener {
+
+    /*
+    Why "priority = EventPriority.HIGHEST"?
+    by Spigot documentation:
+    "Event call is critical and must have the final say in what happens to the event"
+    Source: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/EventPriority.html
+     */
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -40,19 +48,22 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBreak(BlockBreakEvent event) {
+        if(event.isCancelled()) return;
         Achievement.Check(event.getPlayer(), "break " + event.getBlock().getType().name());
         Achievement.Check(event.getPlayer(), "destroy " + event.getBlock().getType().name());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlace(BlockPlaceEvent event) {
+        if(event.isCancelled()) return;
         Achievement.Check(event.getPlayer(), "place " + event.getBlock().getType().name());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPickup(EntityPickupItemEvent event) {
+        if(event.isCancelled()) return;
         if(event.getEntity() instanceof Player) {
             for(int i = 0; i < event.getItem().getItemStack().getAmount(); i++) {
                 Achievement.Check((Player) event.getEntity(), "pickup " + event.getItem().getItemStack().getType()
@@ -63,8 +74,9 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrop(PlayerDropItemEvent event) {
+        if(event.isCancelled()) return;
         for(int i = 0; i < event.getItemDrop().getItemStack().getAmount(); i++) {
             Achievement.Check(event.getPlayer(), "drop " + event.getItemDrop().getItemStack().getType()
                     + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
@@ -73,24 +85,24 @@ public class Events implements Listener {
                 + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCraft(CraftItemEvent event) {
+        if(event.isCancelled()) return;
         for(int i = 0; i < event.getCurrentItem().getAmount(); i++) {
             Achievement.Check((Player) event.getWhoClicked(), "craft " + event.getCurrentItem().getType());
         }
-        if(event.isShiftClick()) {
-
-        }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEnchant(EnchantItemEvent event) {
+        if(event.isCancelled()) return;
         Achievement.Check(event.getEnchanter(), "enchant " + event.getItem().getType()
                 + " named " + event.getItem().getItemMeta().getDisplayName());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onFish(PlayerFishEvent event) {
+        if(event.isCancelled()) return;
         if(event.getCaught() != null && event.getCaught() instanceof Item && event.getState().toString().equals("CAUGHT_FISH")) {
             Achievement.Check(event.getPlayer(), "fish " + ((Item) event.getCaught()).getItemStack().getType());
         }
@@ -99,20 +111,23 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onShootBow(EntityShootBowEvent event) {
+        if(event.isCancelled()) return;
         if(event.getEntity() instanceof Player) {
             Achievement.Check((Player) event.getEntity(), "shoot bow named " + event.getBow().getItemMeta().getDisplayName());
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if(event.isCancelled()) return;
         Achievement.Check(event.getPlayer(), "command " + event.getMessage());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
+        if(event.isCancelled()) return;
         Achievement.Check(event.getPlayer(), "chat " + event.getMessage());
     }
 

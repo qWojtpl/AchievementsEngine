@@ -169,20 +169,14 @@ public class SQLHandler {
                 Connection conn = handler.connection;
                 String name1 = state1.getPlayer().getName();
                 String name2 = state2.getPlayer().getName();
-                PreparedStatement ps = conn.prepareStatement("DELETE FROM CompletedAchievements WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
-                ps.setString(1, name1);
-                ps.executeUpdate();
-                PreparedStatement ps2 = conn.prepareStatement("DELETE FROM Progress WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
-                ps2.setString(1, name1);
+                PreparedStatement ps1 = conn.prepareStatement("UPDATE CompletedAchievements SET id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
+                ps1.setString(1, name2);
+                ps1.setString(2, name1);
+                ps1.executeUpdate();
+                PreparedStatement ps2 = conn.prepareStatement("UPDATE Progress SET id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
+                ps2.setString(1, name2);
+                ps2.setString(2, name1);
                 ps2.executeUpdate();
-                PreparedStatement ps3 = conn.prepareStatement("UPDATE CompletedAchievements SET id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
-                ps3.setString(1, name2);
-                ps3.setString(2, name1);
-                ps3.executeUpdate();
-                PreparedStatement ps4 = conn.prepareStatement("UPDATE Progress SET id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?)");
-                ps4.setString(1, name2);
-                ps4.setString(2, name1);
-                ps4.executeUpdate();
                 handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to transfer achievements: " + e);
@@ -204,6 +198,23 @@ public class SQLHandler {
                 handler.Disconnect();
             } catch (SQLException e) {
                 AchievementsEngine.main.getLogger().info("SQL Exception while trying to update progress: " + e);
+                lastException = String.valueOf(e);
+            }
+        });
+    }
+
+    public static void resetProgress(PlayerAchievementState state, Achievement achievement) {
+        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.main, () -> {
+            try {
+                SQLHandler handler = new SQLHandler().Connect();
+                Connection conn = handler.connection;
+                PreparedStatement ps = conn.prepareStatement("DELETE FROM PROGRESS WHERE id_user=(SELECT id_user FROM PlayerAchievementState WHERE name=?) AND achievement_key=?");
+                ps.setString(1, state.getPlayer().getName());
+                ps.setString(2, achievement.ID);
+                ps.executeUpdate();
+                handler.Disconnect();
+            } catch (SQLException e) {
+                AchievementsEngine.main.getLogger().info("SQL Exception while trying to reset progress: " + e);
                 lastException = String.valueOf(e);
             }
         });
