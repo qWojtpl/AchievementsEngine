@@ -1,6 +1,8 @@
 package pl.achievementsengine;
 
 import org.bukkit.entity.Player;
+import pl.achievementsengine.data.DataHandler;
+import pl.achievementsengine.data.SQLHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ public class PlayerAchievementState {
             state.uuid = p.getUniqueId(); // Save UUID
             state.completedAchievements = new ArrayList<>(); // Create completed achievements
             AchievementsEngine.playerStates.put(p.getName(), state); // Put state to all states
-            SQLHandler.createPlayerAchievementState(p); // Create state (SQL)
+            DataHandler.createPlayerAchievementState(p); // Create data in playerData.yml (and if available in SQL)
             return state;
         } else {
             AchievementsEngine.playerStates.get(p.getName()).player = p; // Update player object
@@ -40,11 +42,13 @@ public class PlayerAchievementState {
     public void UpdateProgress(Achievement achievement, int[] progressArray) { // Update progress
         progress.remove(achievement); // Remove achievement progress
         progress.put(achievement, progressArray); // Add new achievement progress
+        DataHandler.updateProgress(this, achievement); // Update progress (Save data)
     }
 
     public void RemoveAchievement(Achievement achievement) { // Remove achievement from completed achievements
         this.completedAchievements.remove(achievement);
-        this.progress.remove(achievement);
-        SQLHandler.removeCompletedAchievement(this, achievement);
+        this.progress.put(achievement, new int[achievement.events.size()]);
+        DataHandler.removeCompletedAchievement(this, achievement);
+        DataHandler.updateProgress(this, achievement);
     }
 }

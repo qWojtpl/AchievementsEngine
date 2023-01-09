@@ -4,7 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import pl.achievementsengine.data.DataHandler;
+import pl.achievementsengine.data.SQLHandler;
 
+import javax.xml.crypto.Data;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -51,7 +54,7 @@ public class Achievement {
             Bukkit.getScheduler().callSyncMethod(AchievementsEngine.main, () ->
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name)));
         }
-        SQLHandler.addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (SQL)
+        DataHandler.addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (Save data)
         Achievement.Check(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement
     }
 
@@ -110,7 +113,6 @@ public class Achievement {
                                     p.sendMessage(m);
                                 }
                             }
-                            SQLHandler.addProgress(playerState, a, j); // Add 1 to progress (SQL)
                         }
                     }
                     max += Integer.valueOf(events[1]); // Add required progress to max progress

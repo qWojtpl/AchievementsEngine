@@ -6,6 +6,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import pl.achievementsengine.commands.CommandHelper;
+import pl.achievementsengine.commands.Commands;
+import pl.achievementsengine.data.DataHandler;
+import pl.achievementsengine.data.SQLHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +47,10 @@ public final class AchievementsEngine extends JavaPlugin {
         getLogger().info("Bye!"); // Print to console
     }
 
+    public void DisablePlugin() {
+        getServer().getPluginManager().disablePlugin(this);
+    }
+
     public void LoadConfig() {
         playerStates = new HashMap<>(); // Reset player states list
         achievements = new ArrayList<>(); // Reset achievements list
@@ -73,6 +81,7 @@ public final class AchievementsEngine extends JavaPlugin {
             try {
                 sqlFile.createNewFile();
                 yml = YamlConfiguration.loadConfiguration(sqlFile);
+                yml.set("sql.useSQL", "false");
                 yml.set("sql.host", "localhost");
                 yml.set("sql.port", 3306);
                 yml.set("sql.username", "username");
@@ -85,6 +94,7 @@ public final class AchievementsEngine extends JavaPlugin {
             }
         }
         yml = YamlConfiguration.loadConfiguration(sqlFile);
+        DataHandler.useSQL = yml.getBoolean("sql.useSQL");
         SQLHandler.host = ReadStringPath("sql.host");
         SQLHandler.port = ReadStringPath("sql.port");
         SQLHandler.username = ReadStringPath("sql.username");
