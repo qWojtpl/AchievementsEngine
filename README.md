@@ -180,7 +180,7 @@ messages:
 
 <br>
 <b>
-YOU MUST CONNECT DATABASE TO SAVE ANY DATA.<br>
+All data will be stored in playerdata.yml and (if connected to MySQL) in database.<br>
 </b>
 <br>
 
@@ -192,6 +192,7 @@ Database structure will be created automaticlly.<br>
 </b>
 <br>
 
+`useSQL` - When set to true, data will be saved in MySQL too.<br>
 `host` - SQL host<br>
 `port` -  SQL port<br>
 `username` - SQL username<br>
@@ -202,6 +203,7 @@ Database structure will be created automaticlly.<br>
 
 ```yml
 sql:
+  useSQL: false
   host: localhost
   port: 3306
   username: username
@@ -210,3 +212,6 @@ sql:
 ```
 
 </details>
+
+# Commands & Permissions
+
