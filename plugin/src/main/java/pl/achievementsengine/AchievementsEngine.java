@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.achievementsengine.commands.CommandHelper;
 import pl.achievementsengine.commands.Commands;
-import pl.achievementsengine.data.DataHandler;
 
 import java.io.File;
 import java.io.IOException;

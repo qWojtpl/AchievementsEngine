@@ -78,11 +78,13 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Reload(CommandSender sender) {
+        if(!checkPlayerPermission(sender, "ae.reload")) return;
         AchievementsEngine.main.LoadConfig();
         sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aReloaded!");
     }
 
     private void c_Help(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.manage")) return;
         if(args.length < 2) {
             ShowHelp(sender, 1);
             return;
@@ -98,6 +100,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Achievements(CommandSender sender) {
+        if(!checkPlayerPermission(sender, "ae.achievements")) return;
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
         for (Achievement a : AchievementsEngine.achievements) {
             String events = "";
@@ -111,6 +114,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_CheckState(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.checkstate")) return;
         if(args.length != 2) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae checkstate <player:Player>");
             return;
@@ -131,6 +135,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Complete(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.complete")) return;
         if(args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae complete <player:Player> <id:String>");
             return;
@@ -161,6 +166,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Remove(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.remove")) return;
         if (args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae remove <player:Player> <id:String>");
             return;
@@ -199,6 +205,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Reset(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.reset")) return;
         if(args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae reset <player:Player> <id:String>");
             return;
@@ -227,6 +234,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Transfer(CommandSender sender, String[] args) {
+        if(!checkPlayerPermission(sender, "ae.transfer")) return;
         if(args.length != 3 || args[1].equals(args[2])) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
             return;
@@ -255,5 +263,14 @@ public class Commands implements CommandExecutor {
             }
         }
         return null;
+    }
+
+    public static boolean checkPlayerPermission(CommandSender sender, String permission) {
+        if(!(sender instanceof Player)) return true;
+        if(!sender.hasPermission(permission)) {
+            sender.sendMessage("§cYou don't have permission to use this command!");
+            return false;
+        }
+        return true;
     }
 }
