@@ -181,7 +181,7 @@ messages:
 `/ae`                               `ae.use` - Show achievements list, permission to receive any achievement<br>
 `/ae help`                          `ae.manage` - Permission that let using below commands (and /ae help)<br>
 `/ae reload`                        `ae.reload` - Reload config<br>
-`/ae achievements`                  `ae.achievements` - Print all achievements and requirements to completev
+`/ae achievements`                  `ae.achievements` - Print all achievements and requirements to complete<br>
 `/ae complete <nick> <achievement>` `ae.complete` - Complete achievement for some player<br>
 `/ae remove <nick> <achievement>`   `ae.remove` - Remove player's completed achievement<br>
 `/ae reset <nick> <achievement>`    `ae.reset` - Reset player's achievement progress<br>
