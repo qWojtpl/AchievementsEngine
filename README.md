@@ -178,12 +178,12 @@ messages:
 
 # Commands & Permissions
 
-`/ae`                               `ae.use` - Show achievements list, permission to receive any achievement
-`/ae help`                          `ae.manage` - Permission that let using below commands (and /ae help)
-`/ae reload`                        `ae.reload` - Reload config
-`/ae achievements`                  `ae.achievements` - Print all achievements and requirements to complete
-`/ae complete <nick> <achievement>` `ae.complete` - Complete achievement for some player
-`/ae remove <nick> <achievement>`   `ae.remove` - Remove player's completed achievement
-`/ae reset <nick> <achievement>`    `ae.reset` - Reset player's achievement progress
-`/ae checkstate <nick>`             `ae.checkstate` - Check if player's state is initialized
-`/ae transfer <from> <to>`          `ae.transfer` - Transfer player's completed achievements and progress to other player
+`/ae`                               `ae.use` - Show achievements list, permission to receive any achievement<br>
+`/ae help`                          `ae.manage` - Permission that let using below commands (and /ae help)<br>
+`/ae reload`                        `ae.reload` - Reload config<br>
+`/ae achievements`                  `ae.achievements` - Print all achievements and requirements to completev
+`/ae complete <nick> <achievement>` `ae.complete` - Complete achievement for some player<br>
+`/ae remove <nick> <achievement>`   `ae.remove` - Remove player's completed achievement<br>
+`/ae reset <nick> <achievement>`    `ae.reset` - Reset player's achievement progress<br>
+`/ae checkstate <nick>`             `ae.checkstate` - Check if player's state is initialized<br>
+`/ae transfer <from> <to>`          `ae.transfer` - Transfer player's completed achievements and progress to other player<br>
