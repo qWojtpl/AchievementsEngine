@@ -3,7 +3,7 @@
 <p>Add achievements to your Minecraft server.</p>
 <p>Tested minecraft versions: </p> 
 
-`1.18.2`
+`Spigot 1.18.2`
 
 # Installation
 
@@ -172,43 +172,6 @@ messages:
   progress: '§6§lProgress:'
   progress-field-prefix: §7§l- §b
   completed: §aCOMPLETED!
-```
-
-</details>
-
-<details><summary>database.yml</summary>
-
-<br>
-<b>
-All data will be stored in playerdata.yml and (if connected to MySQL) in database.<br>
-</b>
-<br>
-
-## YML Fields:
-
-<b>
-Below fields must be child of "sql"<br>
-Database structure will be created automaticlly.<br>
-</b>
-<br>
-
-`useSQL` - When set to true, data will be saved in MySQL too.<br>
-`host` - SQL host<br>
-`port` -  SQL port<br>
-`username` - SQL username<br>
-`password` - SQL password<br>
-`database` - SQL database<br>
-
-## Default configuration:
-
-```yml
-sql:
-  useSQL: false
-  host: localhost
-  port: 3306
-  username: username
-  password: password
-  database: database
 ```
 
 </details>

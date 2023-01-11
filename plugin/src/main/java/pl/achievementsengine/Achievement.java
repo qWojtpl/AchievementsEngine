@@ -5,9 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.data.DataHandler;
-import pl.achievementsengine.data.SQLHandler;
 
-import javax.xml.crypto.Data;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -59,6 +57,7 @@ public class Achievement {
     }
 
     public static void Check(Player p, String checkable) { // Event interpreter
+        if(!p.hasPermission("ae.use")) return; // Check if player has permission
         for(int i = 0; i < AchievementsEngine.achievements.size(); i++) { // Loop through all achievements
             Achievement a = AchievementsEngine.achievements.get(i);
             if(a.enabled) { // Check if achievement is enabled

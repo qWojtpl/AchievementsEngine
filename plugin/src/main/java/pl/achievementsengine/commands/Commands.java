@@ -10,7 +10,6 @@ import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.GUIHandler;
 import pl.achievementsengine.PlayerAchievementState;
 import pl.achievementsengine.data.DataHandler;
-import pl.achievementsengine.data.SQLHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +38,6 @@ public class Commands implements CommandExecutor {
             c_Help(sender, args);
         } else if(args[0].equalsIgnoreCase("achievements")) {
             c_Achievements(sender);
-        } else if(args[0].equalsIgnoreCase("connection")) {
-            c_Connection(sender);
         } else if(args[0].equalsIgnoreCase("checkstate")) {
             c_CheckState(sender, args);
         } else if(args[0].equalsIgnoreCase("complete")) {
@@ -65,10 +62,9 @@ public class Commands implements CommandExecutor {
                 sender.sendMessage("§6/ae help <page> §e- Shows help page");
                 sender.sendMessage("§6/ae reload §e- Reloads configuration");
                 sender.sendMessage("§6/ae achievements §e- Shows the list of achievements");
-                sender.sendMessage("§6/ae connection §e- Shows the SQL connection status");
+                sender.sendMessage("§6/ae complete <player> <id> §e- Complete achievement for player");
                 break;
             case 2:
-                sender.sendMessage("§6/ae complete <player> <id> §e- Complete achievement for player");
                 sender.sendMessage("§6/ae remove <player> <id> §e- Remove achievement for player");
                 sender.sendMessage("§6/ae reset <player> <id> §e- Reset progress for player");
                 sender.sendMessage("§6/ae checkstate <player> §e- Check player's state");
@@ -111,14 +107,6 @@ public class Commands implements CommandExecutor {
             sender.sendMessage("§e" + a.ID + "§2§l#§r" + a.name + ": " + a.description);
             sender.sendMessage("   §e--> " + events);
         }
-        sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
-    }
-
-    private void c_Connection(CommandSender sender) {
-        sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
-        String connectionStatus = "§cNot connected";
-        sender.sendMessage("§eConnection status: " + connectionStatus);
-        sender.sendMessage("§eLast exception: §c" + SQLHandler.lastException);
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
     }
 

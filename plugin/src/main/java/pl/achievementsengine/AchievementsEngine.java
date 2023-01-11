@@ -9,7 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import pl.achievementsengine.commands.CommandHelper;
 import pl.achievementsengine.commands.Commands;
 import pl.achievementsengine.data.DataHandler;
-import pl.achievementsengine.data.SQLHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +31,6 @@ public final class AchievementsEngine extends JavaPlugin {
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         main = this; // Set main as this instance
         LoadConfig(); // Load configuration files
-        SQLHandler.mainConnection = new SQLHandler(); // Connect to MySQL (create structure if not created)
-        SQLHandler.mainConnection.Connect();
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
             PlayerAchievementState.Create(p);
@@ -43,7 +40,6 @@ public final class AchievementsEngine extends JavaPlugin {
     @Override
     public void onDisable() {
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        SQLHandler.mainConnection.Disconnect();
         getLogger().info("Bye!"); // Print to console
     }
 
@@ -55,7 +51,6 @@ public final class AchievementsEngine extends JavaPlugin {
         playerStates = new HashMap<>(); // Reset player states list
         achievements = new ArrayList<>(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        loadDatabaseFile(); // Load database
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
     }
@@ -73,33 +68,6 @@ public final class AchievementsEngine extends JavaPlugin {
         } else {
             return "§cCannotRead exception for path \"" + path + "\"";
         }
-    }
-
-    private void loadDatabaseFile() {
-        File sqlFile = new File(getDataFolder(), "database.yml");
-        if (!sqlFile.exists()) { // If file doesn't exist, create default file
-            try {
-                sqlFile.createNewFile();
-                yml = YamlConfiguration.loadConfiguration(sqlFile);
-                yml.set("sql.useSQL", "false");
-                yml.set("sql.host", "localhost");
-                yml.set("sql.port", 3306);
-                yml.set("sql.username", "username");
-                yml.set("sql.password", "password");
-                yml.set("sql.database", "database");
-                yml.save(sqlFile);
-            } catch (IOException e) {
-                getLogger().info("Cannot create database.yml - exception: " + e);
-                return;
-            }
-        }
-        yml = YamlConfiguration.loadConfiguration(sqlFile);
-        DataHandler.useSQL = yml.getBoolean("sql.useSQL");
-        SQLHandler.host = ReadStringPath("sql.host");
-        SQLHandler.port = ReadStringPath("sql.port");
-        SQLHandler.username = ReadStringPath("sql.username");
-        SQLHandler.password = ReadStringPath("sql.password");
-        SQLHandler.database = ReadStringPath("sql.database");
     }
 
     private void loadAchievementsFile() {

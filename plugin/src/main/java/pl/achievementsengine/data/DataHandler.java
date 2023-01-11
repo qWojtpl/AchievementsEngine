@@ -17,18 +17,13 @@ import java.util.List;
 
 public class DataHandler {
 
-    public static boolean useSQL = false;
-    public static YamlConfiguration data;
-    public static File dataFile;
-
     public static void createPlayerAchievementState(Player p) {
         PlayerAchievementState state = PlayerAchievementState.Create(p);
-        if (useSQL) {
-            SQLHandler.createPlayerAchievementState(p);
-        }
-        createFile();
+        createFile(p);
+        File dataFile = getPlayerFile(state.getPlayer());
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         String nick = p.getName();
-        ConfigurationSection section = data.getConfigurationSection("users." + nick);
+        ConfigurationSection section = data.getConfigurationSection("user." + nick);
         if (section == null) {
             state.initialized = true;
             return;
@@ -38,10 +33,10 @@ public class DataHandler {
                 if (!a.ID.equals(key)) {
                     continue;
                 }
-                if (data.getBoolean("users." + nick + "." + key + ".completed")) {
+                if (data.getBoolean("user." + nick + "." + key + ".completed")) {
                     state.completedAchievements.add(a);
                 }
-                List<Integer> progressList = data.getIntegerList("users." + nick + "." + key + ".progress");
+                List<Integer> progressList = data.getIntegerList("user." + nick + "." + key + ".progress");
                 int[] progress = new int[a.events.size()];
                 int i = 0;
                 for (int value : progressList) {
@@ -53,20 +48,17 @@ public class DataHandler {
             }
         }
         state.initialized = true;
-        if (!useSQL) {
-            if (state.openGUI) {
-                state.openGUI = false;
-                Bukkit.getScheduler().scheduleSyncDelayedTask(AchievementsEngine.main, () -> GUIHandler.New(state.getPlayer(), 0));
-            }
+        if (state.openGUI) {
+            state.openGUI = false;
+            Bukkit.getScheduler().scheduleSyncDelayedTask(AchievementsEngine.main, () -> GUIHandler.New(state.getPlayer(), 0));
         }
     }
 
     public static void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
-        if(useSQL) {
-            SQLHandler.addCompletedAchievement(state, achievement);
-        }
-        createFile();
-        data.set("users." + state.getPlayer().getName() + "." + achievement.ID + ".completed", true);
+        createFile(state.getPlayer());
+        File dataFile = getPlayerFile(state.getPlayer());
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        data.set("user." + state.getPlayer().getName() + "." + achievement.ID + ".completed", true);
         try {
             data.save(dataFile);
         } catch(IOException e) {
@@ -76,11 +68,10 @@ public class DataHandler {
     }
 
     public static void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
-        if(useSQL) {
-            SQLHandler.addCompletedAchievement(state, achievement);
-        }
-        createFile();
-        data.set("users." + state.getPlayer().getName() + "." + achievement.ID + ".completed", false);
+        createFile(state.getPlayer());
+        File dataFile = getPlayerFile(state.getPlayer());
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        data.set("user." + state.getPlayer().getName() + "." + achievement.ID + ".completed", false);
         try {
             data.save(dataFile);
         } catch(IOException e) {
@@ -90,13 +81,15 @@ public class DataHandler {
     }
 
     public static void updateProgress(PlayerAchievementState state, Achievement achievement) {
-        createFile();
+        createFile(state.getPlayer());
         int[] progress = state.progress.get(achievement);
         List<Integer> newProgress = new ArrayList<>();
         for(int i = 0; i < progress.length; i++) {
             newProgress.add(progress[i]);
         }
-        data.set("users." + state.getPlayer().getName() + "." + achievement.ID + ".progress", newProgress);
+        File dataFile = getPlayerFile(state.getPlayer());
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        data.set("user." + state.getPlayer().getName() + "." + achievement.ID + ".progress", newProgress);
         try {
             data.save(dataFile);
         } catch(IOException e) {
@@ -107,10 +100,13 @@ public class DataHandler {
     }
 
     public static void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
-        createFile();
-        data.set("users." + state1.getPlayer().getName(), null);
+        createFile(state2.getPlayer());
+        createFile(state1.getPlayer());
+        File dataFile1 = getPlayerFile(state1.getPlayer());
+        YamlConfiguration data1 = YamlConfiguration.loadConfiguration(dataFile1);
         try {
-            data.save(dataFile);
+            data1.set("user." + state1.getPlayer().getName(), null);
+            data1.save(dataFile1);
         } catch(IOException e) {
             AchievementsEngine.main.getLogger().info("Cannot transfer achievements from " + state1.getPlayer().getName()
                     + " to " + state2.getPlayer().getName());
@@ -128,25 +124,26 @@ public class DataHandler {
         }
     }
 
-    public static void createFile() {
-        dataFile = new File(AchievementsEngine.main.getDataFolder(), "playerData.yml");
+    public static void createFile(Player p) {
+        File dataFile = getPlayerFile(p);
         if(!dataFile.exists()) {
             try {
+                File directory = new File(AchievementsEngine.main.getDataFolder(), "/playerData/");
+                if(!directory.exists()) directory.mkdir();
                 dataFile.createNewFile();
             } catch(IOException e) {
-                AchievementsEngine.main.getLogger().info("Cannot create playerData.yml - disabling plugin..");
+                AchievementsEngine.main.getLogger().info("Cannot create " + p.getName() + ".yml");
                 AchievementsEngine.main.getLogger().info("IO Exception: " + e);
-                AchievementsEngine.main.DisablePlugin();
-                return;
             }
         } else {
             if(!dataFile.canRead() || !dataFile.canWrite()) {
-                AchievementsEngine.main.getLogger().info("Cannot read or write to playerData.yml - disabling plugin..");
-                AchievementsEngine.main.DisablePlugin();
-                return;
+                AchievementsEngine.main.getLogger().info("Cannot create " + p.getName() + ".yml");
             }
         }
-        data = YamlConfiguration.loadConfiguration(dataFile);
+    }
+
+    public static File getPlayerFile(Player p) {
+        return new File(AchievementsEngine.main.getDataFolder(), "/playerData/" + p.getName() + ".yml");
     }
 
 }

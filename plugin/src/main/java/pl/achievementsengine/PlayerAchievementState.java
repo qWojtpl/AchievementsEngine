@@ -2,7 +2,6 @@ package pl.achievementsengine;
 
 import org.bukkit.entity.Player;
 import pl.achievementsengine.data.DataHandler;
-import pl.achievementsengine.data.SQLHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
