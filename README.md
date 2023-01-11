@@ -1,5 +1,19 @@
 # AchievementsEngine
 
+<div style='display:inline-block'>
+<img src='https://img.shields.io/github/v/release/qWojtpl/achievementsengine'>
+<img src='https://img.shields.io/github/languages/top/qWojtpl/achievementsengine'>
+<img src='https://img.shields.io/github/repo-size/qWojtpl/achievementsengine'>
+</div>
+<div style='display:inline-block'>
+<img src='https://img.shields.io/github/downloads/qWojtpl/achievementsengine/latest/total'>
+<img src='https://img.shields.io/github/commit-activity/m/qWojtpl/achievementsengine'>
+<img src='https://img.shields.io/github/commits-since/qWojtpl/achievementsengine/latest'>
+<img src='https://img.shields.io/github/last-commit/qWojtpl/achievementsengine'>
+</div>
+
+<br>
+
 <p>Add achievements to your Minecraft server.</p>
 <p>Tested minecraft versions: </p> 
 
