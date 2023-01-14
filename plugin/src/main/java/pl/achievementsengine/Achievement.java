@@ -74,8 +74,8 @@ public class Achievement {
                     String[] givenEvents = checkable.split(" "); // Split checkable into pieces eg. [kill] [player]
                     if(events[0].equalsIgnoreCase(givenEvents[0]) && (events[2].equalsIgnoreCase("*") || events[2].equalsIgnoreCase(givenEvents[1]))) { // Check if events[0] equals givenEvents[0] ([kill] = [kill]) and events[2] equals (* - any) or givenEvents[1] ([Player] = [Player]), events[1] is a number
                         boolean match = false; // Mark if all external things (name, chat string) matches
-                        if(events.length > 4) { // Check if event length is larger than 4 (event contains named or chat with space) - pickup 1 bedrock named BEDDI (at least 4 arguments)
-                            if (events[3].equals("named") && givenEvents[2].equals("named")) { // Check if third argument is named and second argument of given event is "named" (checks if event provides named too)
+                        if(events.length > 4) { // Check if event length is greater than 4 (event contains named or chat with space) - pickup 1 bedrock named BEDDI (at least 5 arguments)
+                            if (events[3].equals("named") && givenEvents[2].equals("named") && givenEvents.length > 3) { // Check if third argument is named and second argument of given event is "named" (checks if event provides named too), and given events contains at least 4 arguments - enchant diamond_sword named xyz
                                 String name = givenEvents[3];
                                 for(int k = 5; k < events.length; k++) { // If name from event contains spaces - join it
                                     events[4] = events[4] + " " + events[k];
@@ -100,6 +100,8 @@ public class Achievement {
                                 }
                             }
                         } else {
+                            AchievementsEngine.main.getLogger().info("events length: " + events.length);
+                            AchievementsEngine.main.getLogger().info("given length: " + givenEvents.length);
                             match = true;
                         }
                         if(progress[j] < Integer.valueOf(events[1]) && match) { // Check if progress of event is less than required progress of this event
