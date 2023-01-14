@@ -100,8 +100,6 @@ public class Achievement {
                                 }
                             }
                         } else {
-                            AchievementsEngine.main.getLogger().info("events length: " + events.length);
-                            AchievementsEngine.main.getLogger().info("given length: " + givenEvents.length);
                             match = true;
                         }
                         if(progress[j] < Integer.valueOf(events[1]) && match) { // Check if progress of event is less than required progress of this event
