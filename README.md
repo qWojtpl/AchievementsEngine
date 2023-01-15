@@ -31,11 +31,6 @@
 <details><summary>achievements.yml</summary>
 <br>
 
-<b>
-DO NOT CHANGE ACHIEVEMENT KEY AND EVENTS COUNT AFTER INSERTING FIRST DATA TO DATABASE. IT CAN CAUSE MANY ERRORS.<br>
-REMEMBER THAT EDITING RECORDS MANUALLY CAN CAUSE ERRORS.<br>
-</b>
-
 `* means anything, eg. kill 10 * (means kill 10 any entity), drop 64 * (means drop 64 of any item)`
 <br>
 
