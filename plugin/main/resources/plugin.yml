@@ -1,0 +1,15 @@
+name: AchievementsEngine
+version: '${project.version}'
+main: pl.achievementsengine.AchievementsEngine
+api-version: 1.18
+authors: [ Assasin98980 ]
+description: Add achievements to your Minecraft server.
+commands:
+  achievementsengine:
+    usage: /<command>
+    description: Use AchievementsEngine
+    permission: ae.use
+    permission-message: §cYou don't have permission to use this command!
+    aliases:
+      - ae
+      - osiagniecia
