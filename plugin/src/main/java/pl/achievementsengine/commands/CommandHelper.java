@@ -6,9 +6,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
-import pl.achievementsengine.Achievement;
+import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
-import pl.achievementsengine.PlayerAchievementState;
+import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.util.ArrayList;
 import java.util.List;
