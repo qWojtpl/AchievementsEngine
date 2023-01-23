@@ -17,7 +17,7 @@ public class CommandHelper implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)) {
+        if(!(sender instanceof Player) || !sender.hasPermission("ae.manage")) {
             return null;
         }
         List<String> completions = new ArrayList<>();
@@ -25,14 +25,15 @@ public class CommandHelper implements TabCompleter {
             completions.add("help");
             completions.add("reload");
             completions.add("achievements");
-            completions.add("connection");
             completions.add("complete");
             completions.add("remove");
             completions.add("reset");
             completions.add("checkstate");
             completions.add("transfer");
         } else if(args.length == 2) {
-            if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("transfer") || args[0].equalsIgnoreCase("checkstate")) {
+            if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("remove") ||
+                    args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("transfer") ||
+                    args[0].equalsIgnoreCase("checkstate")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
                 }

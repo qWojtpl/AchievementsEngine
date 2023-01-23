@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
@@ -19,10 +20,11 @@ public class Commands implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender instanceof Player) { // Check if sender is player
+            if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.use"))) return true;
             if(args.length == 0) { // If not arguments given - open GUI
                 GUIHandler.New((Player) sender, 0);
                 return true;
-            } else if(!sender.hasPermission("ae.manage")) { // If arguments given but player don't have permission - open GUI
+            } else if(!sender.hasPermission(PermissionManager.getPermission("ae.manage"))) { // If arguments given but player don't have permission - open GUI
                 GUIHandler.New((Player) sender, 0);
                 return true;
             }
@@ -65,7 +67,7 @@ public class Commands implements CommandExecutor {
                 sender.sendMessage("§6/ae complete <player> <id> §e- Complete achievement for player");
                 break;
             case 2:
-                sender.sendMessage("§6/ae remove <player> <id> §e- Remove achievement for player");
+                sender.sendMessage("§6/ae remove <player> <id> §e- Remove achievement from player");
                 sender.sendMessage("§6/ae reset <player> <id> §e- Reset progress for player");
                 sender.sendMessage("§6/ae checkstate <player> §e- Check player's state");
                 sender.sendMessage("§6/ae transfer <from> <to> §e- Transfer player's achievements to other player");
@@ -78,20 +80,20 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Reload(CommandSender sender) {
-        if(!checkPlayerPermission(sender, "ae.reload")) return;
-        AchievementsEngine.main.LoadConfig();
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.reload"))) return;
+        DataHandler.LoadConfig();
         sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aReloaded!");
     }
 
     private void c_Help(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.manage")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.manage"))) return;
         if(args.length < 2) {
             ShowHelp(sender, 1);
             return;
         }
         int page = 1;
         try {
-            page = Integer.valueOf(args[1]);
+            page = Integer.parseInt(args[1]);
         } catch(NumberFormatException e) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae help <page:int>");
         } finally {
@@ -100,7 +102,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Achievements(CommandSender sender) {
-        if(!checkPlayerPermission(sender, "ae.achievements")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.achievements"))) return;
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
         for (Achievement a : AchievementsEngine.achievements) {
             String events = "";
@@ -114,7 +116,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_CheckState(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.checkstate")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.checkstate"))) return;
         if(args.length != 2) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae checkstate <player:Player>");
             return;
@@ -135,7 +137,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Complete(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.complete")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.complete"))) return;
         if(args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae complete <player:Player> <id:String>");
             return;
@@ -166,7 +168,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Remove(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.remove")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.remove"))) return;
         if (args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae remove <player:Player> <id:String>");
             return;
@@ -205,7 +207,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Reset(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.reset")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.reset"))) return;
         if(args.length != 3) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae reset <player:Player> <id:String>");
             return;
@@ -234,7 +236,7 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Transfer(CommandSender sender, String[] args) {
-        if(!checkPlayerPermission(sender, "ae.transfer")) return;
+        if(!PermissionManager.checkIfSenderHasPermission(sender, PermissionManager.getPermission("ae.transfer"))) return;
         if(args.length != 3 || args[1].equals(args[2])) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
             return;
@@ -265,12 +267,4 @@ public class Commands implements CommandExecutor {
         return null;
     }
 
-    public static boolean checkPlayerPermission(CommandSender sender, String permission) {
-        if(!(sender instanceof Player)) return true;
-        if(!sender.hasPermission(permission)) {
-            sender.sendMessage("§cYou don't have permission to use this command!");
-            return false;
-        }
-        return true;
-    }
 }

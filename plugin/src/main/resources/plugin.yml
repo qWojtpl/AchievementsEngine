@@ -8,8 +8,6 @@ commands:
   achievementsengine:
     usage: /<command>
     description: Use AchievementsEngine
-    permission: ae.use
-    permission-message: §cYou don't have permission to use this command!
     aliases:
       - ae
       - osiagniecia

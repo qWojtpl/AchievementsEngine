@@ -1,21 +1,18 @@
 package pl.achievementsengine;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 import pl.achievementsengine.commands.CommandHelper;
 import pl.achievementsengine.commands.Commands;
+import pl.achievementsengine.commands.PermissionManager;
 import pl.achievementsengine.data.DataHandler;
 import pl.achievementsengine.events.Events;
 import pl.achievementsengine.gui.GUIHandler;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,14 +23,16 @@ public final class AchievementsEngine extends JavaPlugin {
     public static List<Achievement> achievements = new ArrayList<>(); // List of all achievements
     public static HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
     public static HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
+    public static HashMap<String, Permission> permissions = new HashMap<>();
 
     @Override
     public void onEnable() {
+        main = this; // Set main as this instance
+        PermissionManager.loadPermissions(); // Register permissions
         getServer().getPluginManager().registerEvents(new Events(), this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
-        main = this; // Set main as this instance
-        LoadConfig(); // Load configuration files
+        DataHandler.LoadConfig(); // Load configuration files
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
             PlayerAchievementState.Create(p);
@@ -50,13 +49,6 @@ public final class AchievementsEngine extends JavaPlugin {
         getServer().getPluginManager().disablePlugin(this);
     }
 
-    public void LoadConfig() {
-        playerStates = new HashMap<>(); // Reset player states list
-        achievements = new ArrayList<>(); // Reset achievements list
-        GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        DataHandler.loadAchievementsFile(); // Load achievements
-        DataHandler.loadMessagesFile(); // Load messages
-    }
 
     public static String ReadLanguage(String path) {
         if (messages.containsKey(path)) {

@@ -187,12 +187,12 @@ messages:
 
 # Commands & Permissions
 
-`/ae`                               `ae.use` - Show achievements list, permission to receive any achievement<br>
-`/ae help`                          `ae.manage` - Permission that let using below commands (and /ae help)<br>
-`/ae reload`                        `ae.reload` - Reload config<br>
-`/ae achievements`                  `ae.achievements` - Print all achievements and requirements to complete<br>
-`/ae complete <nick> <achievement>` `ae.complete` - Complete achievement for some player<br>
-`/ae remove <nick> <achievement>`   `ae.remove` - Remove player's completed achievement<br>
-`/ae reset <nick> <achievement>`    `ae.reset` - Reset player's achievement progress<br>
-`/ae checkstate <nick>`             `ae.checkstate` - Check if player's state is initialized<br>
-`/ae transfer <from> <to>`          `ae.transfer` - Transfer player's completed achievements and progress to other player<br>
+`/ae`                                - Show achievements list, permission to receive any achievement `ae.use`<br> 
+`/ae help`                           - Permission that let using below commands (and /ae help) `ae.manage`<br> 
+`/ae reload`                         - Reload config `ae.reload`<br>
+`/ae achievements`                   - Print all achievements and requirements to complete `ae.achievements`<br>
+`/ae complete <nick> <achievement>`  - Complete achievement for some player `ae.complete`<br>
+`/ae remove <nick> <achievement>`    - Remove player's completed achievement `ae.remove`<br>
+`/ae reset <nick> <achievement>`     - Reset player's achievement progress `ae.reset`<br>
+`/ae checkstate <nick>`              - Check if player's state is initialized `ae.checkstate`<br>
+`/ae transfer <from> <to>`           - Transfer player's completed achievements and progress to other player `ae.transfer`<br>

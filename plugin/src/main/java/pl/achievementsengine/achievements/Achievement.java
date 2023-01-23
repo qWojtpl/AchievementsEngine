@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.AchievementsEngine;
+import pl.achievementsengine.commands.PermissionManager;
 import pl.achievementsengine.data.DataHandler;
 
 import java.text.MessageFormat;
@@ -58,7 +59,7 @@ public class Achievement {
     }
 
     public static void Check(Player p, String checkable) { // Event interpreter
-        if(!p.hasPermission("ae.use")) return; // Check if player has permission
+        if(!p.hasPermission(PermissionManager.getPermission("ae.use"))) return; // Check if player has permission
         for(int i = 0; i < AchievementsEngine.achievements.size(); i++) { // Loop through all achievements
             Achievement a = AchievementsEngine.achievements.get(i);
             if(a.enabled) { // Check if achievement is enabled
@@ -115,7 +116,7 @@ public class Achievement {
                             }
                         }
                     }
-                    max += Integer.valueOf(events[1]); // Add required progress to max progress
+                    max += Integer.parseInt(events[1]); // Add required progress to max progress
                 }
                 int sum = 0; // Set sum to 0
                 for(int pr : progress) { // Loop through player's progresses
