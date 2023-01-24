@@ -28,12 +28,10 @@ public class CommandHelper implements TabCompleter {
             completions.add("complete");
             completions.add("remove");
             completions.add("reset");
-            completions.add("checkstate");
             completions.add("transfer");
         } else if(args.length == 2) {
             if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("remove") ||
-                    args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("transfer") ||
-                    args[0].equalsIgnoreCase("checkstate")) {
+                    args[0].equalsIgnoreCase("reset") || args[0].equalsIgnoreCase("transfer")) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     completions.add(p.getName());
                 }
@@ -44,14 +42,14 @@ public class CommandHelper implements TabCompleter {
         } else if(args.length == 3) {
             if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("reset")) {
                 for (Achievement a : AchievementsEngine.achievements) {
-                    completions.add(a.ID);
+                    completions.add(a.getID());
                 }
             } else if(args[0].equalsIgnoreCase("remove")) {
                 Player argumentPlayer = Commands.checkIfPlayerExists(args[1]);
                 if(argumentPlayer != null) {
                     PlayerAchievementState state = PlayerAchievementState.Create(argumentPlayer);
-                    for(Achievement a : state.completedAchievements) {
-                        completions.add(a.ID);
+                    for(Achievement a : state.getCompletedAchievements()) {
+                        completions.add(a.getID());
                     }
                     completions.add("*");
                 }

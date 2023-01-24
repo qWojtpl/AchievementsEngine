@@ -194,5 +194,4 @@ messages:
 `/ae complete <nick> <achievement>`  - Complete achievement for some player `ae.complete`<br>
 `/ae remove <nick> <achievement>`    - Remove player's completed achievement `ae.remove`<br>
 `/ae reset <nick> <achievement>`     - Reset player's achievement progress `ae.reset`<br>
-`/ae checkstate <nick>`              - Check if player's state is initialized `ae.checkstate`<br>
 `/ae transfer <from> <to>`           - Transfer player's completed achievements and progress to other player `ae.transfer`<br>

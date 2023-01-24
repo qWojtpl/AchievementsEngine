@@ -33,11 +33,6 @@ public class GUIHandler {
     }
 
     public static void New(Player p, int start) {
-        PlayerAchievementState state = PlayerAchievementState.Create(p); // Create or get state
-        if(!state.initialized) { // If state is not initialized (data is not downloaded) then mark GUI as "will be opened as soon as data will be downloaded"
-            state.openGUI = true;
-            return;
-        }
         GUIHandler gui = new GUIHandler(p, start); // Create object
         registeredInventories.add(gui); // Add gui to registered inventories
         gui.Open(); // Open GUI to player
@@ -54,7 +49,7 @@ public class GUIHandler {
         int current = currentStart/28+1; // Current page
         int max = AchievementsEngine.achievements.size()/28+1; // Max pages
         PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
-        float c = (float) state.completedAchievements.size() / (float) AchievementsEngine.achievements.size() * 100.0F; // Get completed percent
+        float c = (float) state.getCompletedAchievements().size() / (float) AchievementsEngine.achievements.size() * 100.0F; // Get completed percent
         int completed = Math.round(c); // Round percent to integer
         inventory = Bukkit.createInventory(null, size, MessageFormat.format(AchievementsEngine.ReadLanguage("gui-title") + " " + completed + "%", current, max)); // Create inventory
         for(int i = 0; i < size; i++) { // Create black background
@@ -83,25 +78,25 @@ public class GUIHandler {
                 continue;
             }
             if(i > 43) break; // If achievement slot is higher than 43, then break loop. (43 is last slot before border.)
-            String desc = a.description; // Set item description to achievement description
+            String desc = a.getDescription(); // Set item description to achievement description
             boolean glow = false; // Mark if item is glowing
-            if(a.showProgress) { // If achievement has turned on showProgress
+            if(a.isShowProgress()) { // If achievement has turned on showProgress
                 desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress"); // Add "Progress:" to description
-                for (int k = 0; k < a.events.size(); k++) { // Loop through events
+                for (int k = 0; k < a.getEvents().size(); k++) { // Loop through events
                     if(!state.progress.containsKey(a)) { // If state progress don't have key, create empty progress
-                        state.UpdateProgress(a, new int[a.events.size()]);
+                        state.UpdateProgress(a, new int[a.getEvents().size()]);
                     }
-                    desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress-field-prefix") + a.events.get(k) +
-                            ": " + state.progress.get(a)[k] + "/" + a.events.get(k).split(" ")[1]; // Create field. (progress)/(max)
+                    desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress-field-prefix") + a.getEvents().get(k) +
+                            ": " + state.progress.get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
                 }
             }
-            if(!state.completedAchievements.isEmpty()) { // If player's state completed achievements is not empty
-                if(state.completedAchievements.contains(a)) { // If player's state completed achievement contains achievement
+            if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty
+                if(state.getCompletedAchievements().contains(a)) { // If player's state completed achievement contains achievement
                     desc = desc + "%nl%" + ChatColor.GREEN + AchievementsEngine.ReadLanguage("completed"); // Add "completed" to description
                     glow = true; // Make item glow
                 }
             }
-            AddItem(i, a.item, 1, a.name, desc, glow); // Create item
+            AddItem(i, a.getItem(), 1, a.getName(), desc, glow); // Create item
             if(i == 16 || i == 25 || i == 34 || i == 43) { // Border
                 i += 3;
             } else {
