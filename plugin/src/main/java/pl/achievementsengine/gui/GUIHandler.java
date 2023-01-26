@@ -21,9 +21,9 @@ import java.util.List;
 
 public class GUIHandler {
 
-    public Inventory inventory; // inventory for object
-    public Player player; // inventory owner
-    public int currentStart; // start slot (pages based on this variable)
+    private Inventory inventory; // inventory for object
+    private Player player; // inventory owner
+    private int currentStart; // start slot (pages based on this variable)
     public static List<GUIHandler> registeredInventories = new ArrayList<>(); // opened inventories
 
     public GUIHandler(Player p, int start) {
@@ -122,6 +122,23 @@ public class GUIHandler {
         item.setItemMeta(meta);
 
         inventory.setItem(slot, item); // Add item to GUI
+    }
+
+    public Inventory getInventory() {
+        return this.inventory;
+    }
+
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public int getCurrentStart() {
+        return this.currentStart;
+    }
+
+    public int setCurrentStart(int start) {
+        this.currentStart = start;
+        return this.currentStart;
     }
 
     public static void CloseAllInventories() { // Close all registered inventories

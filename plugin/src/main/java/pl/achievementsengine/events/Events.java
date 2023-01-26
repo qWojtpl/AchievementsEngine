@@ -137,7 +137,7 @@ public class Events implements Listener {
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
         for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
-            if (event.getInventory().equals(gui.inventory)) { // If player's inventory is in registered inventories
+            if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
                 event.setCancelled(true); // Cancel drag event
                 break; // Exit loop
             }
@@ -147,16 +147,17 @@ public class Events implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
-            if (event.getInventory().equals(gui.inventory)) { // If player's inventory is in registered inventories
+            if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
+                int currentStart = gui.getCurrentStart();
                 switch(event.getSlot()) {
                     case 53: // Next page button
-                        if(AchievementsEngine.achievements.size() > gui.currentStart + 28) { // Check if there's second page
-                            GUIHandler.New(((Player) event.getWhoClicked()).getPlayer(), gui.currentStart += 28); // Create new GUI (next 28 achievements)
+                        if(AchievementsEngine.achievements.size() > currentStart + 28) { // Check if there's second page
+                            GUIHandler.New(((Player) event.getWhoClicked()).getPlayer(), gui.setCurrentStart(currentStart + 28)); // Create new GUI (next 28 achievements)
                         }
                         break;
                     case 45: // Previous page button
-                        if(gui.currentStart >= 28) { // Check if there's previous page
-                            GUIHandler.New(((Player) event.getWhoClicked()).getPlayer(), gui.currentStart -= 28); // Create new GUI (previous 28 achievements)
+                        if(gui.getCurrentStart() >= 28) { // Check if there's previous page
+                            GUIHandler.New(((Player) event.getWhoClicked()).getPlayer(), gui.setCurrentStart(currentStart - 28)); // Create new GUI (previous 28 achievements)
                         }
                         break;
                 }
@@ -169,7 +170,7 @@ public class Events implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) { // Remove inventory from registered inventories on close
         for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
-            if (event.getInventory().equals(gui.inventory)) { // Check if looped inventory equals closed inventory
+            if (event.getInventory().equals(gui.getInventory())) { // Check if looped inventory equals closed inventory
                 GUIHandler.registeredInventories.remove(gui); // Remove inventory from registered inventories
                 break; // Exit loop
             }

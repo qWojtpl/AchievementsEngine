@@ -19,7 +19,6 @@ public class MySQLManager {
     public static final String PLAYERS = "players";
     public static final String ACHIEVEMENTS = "achievements";
 
-
     public MySQLManager() {
         this.plugin = AchievementsEngine.getInstance();
         this.log = plugin.getLogger();
@@ -82,5 +81,4 @@ public class MySQLManager {
         }
         return achievements;
     }
-
 }
