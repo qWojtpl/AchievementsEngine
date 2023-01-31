@@ -17,8 +17,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 import pl.achievementsengine.AchievementsEngine;
+import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 import pl.achievementsengine.gui.GUIHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Events implements Listener {
 
@@ -29,16 +34,41 @@ public class Events implements Listener {
     Source: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/EventPriority.html
      */
 
+    private final HashMap<String, List<Achievement>> registeredEvents = new HashMap<>();
+
+    public List<Achievement> getEventAchievements(String event) {
+        if(!registeredEvents.containsKey(event)) {
+            registeredEvents.put(event, new ArrayList<>());
+        }
+        return registeredEvents.get(event);
+    }
+
+    public HashMap<String, List<Achievement>> getRegisteredEvents() {
+        return this.registeredEvents;
+    }
+
+    public void registerEvent(String event, Achievement achievement) {
+        List<Achievement> list = getEventAchievements(event);
+        list.add(achievement);
+    }
+
+    public void checkForAchievementEvents(Player player, String checkable) {
+        String[] ev = checkable.split(" ");
+        for(Achievement a : getEventAchievements(ev[0])) {
+            AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
+        }
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         PlayerAchievementState.Create(event.getPlayer());
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "join server");
+        checkForAchievementEvents(event.getPlayer(), "join server");
     }
 
     @EventHandler
     public void onKill(EntityDeathEvent event) {
         if(event.getEntity().getKiller() instanceof Player) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getEntity().getKiller(), "kill " + event.getEntity().getType().name()
+            checkForAchievementEvents(event.getEntity().getKiller(), "kill " + event.getEntity().getType().name()
                     + " named " + event.getEntity().getCustomName());
         }
     }
@@ -46,22 +76,22 @@ public class Events implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if(event.getClickedBlock() != null) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "interact " + event.getClickedBlock().getType().name());
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "click " + event.getClickedBlock().getType().name());
+            checkForAchievementEvents(event.getPlayer(), "interact " + event.getClickedBlock().getType().name());
+            checkForAchievementEvents(event.getPlayer(), "click " + event.getClickedBlock().getType().name());
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBreak(BlockBreakEvent event) {
         if(event.isCancelled()) return;
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "break " + event.getBlock().getType().name());
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "destroy " + event.getBlock().getType().name());
+        checkForAchievementEvents(event.getPlayer(), "break " + event.getBlock().getType().name());
+        checkForAchievementEvents(event.getPlayer(), "destroy " + event.getBlock().getType().name());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlace(BlockPlaceEvent event) {
         if(event.isCancelled()) return;
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "place " + event.getBlock().getType().name());
+        checkForAchievementEvents(event.getPlayer(), "place " + event.getBlock().getType().name());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -69,10 +99,10 @@ public class Events implements Listener {
         if(event.isCancelled()) return;
         if(event.getEntity() instanceof Player) {
             for(int i = 0; i < event.getItem().getItemStack().getAmount(); i++) {
-                AchievementsEngine.getInstance().getAchievementManager().Check((Player) event.getEntity(), "pickup " + event.getItem().getItemStack().getType()
+                checkForAchievementEvents((Player) event.getEntity(), "pickup " + event.getItem().getItemStack().getType()
                         + " named " + event.getItem().getItemStack().getItemMeta().getDisplayName());
             }
-            AchievementsEngine.getInstance().getAchievementManager().Check((Player) event.getEntity(), "T_pickup " + event.getItem().getItemStack().getType()
+            checkForAchievementEvents((Player) event.getEntity(), "T_pickup " + event.getItem().getItemStack().getType()
                     + " named " + event.getItem().getItemStack().getItemMeta().getDisplayName());
         }
     }
@@ -81,10 +111,10 @@ public class Events implements Listener {
     public void onDrop(PlayerDropItemEvent event) {
         if(event.isCancelled()) return;
         for(int i = 0; i < event.getItemDrop().getItemStack().getAmount(); i++) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "drop " + event.getItemDrop().getItemStack().getType()
+            checkForAchievementEvents(event.getPlayer(), "drop " + event.getItemDrop().getItemStack().getType()
                     + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
         }
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "T_drop " + event.getItemDrop().getItemStack().getType()
+        checkForAchievementEvents(event.getPlayer(), "T_drop " + event.getItemDrop().getItemStack().getType()
                 + " named " + event.getItemDrop().getItemStack().getItemMeta().getDisplayName());
     }
 
@@ -92,14 +122,14 @@ public class Events implements Listener {
     public void onCraft(CraftItemEvent event) {
         if(event.isCancelled()) return;
         for(int i = 0; i < event.getCurrentItem().getAmount(); i++) {
-            AchievementsEngine.getInstance().getAchievementManager().Check((Player) event.getWhoClicked(), "craft " + event.getCurrentItem().getType());
+            checkForAchievementEvents((Player) event.getWhoClicked(), "craft " + event.getCurrentItem().getType());
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEnchant(EnchantItemEvent event) {
         if(event.isCancelled()) return;
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getEnchanter(), "enchant " + event.getItem().getType()
+        checkForAchievementEvents(event.getEnchanter(), "enchant " + event.getItem().getType()
                 + " named " + event.getItem().getItemMeta().getDisplayName());
     }
 
@@ -107,10 +137,10 @@ public class Events implements Listener {
     public void onFish(PlayerFishEvent event) {
         if(event.isCancelled()) return;
         if(event.getCaught() != null && event.getCaught() instanceof Item && event.getState().toString().equals("CAUGHT_FISH")) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "fish " + ((Item) event.getCaught()).getItemStack().getType());
+            checkForAchievementEvents(event.getPlayer(), "fish " + ((Item) event.getCaught()).getItemStack().getType());
         }
         if(event.getCaught() != null && !event.getState().toString().equals("CAUGHT_FISH")) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "catch " + event.getCaught().getType());
+            checkForAchievementEvents(event.getPlayer(), "catch " + event.getCaught().getType());
         }
     }
 
@@ -118,20 +148,20 @@ public class Events implements Listener {
     public void onShootBow(EntityShootBowEvent event) {
         if(event.isCancelled()) return;
         if(event.getEntity() instanceof Player) {
-            AchievementsEngine.getInstance().getAchievementManager().Check((Player) event.getEntity(), "shoot bow named " + event.getBow().getItemMeta().getDisplayName());
+            checkForAchievementEvents((Player) event.getEntity(), "shoot bow named " + event.getBow().getItemMeta().getDisplayName());
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         if(event.isCancelled()) return;
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "command " + event.getMessage());
+        checkForAchievementEvents(event.getPlayer(), "command " + event.getMessage());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
         if(event.isCancelled()) return;
-        AchievementsEngine.getInstance().getAchievementManager().Check(event.getPlayer(), "chat " + event.getMessage());
+        checkForAchievementEvents(event.getPlayer(), "chat " + event.getMessage());
     }
 
     @EventHandler

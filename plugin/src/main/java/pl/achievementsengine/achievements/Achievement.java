@@ -35,6 +35,10 @@ public class Achievement {
             this.item = Material.getMaterial(item.toUpperCase());
         }
         this.showProgress = showProgress;
+        for(String event : events) {
+            String[] ev = event.split(" ");
+            AchievementsEngine.getInstance().getEvents().registerEvent(ev[0], this);
+        }
     }
 
     public void Complete(PlayerAchievementState state) {
@@ -55,6 +59,6 @@ public class Achievement {
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name)));
         }
         DataHandler.addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (Save data)
-        AchievementsEngine.getInstance().getAchievementManager().Check(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement
+        AchievementsEngine.getInstance().getEvents().checkForAchievementEvents(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement
     }
 }
