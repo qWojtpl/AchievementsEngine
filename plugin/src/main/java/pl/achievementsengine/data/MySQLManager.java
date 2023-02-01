@@ -38,7 +38,7 @@ public class MySQLManager {
         } else {
             log.warning("Cannot inititate database");
         }
-        connector.getConnection().close();
+        if(connector.getConnection() != null) connector.getConnection().close();
     }
 
     private boolean existTable(String table) {

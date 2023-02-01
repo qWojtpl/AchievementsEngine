@@ -56,8 +56,10 @@ public class Events implements Listener {
 
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" ");
-        AchievementsEngine.getInstance().getLogger().info("Checking event: " + ev[0] + " " + ev[1]);
         for(Achievement a : getEventAchievements(ev[0] + " " + ev[1])) {
+            AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
+        }
+        for(Achievement a : getEventAchievements(ev[0] + " *")) {
             AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
         }
     }
