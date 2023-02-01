@@ -19,10 +19,10 @@ public class DatabaseConnector {
 
     public DatabaseConnector() {
         AchievementsEngine plugin = AchievementsEngine.getInstance();
-        this.host = "sql.pukawka.pl";
-        this.user = "872991";
-        this.password = "QyoGKHpdK2eVThT";
-        this.database = "872991_osiagniecia";
+        this.host = "";
+        this.user = "";
+        this.password = "";
+        this.database = "";
         this.port = 3306;
         this.log = plugin.getLogger();
     }

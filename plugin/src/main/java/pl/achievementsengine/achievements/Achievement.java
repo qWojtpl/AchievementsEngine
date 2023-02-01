@@ -29,15 +29,20 @@ public class Achievement {
         this.enabled = enabled;
         this.events = events;
         this.actions = actions;
-        if(Material.getMaterial(item.toUpperCase()) == null) { // If not found material, use bedrock
-            this.item = Material.BEDROCK;
+        if(item != null) {
+            if (Material.getMaterial(item.toUpperCase()) == null) { // If not found material, use bedrock
+                this.item = Material.BEDROCK;
+            } else {
+                this.item = Material.getMaterial(item.toUpperCase());
+            }
         } else {
-            this.item = Material.getMaterial(item.toUpperCase());
+            this.item = Material.BEDROCK;
         }
         this.showProgress = showProgress;
         for(String event : events) {
             String[] ev = event.split(" ");
-            AchievementsEngine.getInstance().getEvents().registerEvent(ev[0], this);
+            AchievementsEngine.getInstance().getEvents().registerEvent(ev[0] + " " + ev[2], this);
+            AchievementsEngine.getInstance().getLogger().info("Registering event: " + ev[0] + " " + ev[2]);
         }
     }
 

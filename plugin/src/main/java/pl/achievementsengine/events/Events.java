@@ -37,6 +37,7 @@ public class Events implements Listener {
     private final HashMap<String, List<Achievement>> registeredEvents = new HashMap<>();
 
     public List<Achievement> getEventAchievements(String event) {
+        event = event.toLowerCase();
         if(!registeredEvents.containsKey(event)) {
             registeredEvents.put(event, new ArrayList<>());
         }
@@ -48,13 +49,15 @@ public class Events implements Listener {
     }
 
     public void registerEvent(String event, Achievement achievement) {
+        event = event.toLowerCase();
         List<Achievement> list = getEventAchievements(event);
         list.add(achievement);
     }
 
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" ");
-        for(Achievement a : getEventAchievements(ev[0])) {
+        AchievementsEngine.getInstance().getLogger().info("Checking event: " + ev[0] + " " + ev[1]);
+        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1])) {
             AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
         }
     }

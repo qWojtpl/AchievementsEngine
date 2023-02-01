@@ -6,7 +6,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
-import pl.achievementsengine.commands.PermissionManager;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 
