@@ -15,6 +15,7 @@ import pl.achievementsengine.data.DataHandler;
 import pl.achievementsengine.data.MySQLManager;
 import pl.achievementsengine.events.Events;
 import pl.achievementsengine.gui.GUIHandler;
+import pl.achievementsengine.util.Messages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +29,8 @@ public final class AchievementsEngine extends JavaPlugin {
     private AchievementManager achievementManager;
     private MySQLManager manager;
     private Events events;
-
+    private Messages messages;
     private final HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
-    private final HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
 
     @Override
     public void onEnable() {
@@ -39,6 +39,7 @@ public final class AchievementsEngine extends JavaPlugin {
         this.achievementManager = new AchievementManager();
         permissionManager.loadPermissions(); // Register permissions
         this.events = new Events();
+        this.messages = new Messages();
         getServer().getPluginManager().registerEvents(events, this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
@@ -58,14 +59,6 @@ public final class AchievementsEngine extends JavaPlugin {
 
     public void DisablePlugin() {
         getServer().getPluginManager().disablePlugin(this);
-    }
-
-    public static String ReadLanguage(String path) {
-        if(AchievementsEngine.getInstance().getMessages().containsKey(path)) {
-            return AchievementsEngine.getInstance().getMessages().get(path);
-        } else {
-            return "§cCannotRead exception for path \"" + path + "\"";
-        }
     }
 
     public static AchievementsEngine getInstance() {

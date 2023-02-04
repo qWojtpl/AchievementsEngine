@@ -85,7 +85,7 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.reload"))) return;
         DataHandler.LoadConfig();
-        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aReloaded!");
+        sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReloaded!");
     }
 
     private void c_Help(CommandSender sender, String[] args) {
@@ -99,7 +99,7 @@ public class Commands implements CommandExecutor {
         try {
             page = Integer.parseInt(args[1]);
         } catch(NumberFormatException e) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae help <page:int>");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCorrect usage: /ae help <page:int>");
         } finally {
             ShowHelp(sender, page);
         }
@@ -124,26 +124,26 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.complete"))) return;
         if(args.length != 3) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae complete <player:Player> <id:String>");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCorrect usage: /ae complete <player:Player> <id:String>");
             return;
         }
         Player p = checkIfPlayerExists(args[1]);
         if(p == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
         if(a == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if (!state.getCompletedAchievements().contains(a)) {
             a.Complete(state);
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aAdded " + args[2]
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aAdded " + args[2]
                     + "§a to " + args[1] + "'s completed achievements!");
         } else {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cPlayer " + args[1] +
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cPlayer " + args[1] +
                     " §calready has achievement " + args[2] + " §ccompleted!");
         }
     }
@@ -152,27 +152,27 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.remove"))) return;
         if (args.length != 3) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae remove <player:Player> <id:String>");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCorrect usage: /ae remove <player:Player> <id:String>");
             return;
         }
         Player p = checkIfPlayerExists(args[1]);
         if (p == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if (!args[2].equalsIgnoreCase("*")) {
             Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
             if (a == null) {
-                sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
+                sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
                 return;
             }
             if (state.getCompletedAchievements().contains(a)) {
                 state.RemoveAchievement(a);
-                sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aRemoved " + args[2] +
+                sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aRemoved " + args[2] +
                         "§a from " + args[1] + "'s completed achievements!");
             } else {
-                sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cPlayer " + args[1] +
+                sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cPlayer " + args[1] +
                         " §cdon't have achievement " + args[2] + " §ccompleted!");
             }
         } else {
@@ -180,7 +180,7 @@ public class Commands implements CommandExecutor {
             for (Achievement a : completed) {
                 state.RemoveAchievement(a);
             }
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aRemoved all " + args[1] + "'s completed achievements!");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aRemoved all " + args[1] + "'s completed achievements!");
         }
     }
 
@@ -188,25 +188,25 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.reset"))) return;
         if(args.length != 3) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae reset <player:Player> <id:String>");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCorrect usage: /ae reset <player:Player> <id:String>");
             return;
         }
         if(checkIfPlayerExists(args[1]) == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
         if(a == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
             return;
         }
         PlayerAchievementState state = AchievementsEngine.getInstance().getPlayerStates().get(args[1]);
         if(state.getCompletedAchievements().contains(a)) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cThis player already has this achievement completed. Use /ae remove instead.");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cThis player already has this achievement completed. Use /ae remove instead.");
             return;
         }
         state.getProgress().put(a, new int[a.getEvents().size()]);
-        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aReset all " + args[1] + "§a's progress!");
+        sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReset all " + args[1] + "§a's progress!");
         DataHandler.updateProgress(state, a);
     }
 
@@ -214,19 +214,19 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.transfer"))) return;
         if(args.length != 3 || args[1].equals(args[2])) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
             return;
         }
         Player p1 = checkIfPlayerExists(args[1]);
         Player p2 = checkIfPlayerExists(args[2]);
         if(p1 == null || p2 == null) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCannot found player(s)..");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cCannot found player(s)..");
             return;
         }
         PlayerAchievementState state1 = PlayerAchievementState.Create(p1);
         PlayerAchievementState state2 = PlayerAchievementState.Create(p2);
         DataHandler.transferAchievements(state1, state2);
-        sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§aTransferred all achievements from "
+        sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aTransferred all achievements from "
                 + args[1] + "§a to " + args[2] + "§a!");
     }
 

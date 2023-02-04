@@ -20,7 +20,7 @@ public class PermissionManager {
     public boolean checkIfSenderHasPermission(CommandSender sender, Permission permission) {
         if(!(sender instanceof Player)) return true;
         if(!sender.hasPermission(permission)) {
-            sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cYou don't have permission!");
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§cYou don't have permission!");
             return false;
         }
         return true;

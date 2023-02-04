@@ -56,9 +56,9 @@ public class AchievementManager {
                 }
                 if(progress[j] < Integer.parseInt(events[1]) && match) { // Check if progress of event is less than required progress of this event
                     progress[j]++; // Add one to progress
-                    //playerState.UpdateProgress(a, progress); // Update progress
+                    playerState.UpdateProgress(a, progress); // Update progress
                     if(a.isShowProgress()) { // If achievement has showProgress enabled - show message on a chat
-                        String message = MessageFormat.format(AchievementsEngine.ReadLanguage("progress-message"), a.getName());
+                        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("progress-message"), a.getName());
                         String[] msg = message.split("%nl%");
                         for(String m : msg) {
                             p.sendMessage(m);

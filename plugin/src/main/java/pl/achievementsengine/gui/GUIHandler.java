@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
+import pl.achievementsengine.util.Messages;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,7 +53,8 @@ public class GUIHandler {
         PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
         float c = (float) state.getCompletedAchievements().size() / (float) achievements.size() * 100.0F; // Get completed percent
         int completed = Math.round(c); // Round percent to integer
-        inventory = Bukkit.createInventory(null, size, MessageFormat.format(AchievementsEngine.ReadLanguage("gui-title") + " " + completed + "%", current, max)); // Create inventory
+        Messages messages = AchievementsEngine.getInstance().getMessages();
+        inventory = Bukkit.createInventory(null, size, MessageFormat.format(messages.ReadLanguage("gui-title") + " " + completed + "%", current, max)); // Create inventory
         for(int i = 0; i < size; i++) { // Create black background
             AddItem(i, Material.BLACK_STAINED_GLASS_PANE, 1, " ", " ", false);
         }
@@ -66,10 +68,10 @@ public class GUIHandler {
             }
         }
         if(achievements.size() > currentStart+28) { // If there's second page, create "Next page" button
-            AddItem(53, Material.ARROW, 1, AchievementsEngine.ReadLanguage("gui-next"), "", false);
+            AddItem(53, Material.ARROW, 1, messages.ReadLanguage("gui-next"), "", false);
         }
         if(currentStart >= 28) { // If there's previous page, create "Previous page" button
-            AddItem(45, Material.ARROW, 1, AchievementsEngine.ReadLanguage("gui-previous"), "", false);
+            AddItem(45, Material.ARROW, 1, messages.ReadLanguage("gui-previous"), "", false);
         }
         int i = 10; // From which slot we'll start generating achievements. Border - 9 slots (0-8), 1 slot of border (9), so we'll start from 10
         int j = 0; // Iterator.
@@ -82,18 +84,18 @@ public class GUIHandler {
             String desc = a.getDescription(); // Set item description to achievement description
             boolean glow = false; // Mark if item is glowing
             if(a.isShowProgress()) { // If achievement has turned on showProgress
-                desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress"); // Add "Progress:" to description
+                desc = desc + "%nl%" + messages.ReadLanguage("progress"); // Add "Progress:" to description
                 for (int k = 0; k < a.getEvents().size(); k++) { // Loop through events
                     if(!state.progress.containsKey(a)) { // If state progress don't have key, create empty progress
                         state.UpdateProgress(a, new int[a.getEvents().size()]);
                     }
-                    desc = desc + "%nl%" + AchievementsEngine.ReadLanguage("progress-field-prefix") + a.getEvents().get(k) +
+                    desc = desc + "%nl%" + messages.ReadLanguage("progress-field-prefix") + a.getEvents().get(k) +
                             ": " + state.progress.get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
                 }
             }
             if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty
                 if(state.getCompletedAchievements().contains(a)) { // If player's state completed achievement contains achievement
-                    desc = desc + "%nl%" + ChatColor.GREEN + AchievementsEngine.ReadLanguage("completed"); // Add "completed" to description
+                    desc = desc + "%nl%" + ChatColor.GREEN + messages.ReadLanguage("completed"); // Add "completed" to description
                     glow = true; // Make item glow
                 }
             }

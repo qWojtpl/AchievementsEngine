@@ -52,7 +52,7 @@ public class Achievement {
                 return;
             }
         }
-        String message = MessageFormat.format(AchievementsEngine.ReadLanguage("complete-message"), name, description, events, actions);
+        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("complete-message"), name, description, events, actions);
         String[] msg = message.split("%nl%");
         for(String m : msg) {
             state.getPlayer().sendMessage(m);

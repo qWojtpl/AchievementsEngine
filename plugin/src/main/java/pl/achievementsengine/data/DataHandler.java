@@ -176,9 +176,9 @@ public class DataHandler {
         yml = YamlConfiguration.loadConfiguration(msgFile);
         ConfigurationSection section = yml.getConfigurationSection("messages");
         if(section == null) return;
-        AchievementsEngine.getInstance().getMessages().clear();
+        AchievementsEngine.getInstance().getMessages().clearMessages();
         for (String key : section.getKeys(false)) {
-            AchievementsEngine.getInstance().getMessages().put(key, ReadStringPath("messages." + key));
+            AchievementsEngine.getInstance().getMessages().addMessage(key, ReadStringPath("messages." + key));
         }
     }
 }
