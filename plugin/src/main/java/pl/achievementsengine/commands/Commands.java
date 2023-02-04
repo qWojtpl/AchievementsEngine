@@ -5,7 +5,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
@@ -73,7 +72,6 @@ public class Commands implements CommandExecutor {
             case 2:
                 sender.sendMessage("§6/ae remove <player> <id> §e- Remove achievement from player");
                 sender.sendMessage("§6/ae reset <player> <id> §e- Reset progress for player");
-                sender.sendMessage("§6/ae checkstate <player> §e- Check player's state");
                 sender.sendMessage("§6/ae transfer <from> <to> §e- Transfer player's achievements to other player");
                 break;
             default:

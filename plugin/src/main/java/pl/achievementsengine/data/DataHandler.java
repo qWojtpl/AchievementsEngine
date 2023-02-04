@@ -29,8 +29,7 @@ public class DataHandler {
 
     public static void createPlayerAchievementState(Player p) {
         PlayerAchievementState state = PlayerAchievementState.Create(p);
-        createFile(p);
-        File dataFile = getPlayerFile(state.getPlayer());
+        File dataFile = createPlayerFile(p);
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         String nick = p.getName();
         ConfigurationSection section = data.getConfigurationSection("user." + nick);
@@ -57,8 +56,7 @@ public class DataHandler {
     }
 
     public static void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
-        createFile(state.getPlayer());
-        File dataFile = getPlayerFile(state.getPlayer());
+        File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
         try {
@@ -70,8 +68,7 @@ public class DataHandler {
     }
 
     public static void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
-        createFile(state.getPlayer());
-        File dataFile = getPlayerFile(state.getPlayer());
+        File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
         try {
@@ -83,13 +80,12 @@ public class DataHandler {
     }
 
     public static void updateProgress(PlayerAchievementState state, Achievement achievement) {
-        createFile(state.getPlayer());
         int[] progress = state.getProgress().get(achievement);
         List<Integer> newProgress = new ArrayList<>();
         for(int i = 0; i < progress.length; i++) {
             newProgress.add(progress[i]);
         }
-        File dataFile = getPlayerFile(state.getPlayer());
+        File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
         try {
@@ -102,9 +98,8 @@ public class DataHandler {
     }
 
     public static void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
-        createFile(state2.getPlayer());
-        createFile(state1.getPlayer());
-        File dataFile1 = getPlayerFile(state1.getPlayer());
+        File dataFile1 = createPlayerFile(state1.getPlayer());
+        File dataFile2 = createPlayerFile(state2.getPlayer());
         YamlConfiguration data1 = YamlConfiguration.loadConfiguration(dataFile1);
         try {
             data1.set("user." + state1.getPlayer().getName(), null);
@@ -117,7 +112,7 @@ public class DataHandler {
         state2.setCompletedAchievements(new ArrayList<>(state1.getCompletedAchievements()));
         state2.setProgress(new HashMap<>(state1.getProgress()));
         state1.setCompletedAchievements(new ArrayList<>());
-        state1.getProgress();
+        state1.setProgress(new HashMap<>());
         for(Achievement a : state2.getCompletedAchievements()) {
             DataHandler.addCompletedAchievement(state2, a);
         }
@@ -126,8 +121,8 @@ public class DataHandler {
         }
     }
 
-    public static void createFile(Player p) {
-        File dataFile = getPlayerFile(p);
+    public static File createPlayerFile(Player p) {
+        File dataFile = new File(AchievementsEngine.getInstance().getDataFolder(), "/playerData/" + p.getName() + ".yml");
         if(!dataFile.exists()) {
             try {
                 File directory = new File(AchievementsEngine.getInstance().getDataFolder(), "/playerData/");
@@ -142,10 +137,7 @@ public class DataHandler {
                 AchievementsEngine.getInstance().getLogger().info("Cannot create " + p.getName() + ".yml");
             }
         }
-    }
-
-    public static File getPlayerFile(Player p) {
-        return new File(AchievementsEngine.getInstance().getDataFolder(), "/playerData/" + p.getName() + ".yml");
+        return dataFile;
     }
 
     public static String ReadStringPath(String path) {
@@ -189,7 +181,4 @@ public class DataHandler {
             AchievementsEngine.getInstance().getMessages().put(key, ReadStringPath("messages." + key));
         }
     }
-
-
-
 }
