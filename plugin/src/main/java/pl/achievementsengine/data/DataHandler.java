@@ -158,25 +158,7 @@ public class DataHandler {
     public static void loadAchievementsFile() {
         File achFile = new File(AchievementsEngine.getInstance().getDataFolder(), "achievements.yml");
         if (!achFile.exists()) { // If file doesn't exist, create default file
-            try {
-                achFile.createNewFile();
-                yml = YamlConfiguration.loadConfiguration(achFile);
-                yml.set("achievements.0.enabled", true);
-                yml.set("achievements.0.name", "§2§lSample Achievement");
-                yml.set("achievements.0.description", "§aUse /ae command and get 1 diamond.");
-                yml.set("achievements.0.item", "BEDROCK");
-                yml.set("achievements.0.showProgress", false);
-                List<String> list = new ArrayList<>();
-                list.add("command 1 /ae");
-                yml.set("achievements.0.events", list);
-                list = new ArrayList<>();
-                list.add("give {0} minecraft:diamond 1");
-                yml.set("achievements.0.actions", list);
-                yml.save(achFile);
-            } catch (IOException e) {
-                AchievementsEngine.getInstance().getLogger().info("Cannot create achievements.yml - exception: " + e);
-                return;
-            }
+            AchievementsEngine.getInstance().saveResource("achievements.yml", false);
         }
         yml = YamlConfiguration.loadConfiguration(achFile);
         ConfigurationSection section = yml.getConfigurationSection("achievements");
@@ -196,24 +178,8 @@ public class DataHandler {
 
     public static void loadMessagesFile() {
         File msgFile = new File(AchievementsEngine.getInstance().getDataFolder(), "messages.yml");
-        if (!msgFile.exists()) {
-            try { // If file doesn't exist, create default file
-                msgFile.createNewFile();
-                yml = YamlConfiguration.loadConfiguration(msgFile);
-                yml.set("messages.prefix", "§2[§6AchievementsEngine§2] ");
-                yml.set("messages.gui-title", "Achievements (Page {0}/{1})");
-                yml.set("messages.gui-next", "§f§lNext page");
-                yml.set("messages.gui-previous", "§f§lPrevious page");
-                yml.set("messages.complete-message", "§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked: {0}%nl%%nl%§6§k--------------");
-                yml.set("messages.progress-message", "§aYou made progress in achievement {0}§a!");
-                yml.set("messages.progress", "§6§lProgress:");
-                yml.set("messages.progress-field-prefix", "§7§l- §b");
-                yml.set("messages.completed", "§aCOMPLETED!");
-                yml.save(msgFile);
-            } catch (IOException e) {
-                AchievementsEngine.getInstance().getLogger().info("Cannot create messages.yml");
-                return;
-            }
+        if (!msgFile.exists()) { // If file doesn't exist, create default file
+            AchievementsEngine.getInstance().saveResource("messages.yml", false);
         }
         yml = YamlConfiguration.loadConfiguration(msgFile);
         ConfigurationSection section = yml.getConfigurationSection("messages");
