@@ -1,12 +1,18 @@
 package pl.achievementsengine.achievements;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.commands.PermissionManager;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+@Getter
 public class AchievementManager {
+
+    private final List<Achievement> achievements = new ArrayList<>(); // List of all achievements
 
     public void Check(Player p, String checkable, Achievement a) { // Event interpreter
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
@@ -70,7 +76,7 @@ public class AchievementManager {
     }
 
     public Achievement checkIfAchievementExists(String name) {
-        for (Achievement a : AchievementsEngine.achievements) {
+        for (Achievement a : getAchievements()) {
             if (a.getID().equals(name)) {
                 return a;
             }

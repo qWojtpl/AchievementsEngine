@@ -22,9 +22,9 @@ import java.util.List;
 public class GUIHandler {
 
     private Inventory inventory; // inventory for object
-    private Player player; // inventory owner
+    private final Player player; // inventory owner
     private int currentStart; // start slot (pages based on this variable)
-    public static List<GUIHandler> registeredInventories = new ArrayList<>(); // opened inventories
+    private final static List<GUIHandler> registeredInventories = new ArrayList<>(); // opened inventories
 
     public GUIHandler(Player p, int start) {
         this.player = p;
@@ -41,15 +41,16 @@ public class GUIHandler {
 
     public void Create() {
         int size = 27; // Min size of the window (9 - border, 9 - achievements, 9 - border)
+        List<Achievement> achievements = AchievementsEngine.getInstance().getAchievementManager().getAchievements();
         for(int i = 1; i <= 3; i++) { // In one window you can see max 3 lines of achievements. Mark, how many lines will be generated
-            if(AchievementsEngine.achievements.size() > 7 * i) {
+            if(achievements.size() > 7 * i) {
                 size += 9;
             }
         }
         int current = currentStart/28+1; // Current page
-        int max = AchievementsEngine.achievements.size()/28+1; // Max pages
+        int max = achievements.size()/28+1; // Max pages
         PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
-        float c = (float) state.getCompletedAchievements().size() / (float) AchievementsEngine.achievements.size() * 100.0F; // Get completed percent
+        float c = (float) state.getCompletedAchievements().size() / (float) achievements.size() * 100.0F; // Get completed percent
         int completed = Math.round(c); // Round percent to integer
         inventory = Bukkit.createInventory(null, size, MessageFormat.format(AchievementsEngine.ReadLanguage("gui-title") + " " + completed + "%", current, max)); // Create inventory
         for(int i = 0; i < size; i++) { // Create black background
@@ -64,7 +65,7 @@ public class GUIHandler {
                 i++;
             }
         }
-        if(AchievementsEngine.achievements.size() > currentStart+28) { // If there's second page, create "Next page" button
+        if(achievements.size() > currentStart+28) { // If there's second page, create "Next page" button
             AddItem(53, Material.ARROW, 1, AchievementsEngine.ReadLanguage("gui-next"), "", false);
         }
         if(currentStart >= 28) { // If there's previous page, create "Previous page" button
@@ -72,7 +73,7 @@ public class GUIHandler {
         }
         int i = 10; // From which slot we'll start generating achievements. Border - 9 slots (0-8), 1 slot of border (9), so we'll start from 10
         int j = 0; // Iterator.
-        for(Achievement a : AchievementsEngine.achievements) { // Loop through all achievements
+        for(Achievement a : achievements) { // Loop through all achievements
             if(j < currentStart) { // Loop iterator to current start.
                 j++;
                 continue;
@@ -146,5 +147,9 @@ public class GUIHandler {
         for(GUIHandler handler : guis) {
             handler.player.closeInventory();
         }
+    }
+
+    public static List<GUIHandler> getRegisteredInventories() {
+        return GUIHandler.registeredInventories;
     }
 }

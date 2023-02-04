@@ -41,7 +41,7 @@ public class CommandHelper implements TabCompleter {
             }
         } else if(args.length == 3) {
             if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("reset")) {
-                for (Achievement a : AchievementsEngine.achievements) {
+                for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
                     completions.add(a.getID());
                 }
             } else if(args[0].equalsIgnoreCase("remove")) {

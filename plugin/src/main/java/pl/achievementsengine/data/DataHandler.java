@@ -20,8 +20,8 @@ public class DataHandler {
     public static FileConfiguration yml; // Current reading yml
 
     public static void LoadConfig() {
-        AchievementsEngine.playerStates = new HashMap<>(); // Reset player states list
-        AchievementsEngine.achievements = new ArrayList<>(); // Reset achievements list
+        AchievementsEngine.getInstance().getPlayerStates().clear(); // Reset player states list
+        AchievementsEngine.getInstance().getAchievementManager().getAchievements().clear(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         DataHandler.loadAchievementsFile(); // Load achievements
         DataHandler.loadMessagesFile(); // Load messages
@@ -36,7 +36,7 @@ public class DataHandler {
         ConfigurationSection section = data.getConfigurationSection("user." + nick);
         if (section == null) return;
         for (String key : section.getKeys(false)) {
-            for (Achievement a : AchievementsEngine.achievements) {
+            for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
                 if (!a.getID().equals(key)) {
                     continue;
                 }
@@ -183,7 +183,7 @@ public class DataHandler {
         if(section == null) return;
         for (String key : section.getKeys(false)) {
             if (yml.getString("achievements." + key + ".name") != null) {
-                AchievementsEngine.getInstance().achievements.add(
+                AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
                         new Achievement(key, ReadStringPath("achievements." + key + ".name"),
                                 ReadStringPath("achievements." + key + ".description"),
                                 yml.getBoolean("achievements." + key + ".enabled"), yml.getStringList("achievements." + key + ".events"),
@@ -218,9 +218,9 @@ public class DataHandler {
         yml = YamlConfiguration.loadConfiguration(msgFile);
         ConfigurationSection section = yml.getConfigurationSection("messages");
         if(section == null) return;
-        AchievementsEngine.messages = new HashMap<>();
+        AchievementsEngine.getInstance().getMessages().clear();
         for (String key : section.getKeys(false)) {
-            AchievementsEngine.messages.put(key, ReadStringPath("messages." + key));
+            AchievementsEngine.getInstance().getMessages().put(key, ReadStringPath("messages." + key));
         }
     }
 

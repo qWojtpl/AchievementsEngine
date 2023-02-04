@@ -5,12 +5,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import pl.achievementsengine.AchievementsEngine;
 
+import java.util.HashMap;
+
 public class PermissionManager {
+
+    private final HashMap<String, Permission> permissions = new HashMap<>();
 
     public void registerPermission(String permission, String description) {
         Permission perm = new Permission(permission, description);
         AchievementsEngine.getInstance().getServer().getPluginManager().addPermission(perm);
-        AchievementsEngine.permissions.put(permission, perm);
+        this.permissions.put(permission, perm);
     }
 
     public boolean checkIfSenderHasPermission(CommandSender sender, Permission permission) {
@@ -23,12 +27,12 @@ public class PermissionManager {
     }
 
     public Permission getPermission(String permission) {
-        if(!AchievementsEngine.permissions.containsKey(permission)) {
+        if(!this.permissions.containsKey(permission)) {
             AchievementsEngine.getInstance().getLogger().info("Trying to access permission that not exists (" + permission + ")! " +
                     "Please report it here: https://github.com/qWojtpl/AchievementsEngine/issues");
             return null;
         }
-        return AchievementsEngine.permissions.get(permission);
+        return this.permissions.get(permission);
     }
 
     public void loadPermissions() {

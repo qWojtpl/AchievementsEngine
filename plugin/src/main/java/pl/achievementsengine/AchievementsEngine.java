@@ -28,11 +28,9 @@ public final class AchievementsEngine extends JavaPlugin {
     private AchievementManager achievementManager;
     private MySQLManager manager;
     private Events events;
-    public static List<Achievement> achievements = new ArrayList<>(); // List of all achievements
-    public static HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
-    public static HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
-    public static HashMap<String, Permission> permissions = new HashMap<>();
 
+    private final HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
+    private final HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
 
     @Override
     public void onEnable() {
@@ -40,7 +38,7 @@ public final class AchievementsEngine extends JavaPlugin {
         this.permissionManager = new PermissionManager();
         this.achievementManager = new AchievementManager();
         permissionManager.loadPermissions(); // Register permissions
-        events = new Events();
+        this.events = new Events();
         getServer().getPluginManager().registerEvents(events, this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
@@ -63,8 +61,8 @@ public final class AchievementsEngine extends JavaPlugin {
     }
 
     public static String ReadLanguage(String path) {
-        if (messages.containsKey(path)) {
-            return messages.get(path);
+        if(AchievementsEngine.getInstance().getMessages().containsKey(path)) {
+            return AchievementsEngine.getInstance().getMessages().get(path);
         } else {
             return "§cCannotRead exception for path \"" + path + "\"";
         }

@@ -111,7 +111,7 @@ public class Commands implements CommandExecutor {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.achievements"))) return;
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
-        for (Achievement a : AchievementsEngine.achievements) {
+        for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
             String events = "";
             for (String s : a.getEvents()) {
                 events = events + s + ", ";
@@ -202,7 +202,7 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
             return;
         }
-        PlayerAchievementState state = AchievementsEngine.playerStates.get(args[1]);
+        PlayerAchievementState state = AchievementsEngine.getInstance().getPlayerStates().get(args[1]);
         if(state.getCompletedAchievements().contains(a)) {
             sender.sendMessage(AchievementsEngine.ReadLanguage("prefix") + "§cThis player already has this achievement completed. Use /ae remove instead.");
             return;

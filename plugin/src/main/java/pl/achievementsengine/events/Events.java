@@ -171,7 +171,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
+        for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
                 event.setCancelled(true); // Cancel drag event
                 break; // Exit loop
@@ -181,12 +181,12 @@ public class Events implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
+        for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
                 int currentStart = gui.getCurrentStart();
                 switch(event.getSlot()) {
                     case 53: // Next page button
-                        if(AchievementsEngine.achievements.size() > currentStart + 28) { // Check if there's second page
+                        if(AchievementsEngine.getInstance().getAchievementManager().getAchievements().size() > currentStart + 28) { // Check if there's second page
                             GUIHandler.New(((Player) event.getWhoClicked()).getPlayer(), gui.setCurrentStart(currentStart + 28)); // Create new GUI (next 28 achievements)
                         }
                         break;
@@ -204,9 +204,9 @@ public class Events implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) { // Remove inventory from registered inventories on close
-        for(GUIHandler gui : GUIHandler.registeredInventories) { // Loop through registered inventories
+        for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // Check if looped inventory equals closed inventory
-                GUIHandler.registeredInventories.remove(gui); // Remove inventory from registered inventories
+                GUIHandler.getRegisteredInventories().remove(gui); // Remove inventory from registered inventories
                 break; // Exit loop
             }
         }

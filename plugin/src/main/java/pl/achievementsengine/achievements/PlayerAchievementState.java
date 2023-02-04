@@ -20,15 +20,15 @@ public class PlayerAchievementState {
     }
 
     public static PlayerAchievementState Create(Player p) { // Create state. If is already created, return exist one
-        if(!AchievementsEngine.playerStates.containsKey(p.getName())) {
+        if(!AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
             PlayerAchievementState state = new PlayerAchievementState(p, new ArrayList<>()); // Create object
-            AchievementsEngine.playerStates.put(p.getName(), state); // Put state to all states
+            AchievementsEngine.getInstance().getPlayerStates().put(p.getName(), state); // Put state to all states
             DataHandler.createPlayerAchievementState(p); // Create data in playerData.yml (and if available in SQL)
             return state;
         } else {
-            AchievementsEngine.playerStates.get(p.getName()).setPlayer(p); // Update player object
+            AchievementsEngine.getInstance().getPlayerStates().get(p.getName()).setPlayer(p); // Update player object
         }
-        return AchievementsEngine.playerStates.get(p.getName());
+        return AchievementsEngine.getInstance().getPlayerStates().get(p.getName());
     }
 
     public void UpdateProgress(Achievement achievement, int[] progressArray) { // Update progress
