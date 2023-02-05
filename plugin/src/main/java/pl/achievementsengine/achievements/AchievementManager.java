@@ -17,9 +17,8 @@ public class AchievementManager {
     public void Check(Player p, String checkable, Achievement a) { // Event interpreter
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!p.hasPermission(permissionManager.getPermission("ae.use"))) return; // Check if player has permission
-        PlayerAchievementState playerState;
-        playerState = PlayerAchievementState.Create(p); // Create player's state
-        int[] progress = playerState.progress.getOrDefault(a, new int[a.getEvents().size()]); // Initialize progress
+        PlayerAchievementState playerState = PlayerAchievementState.Create(p); // Get player's state
+        int[] progress = playerState.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Initialize progress
         int max = 0;
         for(int j = 0; j < a.getEvents().size(); j++) { // Loop through all events from achievement
             String[] events = a.getEvents().get(j).split(" "); // Split one event into pieces eg. [kill] [1] [player]

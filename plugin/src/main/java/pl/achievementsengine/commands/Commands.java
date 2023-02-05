@@ -200,7 +200,7 @@ public class Commands implements CommandExecutor {
             return;
         }
         state.getProgress().put(a, new int[a.getEvents().size()]);
-        sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReset all " + args[1] + "§a's progress!");
+        sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReset all " + args[1] + "§a's progress in " + args[2] + "§a!");
         AchievementsEngine.getInstance().getDataHandler().updateProgress(state, a);
     }
 

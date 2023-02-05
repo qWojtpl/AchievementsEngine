@@ -24,6 +24,10 @@ public class DataHandler {
     }
 
     public void LoadConfig() {
+        for(String key : AchievementsEngine.getInstance().getPlayerStates().keySet()) {
+            savePlayerData(AchievementsEngine.getInstance().getPlayerStates().get(key));
+        }
+        AchievementsEngine.getInstance().getEvents().clearRegisteredEvents(); // Clear registered events
         AchievementsEngine.getInstance().getPlayerStates().clear(); // Reset player states list
         AchievementsEngine.getInstance().getAchievementManager().getAchievements().clear(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
@@ -66,24 +70,12 @@ public class DataHandler {
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
-        try {
-            data.save(dataFile);
-        } catch(IOException e) {
-            AchievementsEngine.getInstance().getLogger().info("Cannot add " + achievement.getID() + " to " + state.getPlayer().getName() + "'s completed achievements..");
-            AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
-        }
     }
 
     public void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
-        try {
-            data.save(dataFile);
-        } catch(IOException e) {
-            AchievementsEngine.getInstance().getLogger().info("Cannot remove " + achievement.getID() + " from " + state.getPlayer().getName() + "'s completed achievements..");
-            AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
-        }
     }
 
     public void updateProgress(PlayerAchievementState state, Achievement achievement) {
@@ -95,12 +87,13 @@ public class DataHandler {
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
+    }
+
+    public void savePlayerData(PlayerAchievementState state) {
         try {
-            data.save(dataFile);
+            playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer()));
         } catch(IOException e) {
-            AchievementsEngine.getInstance().getLogger().info("Cannot update progress at " + achievement.getID()
-                    + " (" + state.getPlayer().getName() + "'s progress)");
-            AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
+            AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
         }
     }
 
@@ -123,7 +116,7 @@ public class DataHandler {
         for(Achievement a : state2.getCompletedAchievements()) {
             addCompletedAchievement(state2, a);
         }
-        for(Achievement a : state2.progress.keySet()) {
+        for(Achievement a : state2.getProgress().keySet()) {
             updateProgress(state2, a);
         }
     }

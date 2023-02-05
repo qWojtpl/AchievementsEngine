@@ -86,11 +86,11 @@ public class GUIHandler {
             if(a.isShowProgress()) { // If achievement has turned on showProgress
                 desc = desc + "%nl%" + messages.ReadLanguage("progress"); // Add "Progress:" to description
                 for (int k = 0; k < a.getEvents().size(); k++) { // Loop through events
-                    if(!state.progress.containsKey(a)) { // If state progress don't have key, create empty progress
+                    if(!state.getProgress().containsKey(a)) { // If state progress don't have key, create empty progress
                         state.UpdateProgress(a, new int[a.getEvents().size()]);
                     }
                     desc = desc + "%nl%" + messages.ReadLanguage("progress-field-prefix") + a.getEvents().get(k) +
-                            ": " + state.progress.get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
+                            ": " + state.getProgress().get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
                 }
             }
             if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty

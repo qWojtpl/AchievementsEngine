@@ -12,7 +12,7 @@ public class PlayerAchievementState {
 
     private Player player; // State player
     private List<Achievement> completedAchievements; // Completed achievements
-    public HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
+    private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
 
     public PlayerAchievementState(Player player, List<Achievement> completedAchievements) {
         this.player = player;

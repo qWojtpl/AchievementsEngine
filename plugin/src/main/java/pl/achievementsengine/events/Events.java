@@ -56,6 +56,10 @@ public class Events implements Listener {
         list.add(achievement);
     }
 
+    public void clearRegisteredEvents() {
+        this.registeredEvents.clear();
+    }
+
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" ");
         for(Achievement a : getEventAchievements(ev[0] + " " + ev[1])) {
