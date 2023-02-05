@@ -158,12 +158,13 @@ public class DataHandler {
             if(key.length() > 128) {
                 AchievementsEngine.getInstance().getLogger().warning("Cannot load achievement " + key + " - achievement key is too long..");
             }
-            if (yml.getString("achievements." + key + ".name") != null) {
+            if (yml.getString("achievements." + key + ".name") != null && yml.getBoolean("achievements." + key + ".enabled")) {
                 AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
                         new Achievement(key, yml.getString("achievements." + key + ".name"),
                                 yml.getString("achievements." + key + ".description"),
-                                yml.getBoolean("achievements." + key + ".enabled"), yml.getStringList("achievements." + key + ".events"),
-                                yml.getStringList("achievements." + key + ".actions"), yml.getString("achievements." + key + ".item"),
+                                yml.getStringList("achievements." + key + ".events"),
+                                yml.getStringList("achievements." + key + ".actions"),
+                                yml.getString("achievements." + key + ".item"),
                                 yml.getBoolean("achievements." + key + ".showProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
             }

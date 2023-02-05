@@ -1,5 +1,6 @@
 package pl.achievementsengine.events;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
@@ -126,9 +128,18 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCraft(CraftItemEvent event) {
         if(event.isCancelled()) return;
-        for(int i = 0; i < event.getCurrentItem().getAmount(); i++) {
-            checkForAchievementEvents((Player) event.getWhoClicked(), "craft " + event.getCurrentItem().getType());
+        ItemStack is;
+        if(event.isShiftClick()) {
+            is = getCraftedItemStack(event);
+        } else {
+            is = event.getCurrentItem();
         }
+        for(int i = 0; i < is.getAmount(); i++) {
+            checkForAchievementEvents((Player) event.getWhoClicked(), "craft " + is.getType() +
+                    " named " + is.getItemMeta().getDisplayName());
+        }
+        checkForAchievementEvents((Player) event.getWhoClicked(), "T_craft" + is.getType() +
+                " named " + is.getItemMeta().getDisplayName());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -210,6 +221,22 @@ public class Events implements Listener {
                 break; // Exit loop
             }
         }
+    }
+
+    // Method source: https://www.spigotmc.org/threads/get-accurate-crafting-result-from-shift-clicking.446520/
+    private ItemStack getCraftedItemStack(CraftItemEvent event) {
+        final ItemStack recipeResult = event.getRecipe().getResult();
+        final int resultAmt = recipeResult.getAmount();
+        int leastIngredient = -1;
+        for (ItemStack item : event.getInventory().getMatrix()) {
+            if (item != null && !item.getType().equals(Material.AIR)) {
+                final int re = item.getAmount() * resultAmt;
+                if (leastIngredient == -1 || re < leastIngredient) {
+                    leastIngredient = item.getAmount() * resultAmt;
+                }
+            }
+        }
+        return new ItemStack(recipeResult.getType(), leastIngredient, recipeResult.getDurability());
     }
 
 }

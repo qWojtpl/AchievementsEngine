@@ -15,17 +15,15 @@ public class Achievement {
     private final String ID; // achievement key
     private final String name; // achievement name
     private final String description; // achievement description
-    private final boolean enabled; // is achievement enabled?
     private final List<String> events; // events required to complete this achievement
     private final List<String> actions; // actions (commands) which will be triggered if player will complete achievement
     private final Material item; // GUI item
     private final boolean showProgress; // show achievement progress?
 
-    public Achievement(String id, String name, String description, boolean enabled, List<String> events, List<String> actions, String item, boolean showProgress) {
+    public Achievement(String id, String name, String description, List<String> events, List<String> actions, String item, boolean showProgress) {
         this.ID = id;
         this.name = name;
         this.description = description;
-        this.enabled = enabled;
         this.events = events;
         this.actions = actions;
         if(item != null) {
