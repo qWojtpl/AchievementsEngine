@@ -23,7 +23,7 @@ public class PlayerAchievementState {
         if(!AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
             PlayerAchievementState state = new PlayerAchievementState(p, new ArrayList<>()); // Create object
             AchievementsEngine.getInstance().getPlayerStates().put(p.getName(), state); // Put state to all states
-            AchievementsEngine.getInstance().getDataHandler().createPlayerAchievementState(p); // Create data in playerData.yml (and if available in SQL)
+            AchievementsEngine.getInstance().getDataHandler().createPlayerAchievementState(state); // Create data in playerData.yml (and if available in SQL)
             return state;
         } else {
             AchievementsEngine.getInstance().getPlayerStates().get(p.getName()).setPlayer(p); // Update player object

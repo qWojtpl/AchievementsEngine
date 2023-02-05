@@ -33,11 +33,12 @@ public class DataHandler {
         loadMessagesFile(); // Load messages
     }
 
-    public void createPlayerAchievementState(Player p) {
-        PlayerAchievementState state = PlayerAchievementState.Create(p);
+    public void createPlayerAchievementState(PlayerAchievementState state) {
+        Player p = state.getPlayer();
         File dataFile = createPlayerFile(p);
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         String nick = p.getName();
+        playerYAML.put(nick, data);
         ConfigurationSection section = data.getConfigurationSection("user." + nick);
         if (section == null) return;
         for (String key : section.getKeys(false)) {
@@ -63,7 +64,7 @@ public class DataHandler {
 
     public void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
         try {
             data.save(dataFile);
@@ -75,7 +76,7 @@ public class DataHandler {
 
     public void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
         try {
             data.save(dataFile);
@@ -92,7 +93,7 @@ public class DataHandler {
             newProgress.add(progress[i]);
         }
         File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
         try {
             data.save(dataFile);
@@ -106,7 +107,7 @@ public class DataHandler {
     public void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
         File dataFile1 = createPlayerFile(state1.getPlayer());
         File dataFile2 = createPlayerFile(state2.getPlayer());
-        YamlConfiguration data1 = YamlConfiguration.loadConfiguration(dataFile1);
+        YamlConfiguration data1 = playerYAML.get(state1.getPlayer().getName());
         try {
             data1.set("user." + state1.getPlayer().getName(), null);
             data1.save(dataFile1);

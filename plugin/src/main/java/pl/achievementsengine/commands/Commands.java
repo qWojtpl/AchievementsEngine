@@ -47,11 +47,6 @@ public class Commands implements CommandExecutor {
             c_Reset(sender, args);
         } else if(args[0].equalsIgnoreCase("transfer")) {
             c_Transfer(sender, args);
-        } else if(args[0].equalsIgnoreCase("getachievements")) {
-            List<String> a = AchievementsEngine.getInstance().getManager().getAchievements(null);
-            for(String s : a) {
-                sender.sendMessage(s);
-            }
         } else {
             ShowHelp(sender, 1);
         }
