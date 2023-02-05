@@ -23,7 +23,7 @@ public class PlayerAchievementState {
         if(!AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
             PlayerAchievementState state = new PlayerAchievementState(p, new ArrayList<>()); // Create object
             AchievementsEngine.getInstance().getPlayerStates().put(p.getName(), state); // Put state to all states
-            DataHandler.createPlayerAchievementState(p); // Create data in playerData.yml (and if available in SQL)
+            AchievementsEngine.getInstance().getDataHandler().createPlayerAchievementState(p); // Create data in playerData.yml (and if available in SQL)
             return state;
         } else {
             AchievementsEngine.getInstance().getPlayerStates().get(p.getName()).setPlayer(p); // Update player object
@@ -34,14 +34,15 @@ public class PlayerAchievementState {
     public void UpdateProgress(Achievement achievement, int[] progressArray) { // Update progress
         progress.remove(achievement); // Remove achievement progress
         progress.put(achievement, progressArray); // Add new achievement progress
-        DataHandler.updateProgress(this, achievement); // Update progress (Save data)
+        AchievementsEngine.getInstance().getDataHandler().updateProgress(this, achievement); // Update progress (Save data)
     }
 
     public void RemoveAchievement(Achievement achievement) { // Remove achievement from completed achievements
         this.completedAchievements.remove(achievement);
         this.progress.put(achievement, new int[achievement.getEvents().size()]);
-        DataHandler.removeCompletedAchievement(this, achievement);
-        DataHandler.updateProgress(this, achievement);
+        DataHandler dh = AchievementsEngine.getInstance().getDataHandler();
+        dh.removeCompletedAchievement(this, achievement);
+        dh.updateProgress(this, achievement);
     }
 
     public Player getPlayer() { // Return player

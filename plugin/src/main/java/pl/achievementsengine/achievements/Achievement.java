@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import pl.achievementsengine.AchievementsEngine;
-import pl.achievementsengine.data.DataHandler;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -63,7 +62,7 @@ public class Achievement {
             Bukkit.getScheduler().callSyncMethod(AchievementsEngine.getInstance(), () ->
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name)));
         }
-        DataHandler.addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (Save data)
+        AchievementsEngine.getInstance().getDataHandler().addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (Save data)
         AchievementsEngine.getInstance().getEvents().checkForAchievementEvents(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement
     }
 }

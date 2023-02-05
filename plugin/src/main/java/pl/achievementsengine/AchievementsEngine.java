@@ -3,9 +3,7 @@ package pl.achievementsengine;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
-import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.AchievementManager;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 import pl.achievementsengine.commands.CommandHelper;
@@ -17,9 +15,7 @@ import pl.achievementsengine.events.Events;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.util.Messages;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @Getter
 public final class AchievementsEngine extends JavaPlugin {
@@ -30,6 +26,7 @@ public final class AchievementsEngine extends JavaPlugin {
     private MySQLManager manager;
     private Events events;
     private Messages messages;
+    private DataHandler dataHandler;
     private final HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
 
     @Override
@@ -40,10 +37,11 @@ public final class AchievementsEngine extends JavaPlugin {
         permissionManager.loadPermissions(); // Register permissions
         this.events = new Events();
         this.messages = new Messages();
+        this.dataHandler = new DataHandler();
         getServer().getPluginManager().registerEvents(events, this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
-        DataHandler.LoadConfig(); // Load configuration files
+        dataHandler.LoadConfig(); // Load configuration files
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
             PlayerAchievementState.Create(p);

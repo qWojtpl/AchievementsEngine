@@ -1,12 +1,15 @@
 package pl.achievementsengine.data;
 
+import lombok.Getter;
 import pl.achievementsengine.AchievementsEngine;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
+@Getter
 public class DatabaseConnector {
 
     private final Logger log;
@@ -19,11 +22,16 @@ public class DatabaseConnector {
 
     public DatabaseConnector() {
         AchievementsEngine plugin = AchievementsEngine.getInstance();
-        this.host = "";
-        this.user = "";
-        this.password = "";
-        this.database = "";
-        this.port = 3306;
+        HashMap<String, String> SQLInfo = plugin.getDataHandler().getSQLInfo();
+        this.host = SQLInfo.get("host");
+        this.user = SQLInfo.get("user");
+        this.password = SQLInfo.get("password");
+        this.database = SQLInfo.get("database");
+        if(SQLInfo.get("port") != null) {
+            this.port = Integer.parseInt(SQLInfo.get("port"));
+        } else {
+            this.port = 3306;
+        }
         this.log = plugin.getLogger();
     }
 

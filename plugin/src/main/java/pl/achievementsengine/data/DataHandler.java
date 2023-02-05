@@ -1,7 +1,6 @@
 package pl.achievementsengine.data;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.achievements.Achievement;
@@ -17,17 +16,24 @@ import java.util.List;
 
 public class DataHandler {
 
-    public static FileConfiguration yml; // Current reading yml
+    private final HashMap<String, YamlConfiguration> playerYAML = new HashMap<>();
+    private final HashMap<String, String> SQLInfo = new HashMap<>();
 
-    public static void LoadConfig() {
+    public HashMap<String, String> getSQLInfo() {
+        return this.SQLInfo;
+    }
+
+    public void LoadConfig() {
         AchievementsEngine.getInstance().getPlayerStates().clear(); // Reset player states list
         AchievementsEngine.getInstance().getAchievementManager().getAchievements().clear(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        DataHandler.loadAchievementsFile(); // Load achievements
-        DataHandler.loadMessagesFile(); // Load messages
+        SQLInfo.clear();
+        loadConfig(); // Load config
+        loadAchievementsFile(); // Load achievements
+        loadMessagesFile(); // Load messages
     }
 
-    public static void createPlayerAchievementState(Player p) {
+    public void createPlayerAchievementState(Player p) {
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         File dataFile = createPlayerFile(p);
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
@@ -55,7 +61,7 @@ public class DataHandler {
         }
     }
 
-    public static void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
+    public void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
@@ -67,7 +73,7 @@ public class DataHandler {
         }
     }
 
-    public static void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
+    public void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
@@ -79,7 +85,7 @@ public class DataHandler {
         }
     }
 
-    public static void updateProgress(PlayerAchievementState state, Achievement achievement) {
+    public void updateProgress(PlayerAchievementState state, Achievement achievement) {
         int[] progress = state.getProgress().get(achievement);
         List<Integer> newProgress = new ArrayList<>();
         for(int i = 0; i < progress.length; i++) {
@@ -97,7 +103,7 @@ public class DataHandler {
         }
     }
 
-    public static void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
+    public void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
         File dataFile1 = createPlayerFile(state1.getPlayer());
         File dataFile2 = createPlayerFile(state2.getPlayer());
         YamlConfiguration data1 = YamlConfiguration.loadConfiguration(dataFile1);
@@ -114,14 +120,14 @@ public class DataHandler {
         state1.setCompletedAchievements(new ArrayList<>());
         state1.setProgress(new HashMap<>());
         for(Achievement a : state2.getCompletedAchievements()) {
-            DataHandler.addCompletedAchievement(state2, a);
+            addCompletedAchievement(state2, a);
         }
         for(Achievement a : state2.progress.keySet()) {
-            DataHandler.updateProgress(state2, a);
+            updateProgress(state2, a);
         }
     }
 
-    public static File createPlayerFile(Player p) {
+    public File createPlayerFile(Player p) {
         File dataFile = new File(AchievementsEngine.getInstance().getDataFolder(), "/playerData/" + p.getName() + ".yml");
         if(!dataFile.exists()) {
             try {
@@ -140,26 +146,22 @@ public class DataHandler {
         return dataFile;
     }
 
-    public static String ReadStringPath(String path) {
-        if (yml.getString(path) == null) {
-            yml.set(path, "");
-        }
-        return yml.getString(path);
-    }
-
-    public static void loadAchievementsFile() {
+    public void loadAchievementsFile() {
         File achFile = new File(AchievementsEngine.getInstance().getDataFolder(), "achievements.yml");
         if (!achFile.exists()) { // If file doesn't exist, create default file
             AchievementsEngine.getInstance().saveResource("achievements.yml", false);
         }
-        yml = YamlConfiguration.loadConfiguration(achFile);
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(achFile);
         ConfigurationSection section = yml.getConfigurationSection("achievements");
         if(section == null) return;
         for (String key : section.getKeys(false)) {
+            if(key.length() > 128) {
+                AchievementsEngine.getInstance().getLogger().warning("Cannot load achievement " + key + " - achievement key is too long..");
+            }
             if (yml.getString("achievements." + key + ".name") != null) {
                 AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
-                        new Achievement(key, ReadStringPath("achievements." + key + ".name"),
-                                ReadStringPath("achievements." + key + ".description"),
+                        new Achievement(key, yml.getString("achievements." + key + ".name"),
+                                yml.getString("achievements." + key + ".description"),
                                 yml.getBoolean("achievements." + key + ".enabled"), yml.getStringList("achievements." + key + ".events"),
                                 yml.getStringList("achievements." + key + ".actions"), yml.getString("achievements." + key + ".item"),
                                 yml.getBoolean("achievements." + key + ".showProgress"))); // Create new achievement from yml
@@ -168,17 +170,32 @@ public class DataHandler {
         }
     }
 
-    public static void loadMessagesFile() {
+    public void loadMessagesFile() {
         File msgFile = new File(AchievementsEngine.getInstance().getDataFolder(), "messages.yml");
         if (!msgFile.exists()) { // If file doesn't exist, create default file
             AchievementsEngine.getInstance().saveResource("messages.yml", false);
         }
-        yml = YamlConfiguration.loadConfiguration(msgFile);
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(msgFile);
         ConfigurationSection section = yml.getConfigurationSection("messages");
         if(section == null) return;
         AchievementsEngine.getInstance().getMessages().clearMessages();
         for (String key : section.getKeys(false)) {
-            AchievementsEngine.getInstance().getMessages().addMessage(key, ReadStringPath("messages." + key));
+            AchievementsEngine.getInstance().getMessages().addMessage(key, yml.getString("messages." + key));
+        }
+    }
+
+    public void loadConfig() {
+        File configFile = new File(AchievementsEngine.getInstance().getDataFolder(), "config.yml");
+        if(!configFile.exists()) {
+            AchievementsEngine.getInstance().saveResource("config.yml", false);
+        }
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(configFile);
+        if(yml.getBoolean("config.useSQL")) {
+            SQLInfo.put("host", yml.getString("sql.host"));
+            SQLInfo.put("user", yml.getString("sql.user"));
+            SQLInfo.put("password", yml.getString("sql.password"));
+            SQLInfo.put("database", yml.getString("sql.database"));
+            SQLInfo.put("port", yml.getString("sql.port"));
         }
     }
 }

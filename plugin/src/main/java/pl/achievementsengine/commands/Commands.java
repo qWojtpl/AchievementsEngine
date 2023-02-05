@@ -9,7 +9,6 @@ import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
-import pl.achievementsengine.data.DataHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +83,7 @@ public class Commands implements CommandExecutor {
     private void c_Reload(CommandSender sender) {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.reload"))) return;
-        DataHandler.LoadConfig();
+        AchievementsEngine.getInstance().getDataHandler().LoadConfig();
         sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReloaded!");
     }
 
@@ -207,7 +206,7 @@ public class Commands implements CommandExecutor {
         }
         state.getProgress().put(a, new int[a.getEvents().size()]);
         sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aReset all " + args[1] + "§a's progress!");
-        DataHandler.updateProgress(state, a);
+        AchievementsEngine.getInstance().getDataHandler().updateProgress(state, a);
     }
 
     private void c_Transfer(CommandSender sender, String[] args) {
@@ -225,7 +224,7 @@ public class Commands implements CommandExecutor {
         }
         PlayerAchievementState state1 = PlayerAchievementState.Create(p1);
         PlayerAchievementState state2 = PlayerAchievementState.Create(p2);
-        DataHandler.transferAchievements(state1, state2);
+        AchievementsEngine.getInstance().getDataHandler().transferAchievements(state1, state2);
         sender.sendMessage(AchievementsEngine.getInstance().getMessages().ReadLanguage("prefix") + "§aTransferred all achievements from "
                 + args[1] + "§a to " + args[2] + "§a!");
     }

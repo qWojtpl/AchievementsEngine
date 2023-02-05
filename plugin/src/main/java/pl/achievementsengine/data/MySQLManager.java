@@ -16,8 +16,6 @@ public class MySQLManager {
     private final Logger log;
     private final AchievementsEngine plugin;
     private DatabaseConnector connector;
-    public static final String PLAYERS = "players";
-    public static final String ACHIEVEMENTS = "achievements";
 
     public MySQLManager() {
         this.plugin = AchievementsEngine.getInstance();
@@ -29,20 +27,43 @@ public class MySQLManager {
     private void initiateDB() {
         this.connector = new DatabaseConnector();
         if(connector.checkConnection()) {
-            if(!existTable(PLAYERS)) {
-                execute("CREATE TABLE IF NOT EXISTS achievements ( " +
-                        "id_achievement INT NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-                        "name VARCHAR(128)" +
-                        ")");
+            if(!existTable("players")) {
+                execute("CREATE TABLE IF NOT EXISTS players (" +
+                        " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                        " nick VARCHAR(16)" +
+                        " );");
+            }
+            if(!existTable("achievements")) {
+                execute("CREATE TABLE IF NOT EXISTS achievements (" +
+                        " achievement_key VARCHAR(128) PRIMARY KEY" +
+                        " );");
+            }
+            if(!existTable("progress")) {
+                execute("CREATE TABLE IF NOT EXISTS progress (" +
+                        " id_player INT," +
+                        " achievement_key VARCHAR(128)," +
+                        " event INT," +
+                        " progress INT," +
+                        " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
+                        " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
+                        ");");
+            }
+            if(!existTable("completed")) {
+                execute("CREATE TABLE IF NOT EXISTS completed (" +
+                        " id_player INT," +
+                        " achievement_key VARCHAR(128)," +
+                        " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
+                        " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
+                        ");");
             }
         } else {
-            log.warning("Cannot inititate database");
+            log.warning("Cannot initiate database");
         }
         if(connector.getConnection() != null) connector.getConnection().close();
     }
 
     private boolean existTable(String table) {
-        String database = "872991_osiagniecia";
+        String database = connector.getDatabase();
         try(Connection connection = connector.getConnection();
         ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) {
             return tables.next();
@@ -68,7 +89,7 @@ public class MySQLManager {
             offset = "" + (Integer.parseInt(offset) - 1) * 10;
         }
         // LIMIT <OFFSET>, <LIMIT>
-        String query = "SELECT * FROM " + ACHIEVEMENTS + " LIMIT 10 OFFSET " + offset;
+        String query = "SELECT * FROM achievements LIMIT 10 OFFSET " + offset;
         List<String> achievements = new ArrayList<>();
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
