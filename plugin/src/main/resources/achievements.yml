@@ -5,6 +5,7 @@ achievements:
     description: §aUse /ae command and get 1 diamond.
     item: BEDROCK
     showProgress: false
+    announceProgress: false
     events:
     - command 1 /ae
     actions:

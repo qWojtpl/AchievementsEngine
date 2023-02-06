@@ -19,8 +19,9 @@ public class Achievement {
     private final List<String> actions; // actions (commands) which will be triggered if player will complete achievement
     private final Material item; // GUI item
     private final boolean showProgress; // show achievement progress?
+    private final boolean announceProgress;
 
-    public Achievement(String id, String name, String description, List<String> events, List<String> actions, String item, boolean showProgress) {
+    public Achievement(String id, String name, String description, List<String> events, List<String> actions, String item, boolean showProgress, boolean announceProgress) {
         this.ID = id;
         this.name = name;
         this.description = description;
@@ -36,6 +37,7 @@ public class Achievement {
             this.item = Material.BEDROCK;
         }
         this.showProgress = showProgress;
+        this.announceProgress = announceProgress;
         for(String event : events) {
             String[] ev = event.split(" ");
             AchievementsEngine.getInstance().getEvents().registerEvent(ev[0] + " " + ev[2], this);

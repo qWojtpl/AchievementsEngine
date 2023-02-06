@@ -80,7 +80,8 @@ Before below fields add parent key<br>
 `name` - Achievement name<br>
 `description` - Achievement description<br>
 `item` - GUI item (default is bedrock)<br>
-`showProgress` - If true shows the progress in GUI and when someone will progress in achievement plugin will send chat message<br>
+`showProgress` - If true shows the progress in GUI and e<br>
+`announceProgress` - If true announce when player will progress in achievement by sending chat message to him<br>
 `events` - List of events required to complete this achievement (syntax: {EVENT} {HOW_MANY_TIMES} {BLOCK/ENTITY/ITEM/TEXT} [named] [TEXT]), eg.<br>
 
 ```yml
@@ -112,6 +113,7 @@ achievements:
     description: '§aShoot 64 times from bow%nl%§aRewards:%nl%§b12 diamonds'
     item: BOW
     showProgress: false
+    announceProgress: false
     events:
     - shoot 64 bow
     actions:
@@ -122,6 +124,7 @@ achievements:
     description: '§aFish 50 cods%nl%§aRewards:%nl%§232 emeralds'
     item: FISHING_ROD
     showProgress: true
+    announceProgress: tre
     events:
     - fish 50 cod
     actions:
@@ -132,6 +135,7 @@ achievements:
     description: '§aComplete all achievements'
     item: GOLD_BLOCK
     showProgress: false
+    announceProgress: false
     events:
     - complete 1 0
     - complete 1 fisherman
@@ -150,6 +154,7 @@ achievements:
     description: §aUse /ae command and get 1 diamond.
     item: BEDROCK
     showProgress: false
+    announceProgress: false
     events:
     - command 1 /ae
     actions:
