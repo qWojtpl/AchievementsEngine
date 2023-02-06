@@ -1,18 +1,26 @@
-# AchievementsEngine
+<p align="center">
+  <img src="https://i.imgur.com/FRDyMxv.png">
+</p>
 
-<div style='display:inline-block'>
-<img src='https://img.shields.io/github/v/release/qWojtpl/achievementsengine'>
-<img src='https://img.shields.io/github/languages/top/qWojtpl/achievementsengine'>
-<img src='https://img.shields.io/github/repo-size/qWojtpl/achievementsengine'>
+<div style="display:inline-block">
+  <p align="center">
+    <img src="https://img.shields.io/github/v/release/qWojtpl/achievementsengine">
+    <img src="https://img.shields.io/github/languages/top/qWojtpl/achievementsengine">
+    <img src="https://img.shields.io/github/repo-size/qWojtpl/achievementsengine">
+  </p>
 </div>
-<div style='display:inline-block'>
-<img src='https://img.shields.io/github/downloads/qWojtpl/achievementsengine/latest/total'>
-<img src='https://img.shields.io/github/commit-activity/m/qWojtpl/achievementsengine'>
-<img src='https://img.shields.io/github/commits-since/qWojtpl/achievementsengine/latest'>
-<img src='https://img.shields.io/github/last-commit/qWojtpl/achievementsengine'>
+<div style="display:inline-block">
+  <p align="center">
+    <img src="https://img.shields.io/github/downloads/qWojtpl/achievementsengine/latest/total">
+    <img src="https://img.shields.io/github/commit-activity/m/qWojtpl/achievementsengine">
+    <img src="https://img.shields.io/github/commits-since/qWojtpl/achievementsengine/latest">
+    <img src="https://img.shields.io/github/last-commit/qWojtpl/achievementsengine">
+  </p>
 </div>
 
 <br>
+
+# AchievementsEngine
 
 <p>Add achievements to your Minecraft server.</p>
 <p>Tested minecraft versions: </p> 
@@ -97,7 +105,7 @@ actions:
 
 ```yml
 achievements:
-  '0':
+  "0":
     enabled: true
     name: '§6§lMarksman'
     description: '§aShoot 64 times from bow%nl%§aRewards:%nl%§b12 diamonds'
@@ -107,7 +115,7 @@ achievements:
     - shoot 64 bow
     actions:
     - give {0} minecraft:diamond 12
-  'fisherman':
+  "fisherman":
     enabled: true
     name: '§1§lFisherman'
     description: '§aFish 50 cods%nl%§aRewards:%nl%§232 emeralds'
@@ -117,7 +125,7 @@ achievements:
     - fish 50 cod
     actions:
     - give {0} minecraft:emerald 32
-  'fame':
+  "fame":
     enabled: true
     name: '§6§lIm fame!'
     description: '§aComplete all achievements'
@@ -135,7 +143,7 @@ achievements:
 
 ```yml
 achievements:
-  '0':
+  "0":
     enabled: true
     name: §2§lSample Achievement
     description: §aUse /ae command and get 1 diamond.
@@ -176,10 +184,10 @@ messages:
   gui-title: Achievements (Page {0}/{1})
   gui-next: §f§lNext page
   gui-previous: §f§lPrevious page
-  complete-message: '§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked:
-    {0}%nl%%nl%§6§k--------------'
+  complete-message: "§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked:
+    {0}%nl%%nl%§6§k--------------"
   progress-message: §aYou made progress in achievement {0}§a!
-  progress: '§6§lProgress:'
+  progress: "§6§lProgress:"
   progress-field-prefix: §7§l- §b
   completed: §aCOMPLETED!
 ```
@@ -193,6 +201,6 @@ messages:
 `/ae reload`                         - Reload config `ae.reload`<br>
 `/ae achievements`                   - Print all achievements and requirements to complete `ae.achievements`<br>
 `/ae complete <nick> <achievement>`  - Complete achievement for some player `ae.complete`<br>
-`/ae remove <nick> <achievement>`    - Remove player's completed achievement `ae.remove`<br>
-`/ae reset <nick> <achievement>`     - Reset player's achievement progress `ae.reset`<br>
-`/ae transfer <from> <to>`           - Transfer player's completed achievements and progress to other player `ae.transfer`<br>
+`/ae remove <nick> <achievement>`    - Remove player"s completed achievement `ae.remove`<br>
+`/ae reset <nick> <achievement>`     - Reset player"s achievement progress `ae.reset`<br>
+`/ae transfer <from> <to>`           - Transfer player"s completed achievements and progress to other player `ae.transfer`<br>
