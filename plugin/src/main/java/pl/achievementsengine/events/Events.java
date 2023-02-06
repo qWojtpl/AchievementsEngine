@@ -3,6 +3,8 @@ package pl.achievementsengine.events;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -12,6 +14,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -168,7 +171,20 @@ public class Events implements Listener {
     public void onShootBow(EntityShootBowEvent event) {
         if(event.isCancelled()) return;
         if(event.getEntity() instanceof Player) {
-            checkForAchievementEvents((Player) event.getEntity(), "shoot bow named " + event.getBow().getItemMeta().getDisplayName());
+            checkForAchievementEvents((Player) event.getEntity(), "shoot " + event.getBow().getType().name()
+                    + " named " + event.getBow().getItemMeta().getDisplayName());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onThrow(ProjectileLaunchEvent event) {
+        if(event.isCancelled()) return;
+        if(!(event.getEntity().getShooter() instanceof Player)) return;
+        Player p = (Player) event.getEntity().getShooter();
+        if(event.getEntity() instanceof Trident) {
+            checkForAchievementEvents(p, "throw trident");
+        } else if(event.getEntity() instanceof Snowball) {
+            checkForAchievementEvents(p, "throw snowball");
         }
     }
 

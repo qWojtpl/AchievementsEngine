@@ -60,6 +60,7 @@
 - fish        // Fish (using fishing rod) event, eg. fish 64 pufferfish
 - catch       // Catch (using fishing rod) entity, eg. catch 10 wolf
 - shoot*      // Shoot event, eg. shoot 20 bow
+- throw       // Throw event, eg. throw 64 snowball, throw 10 trident
 - command     // Send command event (without arguments), eg. command 30 /ae
 - chat        // Send chat message event, eg. chat 10 Wiggle-Wiggle
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
