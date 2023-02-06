@@ -107,7 +107,7 @@ actions:
 
 ```yml
 achievements:
-  "0":
+  '0':
     enabled: true
     name: '§6§lMarksman'
     description: '§aShoot 64 times from bow%nl%§aRewards:%nl%§b12 diamonds'
@@ -118,7 +118,7 @@ achievements:
     - shoot 64 bow
     actions:
     - give {0} minecraft:diamond 12
-  "fisherman":
+  'fisherman':
     enabled: true
     name: '§1§lFisherman'
     description: '§aFish 50 cods%nl%§aRewards:%nl%§232 emeralds'
@@ -129,7 +129,7 @@ achievements:
     - fish 50 cod
     actions:
     - give {0} minecraft:emerald 32
-  "fame":
+  'fame':
     enabled: true
     name: '§6§lIm fame!'
     description: '§aComplete all achievements'
@@ -148,7 +148,7 @@ achievements:
 
 ```yml
 achievements:
-  "0":
+  '0':
     enabled: true
     name: §2§lSample Achievement
     description: §aUse /ae command and get 1 diamond.
@@ -176,7 +176,7 @@ Every field must be child of "messages"<br>
 `gui-title` - GUI title<br>
 `gui-next` - Next GUI page<br>
 `gui-previous` - Previous GUI page<br>
-`complete-message` - Complete achievement chat message. {0} is achievement name<br>
+`complete-message` - Complete achievement chat message. {0} is achievement name, {1} is description, {2} is events, {3} is actions<br>
 `progress-message` - Progress achievement chat message. {0} is achievement name<br>
 `progress` - Progress (text in GUI)<br>
 `progress-field-prefix`: Prefix in GUI progress list<br>

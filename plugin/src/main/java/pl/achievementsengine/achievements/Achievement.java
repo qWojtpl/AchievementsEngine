@@ -51,7 +51,27 @@ public class Achievement {
                 return;
             }
         }
-        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("complete-message"), name, description, events, actions);
+        String eventsFormat = "";
+        if(events.size() > 0) {
+            eventsFormat = events.get(0);
+            int i = 0;
+            for(String event : events) {
+                i++;
+                if(i == 1) continue;
+                eventsFormat = eventsFormat + ", " + event;
+            }
+        }
+        String actionsFormat = "";
+        if(actions.size() > 0) {
+            actionsFormat = actions.get(0);
+            int i = 0;
+            for(String action : actions) {
+                i++;
+                if(i == 1) continue;
+                actionsFormat = actionsFormat + ", " + action;
+            }
+        }
+        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("complete-message"), name, description, eventsFormat, actionsFormat);
         String[] msg = message.split("%nl%");
         for(String m : msg) {
             state.getPlayer().sendMessage(m);
