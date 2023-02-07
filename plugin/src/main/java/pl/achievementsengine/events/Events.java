@@ -81,7 +81,7 @@ public class Events implements Listener {
 
     @EventHandler
     public void onKill(EntityDeathEvent event) {
-        if(event.getEntity().getKiller() instanceof Player) {
+        if(event.getEntity().getKiller() != null) {
             checkForAchievementEvents(event.getEntity().getKiller(), "kill " + event.getEntity().getType().name()
                     + " named " + event.getEntity().getCustomName());
         }

@@ -1,6 +1,7 @@
 config:
   useYAML: true
   useSQL: false
+  saveInterval: 300 # 5 minutes
 
 sql:
   host: ''

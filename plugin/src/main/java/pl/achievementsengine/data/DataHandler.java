@@ -1,5 +1,6 @@
 package pl.achievementsengine.data;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,6 +19,9 @@ public class DataHandler {
 
     private final HashMap<String, YamlConfiguration> playerYAML = new HashMap<>();
     private final HashMap<String, String> SQLInfo = new HashMap<>();
+    private final HashMap<String, PlayerAchievementState> pendingStates = new HashMap<>();
+    private int saveInterval;
+    private int saveTask = -1;
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
@@ -27,6 +31,9 @@ public class DataHandler {
         for(String key : AchievementsEngine.getInstance().getPlayerStates().keySet()) {
             savePlayerData(AchievementsEngine.getInstance().getPlayerStates().get(key));
         }
+        if(saveTask != -1) {
+            Bukkit.getScheduler().cancelTask(saveTask);
+        }
         AchievementsEngine.getInstance().getEvents().clearRegisteredEvents(); // Clear registered events
         AchievementsEngine.getInstance().getPlayerStates().clear(); // Reset player states list
         AchievementsEngine.getInstance().getAchievementManager().getAchievements().clear(); // Reset achievements list
@@ -35,6 +42,10 @@ public class DataHandler {
         loadConfig(); // Load config
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
+    }
+
+    public void addToPending(PlayerAchievementState state) {
+        getPendingStates().put(state.getPlayer().getName(), state);
     }
 
     public void createPlayerAchievementState(PlayerAchievementState state) {
@@ -67,18 +78,21 @@ public class DataHandler {
     }
 
     public void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
+        addToPending(state);
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
     }
 
     public void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
+        addToPending(state);
         File dataFile = createPlayerFile(state.getPlayer());
         YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
         data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
     }
 
     public void updateProgress(PlayerAchievementState state, Achievement achievement) {
+        addToPending(state);
         int[] progress = state.getProgress().get(achievement);
         List<Integer> newProgress = new ArrayList<>();
         for(int i = 0; i < progress.length; i++) {
@@ -98,6 +112,7 @@ public class DataHandler {
     }
 
     public void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
+        addToPending(state2);
         File dataFile1 = createPlayerFile(state1.getPlayer());
         File dataFile2 = createPlayerFile(state2.getPlayer());
         YamlConfiguration data1 = playerYAML.get(state1.getPlayer().getName());
@@ -193,5 +208,21 @@ public class DataHandler {
             SQLInfo.put("database", yml.getString("sql.database"));
             SQLInfo.put("port", yml.getString("sql.port"));
         }
+        this.saveInterval = yml.getInt("config.saveInterval");
+        this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(), () -> {
+            for(String key : getPendingStates().keySet()) {
+                PlayerAchievementState state = getPendingStates().get(key);
+                savePlayerData(state);
+            }
+            getPendingStates().clear();
+        }, 0L, 20L * saveInterval);
+    }
+
+    public HashMap<String, PlayerAchievementState> getPendingStates() {
+        return this.pendingStates;
+    }
+
+    public int getSaveInterval() {
+        return this.saveInterval;
     }
 }
