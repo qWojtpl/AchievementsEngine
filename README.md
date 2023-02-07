@@ -202,9 +202,9 @@ messages:
 
 <details><summary>config.yml</summary>
 
-`useYAML` - When set to true plugin will be using YAML to save data
-`useSQL` - When set to true plugin will be using SQL to save data
-`saveInterval` - Interval between data saves (in seconds)
+`useYAML` - When set to true plugin will be using YAML to save data<br>
+`useSQL` - When set to true plugin will be using SQL to save data<br>
+`saveInterval` - Interval between data saves (in seconds)<br>
 
 ## Default configuration:
 
