@@ -200,6 +200,30 @@ messages:
 
 </details>
 
+<details><summary>config.yml</summary>
+
+`useYAML` - When set to true plugin will be using YAML to save data
+`useSQL` - When set to true plugin will be using SQL to save data
+`saveInterval` - Interval between data saves (in seconds)
+
+## Default configuration:
+
+```yml
+config:
+  useYAML: true
+  useSQL: false
+  saveInterval: 300 # 5 minutes
+
+sql:
+  host: ''
+  user: ''
+  password: ''
+  database: ''
+  port: 3306
+```
+
+</details>
+
 # Commands & Permissions
 
 `/ae`                                - Show achievements list, permission to receive any achievement `ae.use`<br> 
