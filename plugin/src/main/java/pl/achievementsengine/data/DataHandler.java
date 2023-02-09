@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
+import pl.achievementsengine.achievements.AchievementManager;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 
@@ -177,6 +178,7 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".showProgress"),
                                 yml.getBoolean("achievements." + key + ".announceProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
+                AchievementsEngine.getInstance().getManager().execute("INSERT INTO achievements VALUES(default, ?)", new String[]{key});
             }
         }
     }

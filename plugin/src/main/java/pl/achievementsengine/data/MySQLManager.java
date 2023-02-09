@@ -31,12 +31,12 @@ public class MySQLManager {
                 execute("CREATE TABLE IF NOT EXISTS players (" +
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " nick VARCHAR(16)" +
-                        " );");
+                        " );", null);
             }
             if(!existTable("achievements")) {
                 execute("CREATE TABLE IF NOT EXISTS achievements (" +
                         " achievement_key VARCHAR(128) PRIMARY KEY" +
-                        " );");
+                        " );", null);
             }
             if(!existTable("progress")) {
                 execute("CREATE TABLE IF NOT EXISTS progress (" +
@@ -46,7 +46,7 @@ public class MySQLManager {
                         " progress INT," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
-                        ");");
+                        ");", null);
             }
             if(!existTable("completed")) {
                 execute("CREATE TABLE IF NOT EXISTS completed (" +
@@ -54,7 +54,7 @@ public class MySQLManager {
                         " achievement_key VARCHAR(128)," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
-                        ");");
+                        ");", null);
             }
         } else {
             log.warning("Cannot initiate database");
@@ -73,33 +73,21 @@ public class MySQLManager {
         }
     }
 
-    public void execute(String query) {
+    public void execute(String query, String[] args) {
+        if(connector.getConnection() == null) {
+            log.severe("Error at execute() - connection is null");
+        }
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            if(args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    preparedStatement.setString(i + 1, args[i]);
+                }
+            }
             preparedStatement.executeUpdate();
         } catch(SQLException e) {
             log.severe("Error at execute() SQL Exception: " + e);
         }
     }
 
-    public List<String> getAchievements(String offset) {
-        if(offset == null) {
-            offset = "0";
-        } else {
-            offset = "" + (Integer.parseInt(offset) - 1) * 10;
-        }
-        // LIMIT <OFFSET>, <LIMIT>
-        String query = "SELECT * FROM achievements LIMIT 10 OFFSET " + offset;
-        List<String> achievements = new ArrayList<>();
-        try(Connection connection = connector.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            final ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()) {
-                achievements.add(resultSet.getString("name"));
-            }
-        } catch(SQLException e) {
-            log.severe("Error at execute() SQL Exception: " + e);
-        }
-        return achievements;
-    }
 }

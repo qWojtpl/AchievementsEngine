@@ -201,6 +201,7 @@ messages:
 </details>
 
 <details><summary>config.yml</summary>
+<br>
 
 `useYAML` - When set to true plugin will be using YAML to save data<br>
 `useSQL` - When set to true plugin will be using SQL to save data<br>
