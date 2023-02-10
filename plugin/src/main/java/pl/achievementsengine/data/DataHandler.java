@@ -1,5 +1,6 @@
 package pl.achievementsengine.data;
 
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,6 +13,7 @@ import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +23,11 @@ public class DataHandler {
     private final HashMap<String, YamlConfiguration> playerYAML = new HashMap<>();
     private final HashMap<String, String> SQLInfo = new HashMap<>();
     private final HashMap<String, PlayerAchievementState> pendingStates = new HashMap<>();
+    private final List<String[]> sqlQueue = new ArrayList<>();
     private int saveInterval;
     private int saveTask = -1;
+    private boolean useYAML;
+    private boolean useSQL;
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
@@ -39,7 +44,7 @@ public class DataHandler {
         AchievementsEngine.getInstance().getPlayerStates().clear(); // Reset player states list
         AchievementsEngine.getInstance().getAchievementManager().getAchievements().clear(); // Reset achievements list
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
-        SQLInfo.clear();
+        SQLInfo.clear(); // Clear SQL info
         loadConfig(); // Load config
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
@@ -49,66 +54,100 @@ public class DataHandler {
         getPendingStates().put(state.getPlayer().getName(), state);
     }
 
+    @SneakyThrows
     public void createPlayerAchievementState(PlayerAchievementState state) {
         Player p = state.getPlayer();
-        File dataFile = createPlayerFile(p);
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
         String nick = p.getName();
-        playerYAML.put(nick, data);
-        ConfigurationSection section = data.getConfigurationSection("user." + nick);
-        if (section == null) return;
-        for (String key : section.getKeys(false)) {
-            for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
-                if (!a.getID().equals(key)) {
-                    continue;
+        if(useYAML) {
+            File dataFile = createPlayerFile(p);
+            YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+            playerYAML.put(nick, data);
+            ConfigurationSection section = data.getConfigurationSection(nick);
+            if(section == null) return;
+            for(String key : section.getKeys(false)) {
+                for(Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
+                    if(!a.getID().equals(key)) {
+                        continue;
+                    }
+                    if(data.getBoolean(nick + "." + key + ".completed")) {
+                        state.getCompletedAchievements().add(a);
+                    }
+                    List<Integer> progressList = data.getIntegerList(nick + "." + key + ".progress");
+                    int[] progress = new int[a.getEvents().size()];
+                    int i = 0;
+                    for(int value : progressList) {
+                        progress[i] = value;
+                        i++;
+                    }
+                    state.getProgress().put(a, progress);
+                    break;
                 }
-                if (data.getBoolean("user." + nick + "." + key + ".completed")) {
-                    state.getCompletedAchievements().add(a);
-                }
-                List<Integer> progressList = data.getIntegerList("user." + nick + "." + key + ".progress");
-                int[] progress = new int[a.getEvents().size()];
-                int i = 0;
-                for (int value : progressList) {
-                    progress[i] = value;
-                    i++;
-                }
-                state.getProgress().put(a, progress);
-                break;
             }
+        }
+        if(useSQL) {
+            getSQLQueue().add(new String[]{"INSERT INTO players VALUES(default, ?)", nick});
+            /*ResultSet rs = AchievementsEngine.getInstance().getManager().query(
+                    "SELECT achievement_key FROM completed JOIN players USING (id_player) WHERE players.nick = ?",
+                    new String[]{nick});
+            while(rs.next()) {
+                state.getCompletedAchievements().add(AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
+                        rs.getString("achievement_key")));
+            }
+            rs = AchievementsEngine.getInstance().getManager().query(
+                    "SELECT event, progress FROM progress JOIN players USING (id_player) WHERE players.nick = ?",
+                    new String[]{nick}
+            );*/
         }
     }
 
     public void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         addToPending(state);
-        File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
-        data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
+        if(useYAML) {
+            File dataFile = createPlayerFile(state.getPlayer());
+            YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
+        }
     }
 
     public void removeCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         addToPending(state);
-        File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
-        data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
+        if(useYAML) {
+            File dataFile = createPlayerFile(state.getPlayer());
+            YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
+        }
     }
 
     public void updateProgress(PlayerAchievementState state, Achievement achievement) {
         addToPending(state);
-        int[] progress = state.getProgress().get(achievement);
-        List<Integer> newProgress = new ArrayList<>();
-        for(int i = 0; i < progress.length; i++) {
-            newProgress.add(progress[i]);
+        if(useYAML) {
+            int[] progress = state.getProgress().get(achievement);
+            List<Integer> newProgress = new ArrayList<>();
+            for(int i = 0; i < progress.length; i++) {
+                newProgress.add(progress[i]);
+            }
+            File dataFile = createPlayerFile(state.getPlayer());
+            YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
         }
-        File dataFile = createPlayerFile(state.getPlayer());
-        YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
-        data.set("user." + state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
     }
 
     public void savePlayerData(PlayerAchievementState state) {
-        try {
-            playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer()));
-        } catch(IOException e) {
-            AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+        if(useYAML) {
+            try {
+                playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer()));
+            } catch (IOException e) {
+                AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+            }
+        }
+        if(useSQL) {
+            for(String[] sql : sqlQueue) {
+                String[] args = new String[sql.length-1];
+                for(int i = 1; i < sql.length; i++) {
+                    args[i-1] = sql[i];
+                }
+                AchievementsEngine.getInstance().getManager().execute(sql[0], args);
+            }
         }
     }
 
@@ -116,14 +155,16 @@ public class DataHandler {
         addToPending(state2);
         File dataFile1 = createPlayerFile(state1.getPlayer());
         File dataFile2 = createPlayerFile(state2.getPlayer());
-        YamlConfiguration data1 = playerYAML.get(state1.getPlayer().getName());
-        try {
-            data1.set("user." + state1.getPlayer().getName(), null);
-            data1.save(dataFile1);
-        } catch(IOException e) {
-            AchievementsEngine.getInstance().getLogger().info("Cannot transfer achievements from " + state1.getPlayer().getName()
-                    + " to " + state2.getPlayer().getName());
-            AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
+        if(useYAML) {
+            YamlConfiguration data1 = playerYAML.get(state1.getPlayer().getName());
+            try {
+                data1.set(state1.getPlayer().getName(), null);
+                data1.save(dataFile1);
+            } catch (IOException e) {
+                AchievementsEngine.getInstance().getLogger().info("Cannot transfer achievements from " + state1.getPlayer().getName()
+                        + " to " + state2.getPlayer().getName());
+                AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
+            }
         }
         state2.setCompletedAchievements(new ArrayList<>(state1.getCompletedAchievements()));
         state2.setProgress(new HashMap<>(state1.getProgress()));
@@ -178,7 +219,10 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".showProgress"),
                                 yml.getBoolean("achievements." + key + ".announceProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
-                AchievementsEngine.getInstance().getManager().execute("INSERT INTO achievements VALUES(default, ?)", new String[]{key});
+                if(useSQL) {
+                    getSQLQueue().add(new String[]{"INSERT INTO achievements VALUES(?)",
+                            yml.getString("achievements." + key + ".name")});
+                }
             }
         }
     }
@@ -211,6 +255,8 @@ public class DataHandler {
             SQLInfo.put("port", yml.getString("sql.port"));
         }
         this.saveInterval = yml.getInt("config.saveInterval");
+        this.useYAML = yml.getBoolean("config.useYAML");
+        this.useSQL = yml.getBoolean("config.useSQL");
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(), () -> {
             for(String key : getPendingStates().keySet()) {
                 PlayerAchievementState state = getPendingStates().get(key);
@@ -222,6 +268,10 @@ public class DataHandler {
 
     public HashMap<String, PlayerAchievementState> getPendingStates() {
         return this.pendingStates;
+    }
+
+    public List<String[]> getSQLQueue() {
+        return this.sqlQueue;
     }
 
     public int getSaveInterval() {

@@ -3,10 +3,7 @@ package pl.achievementsengine.data;
 import lombok.SneakyThrows;
 import pl.achievementsengine.AchievementsEngine;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -76,6 +73,7 @@ public class MySQLManager {
     public void execute(String query, String[] args) {
         if(connector.getConnection() == null) {
             log.severe("Error at execute() - connection is null");
+            return;
         }
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -86,8 +84,28 @@ public class MySQLManager {
             }
             preparedStatement.executeUpdate();
         } catch(SQLException e) {
-            log.severe("Error at execute() SQL Exception: " + e);
+            log.severe("Error at execute(), SQL Exception: " + e);
         }
+    }
+
+    public ResultSet query(String query, String[] args) {
+        if(connector.getConnection() == null) {
+            log.severe("Error at query() - connection is null");
+            return null;
+        }
+        ResultSet resultSet = null;
+        try(Connection connection = connector.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            if(args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    preparedStatement.setString(i + 1, args[i]);
+                }
+            }
+            resultSet = preparedStatement.executeQuery();
+        } catch(SQLException e) {
+            log.severe("Error at query(), SQL Exception: " + e);
+        }
+        return resultSet;
     }
 
 }
