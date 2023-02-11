@@ -18,6 +18,7 @@ public class AchievementManager {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!p.hasPermission(permissionManager.getPermission("ae.use"))) return; // Check if player has permission
         PlayerAchievementState playerState = PlayerAchievementState.Create(p); // Get player's state
+        if(playerState.getCompletedAchievements().contains(a)) return; // If player completed this achievement - return
         int[] progress = playerState.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Initialize progress
         int max = 0;
         for(int j = 0; j < a.getEvents().size(); j++) { // Loop through all events from achievement

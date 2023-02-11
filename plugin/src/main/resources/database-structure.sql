@@ -15,12 +15,14 @@ CREATE TABLE IF NOT EXISTS progress (
     event INT,
     progress INT,
     FOREIGN KEY (id_player) REFERENCES players(id_player),
-    FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)
+    FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement),
+    UNIQUE(id_player, id_achievement, event)
 );
 
 CREATE TABLE IF NOT EXISTS completed (
     id_player INT,
     id_achievement INT,
     FOREIGN KEY (id_player) REFERENCES players(id_player),
-    FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)
+    FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement),
+    UNIQUE(id_player, id_achievement)
 );

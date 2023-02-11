@@ -84,6 +84,7 @@ public class DataHandler {
         if(useSQL) {
             getSQLQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick});
             AchievementsEngine.getInstance().getManager().loadCompleted(state);
+            AchievementsEngine.getInstance().getManager().loadProgress(state);
         }
     }
 
@@ -109,7 +110,7 @@ public class DataHandler {
             data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
         }
         if(useSQL) {
-            getSQLQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT nick FROM players WHERE id_player=?) " +
+            getSQLQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT id_player FROM players WHERE nick=?) " +
                     "AND id_achievement=(SELECT id_achievement FROM achievements WHERE achievement_key=?)",
                     state.getPlayer().getName(),
                     achievement.getID()
@@ -273,7 +274,7 @@ public class DataHandler {
         this.useYAML = yml.getBoolean("config.useYAML");
         this.useSQL = yml.getBoolean("config.useSQL");
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
-                this::saveAll, 0L, 20L * saveInterval);
+                this::saveAll, 20L * saveInterval, 20L * saveInterval);
     }
 
     public HashMap<String, PlayerAchievementState> getPendingStates() {

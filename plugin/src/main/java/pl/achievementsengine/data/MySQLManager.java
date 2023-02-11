@@ -3,6 +3,7 @@ package pl.achievementsengine.data;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import pl.achievementsengine.AchievementsEngine;
+import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.sql.*;
@@ -46,6 +47,7 @@ public class MySQLManager {
                         " progress INT," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)" +
+                        " UNIQUE(id_player, id_achievement, event)" +
                         ");", null);
             }
             if(!existTable("completed")) {
@@ -54,6 +56,7 @@ public class MySQLManager {
                         " id_achievement INT," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)" +
+                        " UNIQUE(id_player, id_achievement)" +
                         ");", null);
             }
         } else {
@@ -111,6 +114,41 @@ public class MySQLManager {
             }
         } catch(SQLException e) {
             log.severe("Error at loadCompleted(), SQL Exception: " + e);
+        }
+    }
+
+    public void loadProgress(PlayerAchievementState state) {
+        /* List<Integer> progressList = data.getIntegerList(nick + "." + key + ".progress");
+                    int[] progress = new int[a.getEvents().size()];
+                    int i = 0;
+                    for(int value : progressList) {
+                        progress[i] = value;
+                        i++;
+                    }
+                    state.getProgress().put(a, progress);
+         */
+        if(connector.getConnection() == null) {
+            log.severe("Error at loadProgress() - connection is null");
+            return;
+        }
+        ResultSet rs = null;
+        String query = "SELECT DISTINCT achievement_key, id_event, progress FROM progress JOIN players USING (id_player) " +
+                "JOIN achievements USING(id_achievement) WHERE players.nick = ?";
+        try(Connection connection = connector.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, state.getPlayer().getName());
+            rs = preparedStatement.executeQuery();
+            if(rs != null) {
+                while (rs.next()) {
+                    Achievement a = AchievementsEngine.getInstance().getAchievementManager()
+                            .checkIfAchievementExists(rs.getString("achievement_key"));
+                    int[] progress = new int[a.getEvents().size()];
+                    int i = 0;
+
+                }
+            }
+        } catch(SQLException e) {
+            log.severe("Error at loadProgress(), SQL Exception: " + e);
         }
     }
 
