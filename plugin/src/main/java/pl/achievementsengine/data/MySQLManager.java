@@ -1,6 +1,7 @@
 package pl.achievementsengine.data;
 
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 import pl.achievementsengine.AchievementsEngine;
 
 import java.sql.*;
@@ -27,13 +28,13 @@ public class MySQLManager {
             if(!existTable("players")) {
                 execute("CREATE TABLE IF NOT EXISTS players (" +
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                        " nick VARCHAR(16)" +
+                        " nick VARCHAR(16) UNIQUE" +
                         ");", null);
             }
             if(!existTable("achievements")) {
                 execute("CREATE TABLE IF NOT EXISTS achievements (" +
-                        " achievement_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                        " achievement_key VARCHAR(128)" +
+                        " id_achievement INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                        " achievement_key VARCHAR(128) UNIQUE" +
                         ");", null);
             }
             if(!existTable("progress")) {
@@ -76,6 +77,7 @@ public class MySQLManager {
             log.severe("Error at execute() - connection is null");
             return;
         }
+        log.info("execute()");
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             if(args != null) {

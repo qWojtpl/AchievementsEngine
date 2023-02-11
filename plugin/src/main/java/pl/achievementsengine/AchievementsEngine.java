@@ -42,16 +42,16 @@ public final class AchievementsEngine extends JavaPlugin {
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         dataHandler.LoadConfig(); // Load configuration files
+        this.manager = new MySQLManager();
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
             PlayerAchievementState.Create(p);
         }
-        this.manager = new MySQLManager();
     }
 
     @Override
     public void onDisable() {
-        dataHandler.saveAllPending();
+        dataHandler.saveAll();
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         getLogger().info("Bye!"); // Print to console
     }

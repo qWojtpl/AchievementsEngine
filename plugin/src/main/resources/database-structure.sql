@@ -1,12 +1,12 @@
 
 CREATE TABLE IF NOT EXISTS players (
     id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nick VARCHAR(16)
+    nick VARCHAR(16) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS achievements (
     id_achievement INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    achievement_key VARCHAR(128)
+    achievement_key VARCHAR(128) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS progress (
