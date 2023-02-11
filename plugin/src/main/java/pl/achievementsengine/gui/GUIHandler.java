@@ -90,7 +90,7 @@ public class GUIHandler {
                         state.UpdateProgress(a, new int[a.getEvents().size()]);
                     }
                     desc = desc + "%nl%" + messages.getMessage("progress-field-prefix") + a.getEvents().get(k) +
-                            ": " + state.getProgress().get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
+                            "§b: " + state.getProgress().get(a)[k] + "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
                 }
             }
             if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty

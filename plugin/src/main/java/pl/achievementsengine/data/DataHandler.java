@@ -83,19 +83,7 @@ public class DataHandler {
         }
         if(useSQL) {
             getSQLQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick});
-            ResultSet rs = AchievementsEngine.getInstance().getManager().query(
-                    "SELECT id_achievement FROM completed JOIN players USING (id_player) WHERE players.nick = ?",
-                    new String[]{nick});
-            if(rs != null) {
-                while (rs.next()) {
-                    state.getCompletedAchievements().add(AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
-                            rs.getString("achievement_key")));
-                }
-            }
-            rs = AchievementsEngine.getInstance().getManager().query(
-                    "SELECT event, progress FROM progress JOIN players USING (id_player) WHERE players.nick = ?",
-                    new String[]{nick}
-            );
+            AchievementsEngine.getInstance().getManager().loadCompleted(state);
         }
     }
 

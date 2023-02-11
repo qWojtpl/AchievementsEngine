@@ -3,6 +3,7 @@ package pl.achievementsengine.data;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import pl.achievementsengine.AchievementsEngine;
+import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -77,7 +78,6 @@ public class MySQLManager {
             log.severe("Error at execute() - connection is null");
             return;
         }
-        log.info("execute()");
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             if(args != null) {
@@ -91,24 +91,27 @@ public class MySQLManager {
         }
     }
 
-    public ResultSet query(String query, String[] args) {
+    public void loadCompleted(PlayerAchievementState state) {
         if(connector.getConnection() == null) {
-            log.severe("Error at query() - connection is null");
-            return null;
+            log.severe("Error at loadCompleted() - connection is null");
+            return;
         }
-        ResultSet resultSet = null;
+        ResultSet rs = null;
+        String query = "SELECT DISTINCT achievement_key FROM completed JOIN players USING (id_player) " +
+                "JOIN achievements USING(id_achievement) WHERE players.nick = ?";
         try(Connection connection = connector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            if(args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    preparedStatement.setString(i + 1, args[i]);
+            preparedStatement.setString(1, state.getPlayer().getName());
+            rs = preparedStatement.executeQuery();
+            if(rs != null) {
+                while (rs.next()) {
+                    state.getCompletedAchievements().add(AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
+                            rs.getString("achievement_key")));
                 }
             }
-            resultSet = preparedStatement.executeQuery();
         } catch(SQLException e) {
-            log.severe("Error at query(), SQL Exception: " + e);
+            log.severe("Error at loadCompleted(), SQL Exception: " + e);
         }
-        return resultSet;
     }
 
 }
