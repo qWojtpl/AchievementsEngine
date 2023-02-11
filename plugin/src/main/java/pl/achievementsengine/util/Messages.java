@@ -9,7 +9,7 @@ public class Messages {
 
     private final HashMap<String, String> messages = new HashMap<>(); // List of all messages from messages.yml
 
-    public String ReadLanguage(String path) {
+    public String getMessage(String path) {
         if(messages.containsKey(path)) {
             return messages.get(path);
         } else {

@@ -57,7 +57,7 @@ public class AchievementManager {
                     progress[j]++; // Add one to progress
                     playerState.UpdateProgress(a, progress); // Update progress
                     if(a.isAnnounceProgress()) { // If achievement has showProgress enabled - show message on a chat
-                        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("progress-message"), a.getName());
+                        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("progress-message"), a.getName());
                         String[] msg = message.split("%nl%");
                         for(String m : msg) {
                             p.sendMessage(m);

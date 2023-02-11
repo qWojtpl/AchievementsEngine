@@ -7,13 +7,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
-import pl.achievementsengine.achievements.AchievementManager;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +149,14 @@ public class DataHandler {
         }
     }
 
+    public void saveAllPending() {
+        for(String key : getPendingStates().keySet()) {
+            PlayerAchievementState state = getPendingStates().get(key);
+            savePlayerData(state);
+        }
+        getPendingStates().clear();
+    }
+
     public void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
         addToPending(state2);
         File dataFile1 = createPlayerFile(state1.getPlayer());
@@ -220,7 +226,7 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".announceProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
-                    getSQLQueue().add(new String[]{"INSERT INTO achievements VALUES(?)",
+                    getSQLQueue().add(new String[]{"INSERT IGNORE INTO achievements VALUES(default, ?)",
                             yml.getString("achievements." + key + ".name")});
                 }
             }
@@ -257,13 +263,8 @@ public class DataHandler {
         this.saveInterval = yml.getInt("config.saveInterval");
         this.useYAML = yml.getBoolean("config.useYAML");
         this.useSQL = yml.getBoolean("config.useSQL");
-        this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(), () -> {
-            for(String key : getPendingStates().keySet()) {
-                PlayerAchievementState state = getPendingStates().get(key);
-                savePlayerData(state);
-            }
-            getPendingStates().clear();
-        }, 0L, 20L * saveInterval);
+        this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
+                this::saveAllPending, 0L, 20L * saveInterval);
     }
 
     public HashMap<String, PlayerAchievementState> getPendingStates() {

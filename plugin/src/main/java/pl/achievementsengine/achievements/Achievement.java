@@ -71,7 +71,7 @@ public class Achievement {
                 actionsFormat = actionsFormat + ", " + action;
             }
         }
-        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().ReadLanguage("complete-message"), name, description, eventsFormat, actionsFormat);
+        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("complete-message"), name, description, eventsFormat, actionsFormat);
         String[] msg = message.split("%nl%");
         for(String m : msg) {
             state.getPlayer().sendMessage(m);

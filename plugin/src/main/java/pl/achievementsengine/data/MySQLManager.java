@@ -28,29 +28,30 @@ public class MySQLManager {
                 execute("CREATE TABLE IF NOT EXISTS players (" +
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " nick VARCHAR(16)" +
-                        " );", null);
+                        ");", null);
             }
             if(!existTable("achievements")) {
                 execute("CREATE TABLE IF NOT EXISTS achievements (" +
-                        " achievement_key VARCHAR(128) PRIMARY KEY" +
-                        " );", null);
+                        " achievement_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                        " achievement_key VARCHAR(128)" +
+                        ");", null);
             }
             if(!existTable("progress")) {
                 execute("CREATE TABLE IF NOT EXISTS progress (" +
                         " id_player INT," +
-                        " achievement_key VARCHAR(128)," +
+                        " id_achievement INT," +
                         " event INT," +
                         " progress INT," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
-                        " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
+                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)" +
                         ");", null);
             }
             if(!existTable("completed")) {
                 execute("CREATE TABLE IF NOT EXISTS completed (" +
                         " id_player INT," +
-                        " achievement_key VARCHAR(128)," +
+                        " id_achievement INT," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
-                        " FOREIGN KEY (achievement_key) REFERENCES achievements(achievement_key)" +
+                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)" +
                         ");", null);
             }
         } else {
