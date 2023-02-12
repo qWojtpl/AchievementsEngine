@@ -23,6 +23,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.achievements.Achievement;
+import pl.achievementsengine.achievements.AchievementManager;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 import pl.achievementsengine.gui.GUIHandler;
 
@@ -41,10 +42,14 @@ public class Events implements Listener {
 
     private final HashMap<String, List<Achievement>> registeredEvents = new HashMap<>();
 
-    public List<Achievement> getEventAchievements(String event) {
+    public List<Achievement> getEventAchievements(String event, boolean addToMemory) {
         event = event.toLowerCase();
         if(!registeredEvents.containsKey(event)) {
-            registeredEvents.put(event, new ArrayList<>());
+            if(addToMemory) {
+                registeredEvents.put(event, new ArrayList<>());
+            } else {
+                return new ArrayList<>();
+            }
         }
         return registeredEvents.get(event);
     }
@@ -55,7 +60,7 @@ public class Events implements Listener {
 
     public void registerEvent(String event, Achievement achievement) {
         event = event.toLowerCase();
-        List<Achievement> list = getEventAchievements(event);
+        List<Achievement> list = getEventAchievements(event, true);
         list.add(achievement);
     }
 
@@ -65,11 +70,20 @@ public class Events implements Listener {
 
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" ");
-        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1])) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
+        AchievementManager am = AchievementsEngine.getInstance().getAchievementManager();
+        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1], false)) {
+            am.Check(player, checkable, a);
         }
-        for(Achievement a : getEventAchievements(ev[0] + " *")) {
-            AchievementsEngine.getInstance().getAchievementManager().Check(player, checkable, a);
+        for(Achievement a : getEventAchievements(ev[0] + " *", false)) {
+            am.Check(player, checkable, a);
+        }
+        for(String key : getRegisteredEvents().keySet()) { // Loop through all registered events
+            String[] k = key.split(" ");
+            if(ev[0].equalsIgnoreCase(k[0]) && key.contains("*%")) { // If registered event equals given event and registered event has *%
+                for(Achievement a : getRegisteredEvents().get(key)) { // Loop through achievements with this key
+                    am.Check(player, checkable, a);
+                }
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-<p align="center">
+t<p align="center">
   <img src="https://i.imgur.com/FRDyMxv.png">
 </p>
 
@@ -39,7 +39,8 @@
 <details><summary>achievements.yml</summary>
 <br>
 
-`* means anything, eg. kill 10 * (means kill 10 any entity), drop 64 * (means drop 64 of any item)`
+`* means anything, eg. kill 10 * (means kill 10 any entity), drop 64 * (means drop 64 of any item)`<br>
+`*% means anything like, eg. break 64 *%ore (means break 64 any block which name contains ore)`
 <br>
 
 ## Supported events:

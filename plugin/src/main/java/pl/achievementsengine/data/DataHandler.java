@@ -51,7 +51,6 @@ public class DataHandler {
         getPendingStates().put(state.getPlayer().getName(), state);
     }
 
-    @SneakyThrows
     public void createPlayerAchievementState(PlayerAchievementState state) {
         Player p = state.getPlayer();
         String nick = p.getName();
@@ -134,17 +133,17 @@ public class DataHandler {
         }
     }
 
-    public void savePlayerData(PlayerAchievementState state) {
-        if(useYAML) {
-            try {
-                playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer()));
-            } catch (IOException e) {
-                AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
-            }
+    public void saveYAML(PlayerAchievementState state) {
+        if(!useYAML) return;
+        try {
+            playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer()));
+        } catch (IOException e) {
+            AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
         }
     }
 
     public void saveSQL() {
+        if(!useSQL) return;
         for(String[] sql : sqlQueue) {
             String[] args = new String[sql.length-1];
             for(int i = 1; i < sql.length; i++) {
@@ -159,7 +158,7 @@ public class DataHandler {
         if(useYAML) {
             for(String key : getPendingStates().keySet()) {
                 PlayerAchievementState state = getPendingStates().get(key);
-                savePlayerData(state);
+                saveYAML(state);
             }
             getPendingStates().clear();
         }
