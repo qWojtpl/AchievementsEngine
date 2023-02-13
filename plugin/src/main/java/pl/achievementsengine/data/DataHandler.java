@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.A;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
@@ -24,6 +25,7 @@ public class DataHandler {
     private final HashMap<String, PlayerAchievementState> pendingStates = new HashMap<>();
     private final List<String[]> sqlQueue = new ArrayList<>();
     private final HashMap<String, String[]> importantSQLQueue = new HashMap<>();
+    private final HashMap<PlayerAchievementState, List<Achievement>> updateProgressQueue = new HashMap<>();
     private int saveInterval;
     private int saveTask = -1;
     private boolean useYAML;
@@ -60,7 +62,10 @@ public class DataHandler {
             YamlConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
             playerYAML.put(nick, data);
             ConfigurationSection section = data.getConfigurationSection(nick);
-            if(section == null) return;
+            if(section == null) {
+                state.setInitialized(true);
+                return;
+            }
             for(String key : section.getKeys(false)) {
                 for(Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
                     if(!a.getID().equals(key)) {
@@ -127,11 +132,14 @@ public class DataHandler {
             for(int i = 0; i < progress.length; i++) {
                 newProgress.add(progress[i]);
             }
-            File dataFile = createPlayerFile(state.getPlayer());
             YamlConfiguration data = playerYAML.get(state.getPlayer().getName());
             data.set(state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress);
         }
         if(useSQL) {
+            if(!getUpdateProgressQueue().containsKey(state)) {
+                getUpdateProgressQueue().put(state, new ArrayList<>());
+            }
+            getUpdateProgressQueue().get(state).add(achievement);
         }
     }
 
@@ -158,6 +166,12 @@ public class DataHandler {
             AchievementsEngine.getInstance().getManager().execute(sql[0], args);
         }
         getSqlQueue().clear();
+        for(PlayerAchievementState state : getUpdateProgressQueue().keySet()) {
+            for(Achievement a : getUpdateProgressQueue().get(state)) {
+                AchievementsEngine.getInstance().getManager().updateProgress(state, a);
+            }
+        }
+        getUpdateProgressQueue().clear();
     }
 
     public void saveAll() {
@@ -251,9 +265,9 @@ public class DataHandler {
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
                     query = query + "(default, ?)";
+                    arguments[i] = key;
+                    i++;
                 }
-                arguments[i] = key;
-                i++;
             }
         }
         if(useSQL) {

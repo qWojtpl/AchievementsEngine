@@ -91,6 +91,9 @@ public class MySQLManager {
                     }
                 }
                 preparedStatement.executeUpdate();
+                if(!connector.getConnection().isClosed()) {
+                    connector.getConnection().close();
+                }
             } catch(SQLException e) {
                 log.severe("Error at execute(), SQL Exception: " + e);
             }
@@ -134,6 +137,9 @@ public class MySQLManager {
                                 rs.getString("achievement_key")));
                     }
                 }
+                if(!connector.getConnection().isClosed()) {
+                    connector.getConnection().close();
+                }
             } catch(SQLException e) {
                 log.severe("Error at loadCompleted(), SQL Exception: " + e);
             } finally {
@@ -145,15 +151,6 @@ public class MySQLManager {
     public void loadProgress(PlayerAchievementState state) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
             DatabaseConnector connector = new DatabaseConnector();
-            /* List<Integer> progressList = data.getIntegerList(nick + "." + key + ".progress");
-                    int[] progress = new int[a.getEvents().size()];
-                    int i = 0;
-                    for(int value : progressList) {
-                        progress[i] = value;
-                        i++;
-                    }
-                    state.getProgress().put(a, progress);
-            */
             if(connector.getConnection() == null) {
                 log.severe("Error at loadProgress() - connection is null");
                 return;
@@ -169,15 +166,34 @@ public class MySQLManager {
                     while (rs.next()) {
                         Achievement a = AchievementsEngine.getInstance().getAchievementManager()
                                 .checkIfAchievementExists(rs.getString("achievement_key"));
-                        int[] progress = new int[a.getEvents().size()];
-                        int i = 0;
-
+                        if(a == null) {
+                            AchievementsEngine.getInstance().getLogger().severe("Trying to load achievement with key " +
+                                    rs.getString("achievement_key") + " which doesn't exist!");
+                            return;
+                        }
+                        int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]);
+                        progress[rs.getInt("event")] = rs.getInt("progress");
+                        state.getProgress().put(a, progress);
                     }
+                }
+                if(!connector.getConnection().isClosed()) {
+                    connector.getConnection().close();
                 }
             } catch(SQLException e) {
                 log.severe("Error at loadProgress(), SQL Exception: " + e);
             }
         });
+    }
+
+    public void updateProgress(PlayerAchievementState state, Achievement a) {
+        for(int event = 0; event < a.getEvents().size(); event++) {
+            String query = "INSERT INTO progress VALUES((SELECT id_player FROM players WHERE nick=?), " +
+                    "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?";
+            int[] progress = state.getProgress().get(a);
+            String[] args = new String[]{state.getPlayer().getName(), a.getID(), String.valueOf(event),
+                    String.valueOf(progress[event]), String.valueOf(progress[event])};
+            execute(query, args);
+        }
     }
 
 }
