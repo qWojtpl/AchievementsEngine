@@ -20,6 +20,8 @@ public class PlayerAchievementState {
     @Setter
     private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
     private boolean initialized;
+    @Setter
+    private int initializeLevel = 0;
     private final List<CheckableObject> queue = new ArrayList<>();
 
 

@@ -24,7 +24,7 @@ public class AchievementManager {
         }
         if(playerState.getCompletedAchievements().contains(a)) return; // If player completed this achievement - return
         int[] progress = playerState.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Initialize progress
-        int max = 0;
+        int max = 0; // Max progress to complete this achievement
         for(int j = 0; j < a.getEvents().size(); j++) { // Loop through all events from achievement
             String[] events = a.getEvents().get(j).split(" "); // Split one event into pieces eg. [kill] [1] [player]
             String[] givenEvents = checkable.split(" "); // Split checkable into pieces eg. [kill] [player]
@@ -74,7 +74,7 @@ public class AchievementManager {
             max += Integer.parseInt(events[1]); // Add required progress to max progress
         }
         int sum = 0; // Set sum to 0
-        for(int pr : progress) { // Loop through player's progresses
+        for(int pr : progress) { // Loop through player's progress
             sum += pr; // Add player's progress to sum
         }
         if(sum == max) a.Complete(playerState); // If sum of player's progresses equals max progress for this achievement - complete it!

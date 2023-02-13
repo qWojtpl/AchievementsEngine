@@ -9,6 +9,7 @@ import org.bukkit.util.StringUtil;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.achievements.PlayerAchievementState;
+import pl.achievementsengine.util.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,8 @@ public class CommandHelper implements TabCompleter {
                     completions.add(a.getID());
                 }
             } else if(args[0].equalsIgnoreCase("remove")) {
-                Player argumentPlayer = Commands.checkIfPlayerExists(args[1]);
+                PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+                Player argumentPlayer = pu.checkIfPlayerExists(args[1]);
                 if(argumentPlayer != null) {
                     PlayerAchievementState state = PlayerAchievementState.Create(argumentPlayer);
                     for(Achievement a : state.getCompletedAchievements()) {

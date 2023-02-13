@@ -23,7 +23,7 @@ public class DatabaseConnector {
     public DatabaseConnector() {
         AchievementsEngine plugin = AchievementsEngine.getInstance();
         HashMap<String, String> SQLInfo = plugin.getDataHandler().getSQLInfo();
-        this.host = SQLInfo.get("host");
+        this.host = SQLInfo.get("host"); // Get SQL info
         this.user = SQLInfo.get("user");
         this.password = SQLInfo.get("password");
         this.database = SQLInfo.get("database");
@@ -36,15 +36,15 @@ public class DatabaseConnector {
     }
 
     private void initialize() {
-        if(!AchievementsEngine.getInstance().getDataHandler().isUseSQL()) return;
+        if(!AchievementsEngine.getInstance().getDataHandler().isUseSQL()) return; // If not using SQL - we're not initializing
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver"); // Get driver
             connection = DriverManager.getConnection("jdbc:mysql://"
                                 + host + ":"
                                 + port + "/"
                                 + database
                                 + "?autoReconnect=true&useUnicode=true&characterEncoding=utf-8",
-                        user, password);
+                        user, password); // Connect
         } catch(ClassNotFoundException e) {
             log.severe("Class not found exception: " + e.getMessage());
         } catch(SQLException e) {
@@ -55,7 +55,7 @@ public class DatabaseConnector {
     public synchronized Connection getConnection() {
         try {
             if(connection == null || connection.isClosed()) {
-                initialize();
+                initialize(); // Initialize connection
             }
         } catch(SQLException e) {
             log.severe("Failed to get connection: " + e.getMessage());
@@ -65,6 +65,6 @@ public class DatabaseConnector {
 
     public boolean checkConnection() {
         return getConnection() != null;
-    }
+    } /// Check if connection is not null
 
 }

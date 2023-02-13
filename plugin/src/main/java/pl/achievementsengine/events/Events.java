@@ -43,9 +43,9 @@ public class Events implements Listener {
     private final HashMap<String, List<Achievement>> registeredEvents = new HashMap<>();
 
     public List<Achievement> getEventAchievements(String event, boolean addToMemory) {
-        event = event.toLowerCase();
-        if(!registeredEvents.containsKey(event)) {
-            if(addToMemory) {
+        event = event.toLowerCase(); // Make event lowercase
+        if(!registeredEvents.containsKey(event)) { // If registered events doesn't contains this event
+            if(addToMemory) { // If we need to add empty list to memory..
                 registeredEvents.put(event, new ArrayList<>());
             } else {
                 return new ArrayList<>();
@@ -59,9 +59,9 @@ public class Events implements Listener {
     }
 
     public void registerEvent(String event, Achievement achievement) {
-        event = event.toLowerCase();
-        List<Achievement> list = getEventAchievements(event, true);
-        list.add(achievement);
+        event = event.toLowerCase(); // Make event lowercase
+        List<Achievement> list = getEventAchievements(event, true); // Get list or add empty list to memory
+        list.add(achievement); // Add achievement ot list
     }
 
     public void clearRegisteredEvents() {
@@ -69,12 +69,12 @@ public class Events implements Listener {
     }
 
     public void checkForAchievementEvents(Player player, String checkable) {
-        String[] ev = checkable.split(" ");
-        AchievementManager am = AchievementsEngine.getInstance().getAchievementManager();
-        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1], false)) {
+        String[] ev = checkable.split(" "); // Split checkable
+        AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
+        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1], false)) { // Loop through registered events which are same as checkable
             am.Check(player, checkable, a);
         }
-        for(Achievement a : getEventAchievements(ev[0] + " *", false)) {
+        for(Achievement a : getEventAchievements(ev[0] + " *", false)) { // Loop through registered events which contains * (any)
             am.Check(player, checkable, a);
         }
         for(String key : getRegisteredEvents().keySet()) { // Loop through all registered events

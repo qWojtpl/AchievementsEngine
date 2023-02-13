@@ -1,6 +1,5 @@
 package pl.achievementsengine.commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +8,7 @@ import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
+import pl.achievementsengine.util.PlayerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +126,8 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCorrect usage: /ae complete <player:Player> <id:String>");
             return;
         }
-        Player p = checkIfPlayerExists(args[1]);
+        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        Player p = pu.checkIfPlayerExists(args[1]);
         if(p == null) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
@@ -154,7 +155,8 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCorrect usage: /ae remove <player:Player> <id:String>");
             return;
         }
-        Player p = checkIfPlayerExists(args[1]);
+        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        Player p = pu.checkIfPlayerExists(args[1]);
         if (p == null) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
@@ -190,7 +192,8 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCorrect usage: /ae reset <player:Player> <id:String>");
             return;
         }
-        if(checkIfPlayerExists(args[1]) == null) {
+        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        if(pu.checkIfPlayerExists(args[1]) == null) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
@@ -216,8 +219,9 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
             return;
         }
-        Player p1 = checkIfPlayerExists(args[1]);
-        Player p2 = checkIfPlayerExists(args[2]);
+        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        Player p1 = pu.checkIfPlayerExists(args[1]);
+        Player p2 = pu.checkIfPlayerExists(args[2]);
         if(p1 == null || p2 == null) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCannot found player(s)..");
             return;
@@ -227,15 +231,6 @@ public class Commands implements CommandExecutor {
         AchievementsEngine.getInstance().getDataHandler().transferAchievements(state1, state2);
         sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§aTransferred all achievements from "
                 + args[1] + "§a to " + args[2] + "§a!");
-    }
-
-    public static Player checkIfPlayerExists(String nickname) {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.getName().equals(nickname)) {
-                return p;
-            }
-        }
-        return null;
     }
 
 }

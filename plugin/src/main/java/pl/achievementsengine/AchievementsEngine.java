@@ -14,6 +14,7 @@ import pl.achievementsengine.data.MySQLManager;
 import pl.achievementsengine.events.Events;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.util.Messages;
+import pl.achievementsengine.util.PlayerUtil;
 
 import java.util.HashMap;
 
@@ -27,6 +28,7 @@ public final class AchievementsEngine extends JavaPlugin {
     private Events events;
     private Messages messages;
     private DataHandler dataHandler;
+    private PlayerUtil playerUtil;
     private final HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
 
     @Override
@@ -38,6 +40,7 @@ public final class AchievementsEngine extends JavaPlugin {
         permissionManager.loadPermissions(); // Register permissions
         this.events = new Events();
         this.messages = new Messages();
+        this.playerUtil = new PlayerUtil();
         getServer().getPluginManager().registerEvents(events, this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer

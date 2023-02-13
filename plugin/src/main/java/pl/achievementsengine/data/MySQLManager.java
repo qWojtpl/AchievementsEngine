@@ -25,9 +25,9 @@ public class MySQLManager {
 
     @SneakyThrows
     private void initiateDB() {
-        this.mainConnector = new DatabaseConnector();
+        this.mainConnector = new DatabaseConnector(); // Get main connection
         if(mainConnector.checkConnection()) {
-            if(!existTable("players")) {
+            if(!existTable("players")) { // If table doesn't exist - create it NOW (not async)
                 executeNow("CREATE TABLE IF NOT EXISTS players ("+
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " nick VARCHAR(16) NOT NULL UNIQUE" +
@@ -62,13 +62,13 @@ public class MySQLManager {
         } else {
             log.warning("Cannot initiate database");
         }
-        if(mainConnector.getConnection() != null) mainConnector.getConnection().close();
+        if(mainConnector.checkConnection()) mainConnector.getConnection().close(); // Close connection
     }
 
     private boolean existTable(String table) {
         String database = mainConnector.getDatabase();
         try(Connection connection = mainConnector.getConnection();
-        ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) {
+        ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) { // Thanks CrySis for sharing this way to do it <3
             return tables.next();
         } catch(SQLException e) {
             log.severe("SQL Exception: " + e);
@@ -77,22 +77,22 @@ public class MySQLManager {
     }
 
     public void execute(String query, String[] args) {
-        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
-            DatabaseConnector connector = new DatabaseConnector();
-            if(connector.getConnection() == null) {
+        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
+            DatabaseConnector connector = new DatabaseConnector(); // Create connection
+            if(!connector.checkConnection()) {
                 log.severe("Error at execute() - connection is null");
                 return;
             }
             try(Connection connection = connector.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                if(args != null) {
+                if(args != null) { // Load arguments for preparedStatement
                     for (int i = 0; i < args.length; i++) {
                         preparedStatement.setString(i + 1, args[i]);
                     }
                 }
-                preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate(); // Execute update
                 if(!connector.getConnection().isClosed()) {
-                    connector.getConnection().close();
+                    connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
                 log.severe("Error at execute(), SQL Exception: " + e);
@@ -101,98 +101,105 @@ public class MySQLManager {
     }
 
     public void executeNow(String query, String[] args) {
-        if(mainConnector.getConnection() == null) {
+        if(!mainConnector.checkConnection()) {
             log.severe("Error at executeNow() - connection is null");
             return;
         }
         try(Connection connection = mainConnector.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            if(args != null) {
+            if(args != null) { // Load arguments for preparedStatement
                 for (int i = 0; i < args.length; i++) {
                     preparedStatement.setString(i + 1, args[i]);
                 }
             }
-            preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate(); // Execute update
         } catch(SQLException e) {
             log.severe("Error at executeNow(), SQL Exception: " + e);
         }
     }
 
     public void loadCompleted(PlayerAchievementState state) {
-        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
-            DatabaseConnector connector = new DatabaseConnector();
-            if(connector.getConnection() == null) {
+        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
+            DatabaseConnector connector = new DatabaseConnector(); // Create connection
+            if(!connector.checkConnection()) {
                 log.severe("Error at loadCompleted() - connection is null");
                 return;
             }
             String query = "SELECT DISTINCT achievement_key FROM completed JOIN players USING (id_player) " +
-                    "JOIN achievements USING(id_achievement) WHERE players.nick = ?";
+                    "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
             try(Connection connection = connector.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, state.getPlayer().getName());
-                ResultSet rs = preparedStatement.executeQuery();
+                ResultSet rs = preparedStatement.executeQuery(); // Execute query
                 if(rs != null) {
                     while (rs.next()) {
                         state.getCompletedAchievements().add(AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
-                                rs.getString("achievement_key")));
+                                rs.getString("achievement_key"))); // Load completed achievements
                     }
                 }
                 if(!connector.getConnection().isClosed()) {
-                    connector.getConnection().close();
+                    connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
                 log.severe("Error at loadCompleted(), SQL Exception: " + e);
             } finally {
-                state.setInitialized(true);
+                state.setInitializeLevel(state.getInitializeLevel() + 1);
+                if(state.getInitializeLevel() >= 2) {
+                    state.setInitialized(true); // Mark state as initialized
+                }
             }
         });
     }
 
     public void loadProgress(PlayerAchievementState state) {
-        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
-            DatabaseConnector connector = new DatabaseConnector();
-            if(connector.getConnection() == null) {
+        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
+            DatabaseConnector connector = new DatabaseConnector(); // Create connection
+            if(!connector.checkConnection()) {
                 log.severe("Error at loadProgress() - connection is null");
                 return;
             }
-            ResultSet rs = null;
             String query = "SELECT DISTINCT achievement_key, event, progress FROM progress JOIN players USING (id_player) " +
-                    "JOIN achievements USING(id_achievement) WHERE players.nick = ?";
+                    "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
             try(Connection connection = connector.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, state.getPlayer().getName());
-                rs = preparedStatement.executeQuery();
+                ResultSet rs = preparedStatement.executeQuery(); // Execute query
                 if(rs != null) {
                     while (rs.next()) {
                         Achievement a = AchievementsEngine.getInstance().getAchievementManager()
-                                .checkIfAchievementExists(rs.getString("achievement_key"));
-                        if(a == null) {
+                                .checkIfAchievementExists(rs.getString("achievement_key")); // Get achievement
+                        if(a == null) { // If achievement is null..
                             AchievementsEngine.getInstance().getLogger().severe("Trying to load achievement with key " +
                                     rs.getString("achievement_key") + " which doesn't exist!");
                             return;
                         }
-                        int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]);
-                        progress[rs.getInt("event")] = rs.getInt("progress");
-                        state.getProgress().put(a, progress);
+                        int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress or initialize it
+                        progress[rs.getInt("event")] = rs.getInt("progress"); // Load progress for event
+                        state.getProgress().put(a, progress); // Put progress to state
                     }
                 }
                 if(!connector.getConnection().isClosed()) {
-                    connector.getConnection().close();
+                    connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
                 log.severe("Error at loadProgress(), SQL Exception: " + e);
+            } finally {
+                state.setInitializeLevel(state.getInitializeLevel() + 1);
+                if(state.getInitializeLevel() >= 2) {
+                    state.setInitialized(true); // Mark state as initialized
+                }
             }
         });
     }
 
     public void updateProgress(PlayerAchievementState state, Achievement a) {
-        for(int event = 0; event < a.getEvents().size(); event++) {
+        for(int event = 0; event < a.getEvents().size(); event++) { // Loop through all achievement's events
             String query = "INSERT INTO progress VALUES((SELECT id_player FROM players WHERE nick=?), " +
-                    "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?";
-            int[] progress = state.getProgress().get(a);
+                    "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?"; // SQL
+            int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress
             String[] args = new String[]{state.getPlayer().getName(), a.getID(), String.valueOf(event),
-                    String.valueOf(progress[event]), String.valueOf(progress[event])};
-            execute(query, args);
+                    String.valueOf(progress[event]), String.valueOf(progress[event])}; // Create arguments
+            execute(query, args); // Execute in async
         }
     }
 
