@@ -2,6 +2,7 @@ config:
 
   # Specify how plugin will save and read data.
   # I don't recommend using YAML and SQL at the same time - it may cause errors
+  # Remember to restart the server after changing useSQL to true
 
   useYAML: true
   useSQL: false

@@ -28,19 +28,19 @@ public class MySQLManager {
         this.mainConnector = new DatabaseConnector();
         if(mainConnector.checkConnection()) {
             if(!existTable("players")) {
-                execute("CREATE TABLE IF NOT EXISTS players (" +
+                executeNow("CREATE TABLE IF NOT EXISTS players ("+
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " nick VARCHAR(16) NOT NULL UNIQUE" +
-                        ");", null);
+                        " );", null);
             }
             if(!existTable("achievements")) {
-                execute("CREATE TABLE IF NOT EXISTS achievements (" +
+                executeNow("CREATE TABLE IF NOT EXISTS achievements (" +
                         " id_achievement INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " achievement_key VARCHAR(128) NOT NULL UNIQUE" +
-                        ");", null);
+                        " );", null);
             }
             if(!existTable("progress")) {
-                execute("CREATE TABLE IF NOT EXISTS progress (" +
+                executeNow("CREATE TABLE IF NOT EXISTS progress (" +
                         " id_player INT NOT NULL," +
                         " id_achievement INT NOT NULL," +
                         " event INT NOT NULL," +
@@ -48,16 +48,16 @@ public class MySQLManager {
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)," +
                         " UNIQUE(id_player, id_achievement, event)" +
-                        ");", null);
+                        " );", null);
             }
             if(!existTable("completed")) {
-                execute("CREATE TABLE IF NOT EXISTS completed (" +
+                executeNow("CREATE TABLE IF NOT EXISTS completed (" +
                         " id_player INT NOT NULL," +
                         " id_achievement INT NOT NULL," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
                         " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)," +
                         " UNIQUE(id_player, id_achievement)" +
-                        ");", null);
+                        " );", null);
             }
         } else {
             log.warning("Cannot initiate database");
@@ -95,6 +95,24 @@ public class MySQLManager {
                 log.severe("Error at execute(), SQL Exception: " + e);
             }
         });
+    }
+
+    public void executeNow(String query, String[] args) {
+        if(mainConnector.getConnection() == null) {
+            log.severe("Error at executeNow() - connection is null");
+            return;
+        }
+        try(Connection connection = mainConnector.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            if(args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    preparedStatement.setString(i + 1, args[i]);
+                }
+            }
+            preparedStatement.executeUpdate();
+        } catch(SQLException e) {
+            log.severe("Error at executeNow(), SQL Exception: " + e);
+        }
     }
 
     public void loadCompleted(PlayerAchievementState state) {

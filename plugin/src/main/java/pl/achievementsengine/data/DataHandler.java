@@ -23,6 +23,7 @@ public class DataHandler {
     private final HashMap<String, String> SQLInfo = new HashMap<>();
     private final HashMap<String, PlayerAchievementState> pendingStates = new HashMap<>();
     private final List<String[]> sqlQueue = new ArrayList<>();
+    private final HashMap<String, String[]> importantSQLQueue = new HashMap<>();
     private int saveInterval;
     private int saveTask = -1;
     private boolean useYAML;
@@ -145,7 +146,11 @@ public class DataHandler {
 
     public void saveSQL() {
         if(!useSQL) return;
-        for(String[] sql : sqlQueue) {
+        for(String key : getImportantSQLQueue().keySet()) {
+            AchievementsEngine.getInstance().getManager().executeNow(key, getImportantSQLQueue().get(key));
+        }
+        getImportantSQLQueue().clear();
+        for(String[] sql : getSqlQueue()) {
             String[] args = new String[sql.length-1];
             for(int i = 1; i < sql.length; i++) {
                 args[i-1] = sql[i];
@@ -222,17 +227,17 @@ public class DataHandler {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(achFile);
         ConfigurationSection section = yml.getConfigurationSection("achievements");
         if(section == null) return;
-        String[] arguments = new String[section.getKeys(false).size()+1];
-        arguments[0] = "INSERT IGNORE INTO achievements VALUES";
+        String[] arguments = new String[section.getKeys(false).size()];
+        String query = "INSERT IGNORE INTO achievements VALUES";
         boolean first = true;
-        int i = 1;
+        int i = 0;
         for (String key : section.getKeys(false)) {
             if(key.length() > 128) {
                 AchievementsEngine.getInstance().getLogger().warning("Cannot load achievement " + key + " - achievement key is too long..");
             }
             if (yml.getString("achievements." + key + ".name") != null && yml.getBoolean("achievements." + key + ".enabled")) {
                 if(useSQL && !first) {
-                    arguments[0] = arguments[0] + ", ";
+                    query = query + ", ";
                 }
                 first = false;
                 AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
@@ -245,14 +250,14 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".announceProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
-                    arguments[0] = arguments[0] + "(default, ?)";
+                    query = query + "(default, ?)";
                 }
                 arguments[i] = key;
                 i++;
             }
         }
         if(useSQL) {
-            getSqlQueue().add(arguments);
+            getImportantSQLQueue().put(query, arguments);
         }
     }
 
@@ -291,9 +296,5 @@ public class DataHandler {
         if(useYAML && useSQL) {
             AchievementsEngine.getInstance().getLogger().warning("ATTENTION! YOU'RE USING YAML AND SQL TO SAVE DATA. THIS MAY CAUSE MANY ERRORS.");
         }
-    }
-
-    public int getSaveInterval() {
-        return this.saveInterval;
     }
 }

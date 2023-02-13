@@ -10,14 +10,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class PlayerAchievementState {
 
-    private Player player; // State player
-    private List<Achievement> completedAchievements; // Completed achievements
-    private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
-    @Getter
     @Setter
+    private Player player; // State player
+    @Setter
+    private List<Achievement> completedAchievements; // Completed achievements
+    @Setter
+    private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
     private boolean initialized;
+    private final List<CheckableObject> queue = new ArrayList<>();
+
 
     public PlayerAchievementState(Player player, List<Achievement> completedAchievements) {
         this.player = player;
@@ -25,7 +29,7 @@ public class PlayerAchievementState {
     }
 
     public static PlayerAchievementState Create(Player p) { // Create state. If is already created, return exist one
-        if(!AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
+        if (!AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
             PlayerAchievementState state = new PlayerAchievementState(p, new ArrayList<>()); // Create object
             AchievementsEngine.getInstance().getPlayerStates().put(p.getName(), state); // Put state to all states
             AchievementsEngine.getInstance().getDataHandler().createPlayerAchievementState(state); // Create data in playerData.yml (and if available in SQL)
@@ -50,28 +54,14 @@ public class PlayerAchievementState {
         dh.updateProgress(this, achievement);
     }
 
-    public Player getPlayer() { // Return player
-        return this.player;
-    }
-
-    public List<Achievement> getCompletedAchievements() {
-        return this.completedAchievements;
-    }
-
-    public HashMap<Achievement, int[]> getProgress() {
-        return this.progress;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public void setCompletedAchievements(List<Achievement> achievements) {
-        this.completedAchievements = achievements;
-    }
-
-    public void setProgress(HashMap<Achievement, int[]> progress) {
-        this.progress = progress;
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
+        if(initialized) {
+            for(CheckableObject co : getQueue()) {
+                AchievementsEngine.getInstance().getAchievementManager().Check(co.getPlayer(), co.getCheckable(), co.getAchievement());
+            }
+            getQueue().clear();
+        }
     }
 
 }
