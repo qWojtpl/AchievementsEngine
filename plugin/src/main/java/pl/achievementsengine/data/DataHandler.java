@@ -1,6 +1,6 @@
 package pl.achievementsengine.data;
 
-import lombok.SneakyThrows;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,11 +12,11 @@ import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class DataHandler {
 
     private final HashMap<String, YamlConfiguration> playerYAML = new HashMap<>();
@@ -79,9 +79,10 @@ public class DataHandler {
                     break;
                 }
             }
+            state.setInitialized(true);
         }
         if(useSQL) {
-            getSQLQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick});
+            getSqlQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick});
             AchievementsEngine.getInstance().getManager().loadCompleted(state);
             AchievementsEngine.getInstance().getManager().loadProgress(state);
         }
@@ -94,7 +95,7 @@ public class DataHandler {
             data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", true);
         }
         if(useSQL) {
-            getSQLQueue().add(new String[]{"INSERT IGNORE INTO completed VALUES((SELECT id_player FROM players WHERE nick=?), " +
+            getSqlQueue().add(new String[]{"INSERT IGNORE INTO completed VALUES((SELECT id_player FROM players WHERE nick=?), " +
                     "(SELECT id_achievement FROM achievements WHERE achievement_key=?))",
                     state.getPlayer().getName(),
                     achievement.getID()
@@ -109,7 +110,7 @@ public class DataHandler {
             data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", false);
         }
         if(useSQL) {
-            getSQLQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT id_player FROM players WHERE nick=?) " +
+            getSqlQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT id_player FROM players WHERE nick=?) " +
                     "AND id_achievement=(SELECT id_achievement FROM achievements WHERE achievement_key=?)",
                     state.getPlayer().getName(),
                     achievement.getID()
@@ -151,7 +152,7 @@ public class DataHandler {
             }
             AchievementsEngine.getInstance().getManager().execute(sql[0], args);
         }
-        getSQLQueue().clear();
+        getSqlQueue().clear();
     }
 
     public void saveAll() {
@@ -221,11 +222,19 @@ public class DataHandler {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(achFile);
         ConfigurationSection section = yml.getConfigurationSection("achievements");
         if(section == null) return;
+        String[] arguments = new String[section.getKeys(false).size()+1];
+        arguments[0] = "INSERT IGNORE INTO achievements VALUES";
+        boolean first = true;
+        int i = 1;
         for (String key : section.getKeys(false)) {
             if(key.length() > 128) {
                 AchievementsEngine.getInstance().getLogger().warning("Cannot load achievement " + key + " - achievement key is too long..");
             }
             if (yml.getString("achievements." + key + ".name") != null && yml.getBoolean("achievements." + key + ".enabled")) {
+                if(useSQL && !first) {
+                    arguments[0] = arguments[0] + ", ";
+                }
+                first = false;
                 AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
                         new Achievement(key, yml.getString("achievements." + key + ".name"),
                                 yml.getString("achievements." + key + ".description"),
@@ -236,9 +245,14 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".announceProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
-                    getSQLQueue().add(new String[]{"INSERT IGNORE INTO achievements VALUES(default, ?)", key});
+                    arguments[0] = arguments[0] + "(default, ?)";
                 }
+                arguments[i] = key;
+                i++;
             }
+        }
+        if(useSQL) {
+            getSqlQueue().add(arguments);
         }
     }
 
@@ -274,14 +288,9 @@ public class DataHandler {
         this.useSQL = yml.getBoolean("config.useSQL");
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
                 this::saveAll, 20L * saveInterval, 20L * saveInterval);
-    }
-
-    public HashMap<String, PlayerAchievementState> getPendingStates() {
-        return this.pendingStates;
-    }
-
-    public List<String[]> getSQLQueue() {
-        return this.sqlQueue;
+        if(useYAML && useSQL) {
+            AchievementsEngine.getInstance().getLogger().warning("ATTENTION! YOU'RE USING YAML AND SQL TO SAVE DATA. THIS MAY CAUSE MANY ERRORS.");
+        }
     }
 
     public int getSaveInterval() {

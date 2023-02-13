@@ -36,6 +36,7 @@ public class DatabaseConnector {
     }
 
     private void initialize() {
+        if(!AchievementsEngine.getInstance().getDataHandler().isUseSQL()) return;
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://"
@@ -51,7 +52,7 @@ public class DatabaseConnector {
         }
     }
 
-    public Connection getConnection() {
+    public synchronized Connection getConnection() {
         try {
             if(connection == null || connection.isClosed()) {
                 initialize();

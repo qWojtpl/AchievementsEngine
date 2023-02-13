@@ -9,3 +9,4 @@ messages:
   progress: '§6§lProgress:'
   progress-field-prefix: §7§l- §b
   completed: §aCOMPLETED!
+  not-downloaded: '§cWhoaa! Not too fast? Your data is not downloaded yet, please try again later!'

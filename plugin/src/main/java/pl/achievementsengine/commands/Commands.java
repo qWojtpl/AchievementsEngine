@@ -20,6 +20,11 @@ public class Commands implements CommandExecutor {
         if(sender instanceof Player) { // Check if sender is player
             PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
             if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.use"))) return true;
+            PlayerAchievementState state = PlayerAchievementState.Create((Player) sender);
+            if(!state.isInitialized()) {
+                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("not-downloaded"));
+                return true;
+            }
             if(args.length == 0) { // If not arguments given - open GUI
                 GUIHandler.New((Player) sender, 0);
                 return true;

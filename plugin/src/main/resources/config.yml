@@ -1,7 +1,16 @@
 config:
+
+  # Specify how plugin will save and read data.
+  # I don't recommend using YAML and SQL at the same time - it may cause errors
+
   useYAML: true
   useSQL: false
-  saveInterval: 300 # 5 minutes
+
+  # Set save interval.
+  # After every <saveInterval> seconds SQL will be executed or YAML will be saved
+  # SQL is running on async, YAML is not - I recommend using at least 300 seconds (5 minutes)
+
+  saveInterval: 300
 
 sql:
   host: ''

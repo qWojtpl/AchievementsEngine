@@ -1,5 +1,7 @@
 package pl.achievementsengine.achievements;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.data.DataHandler;
@@ -13,6 +15,9 @@ public class PlayerAchievementState {
     private Player player; // State player
     private List<Achievement> completedAchievements; // Completed achievements
     private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
+    @Getter
+    @Setter
+    private boolean initialized;
 
     public PlayerAchievementState(Player player, List<Achievement> completedAchievements) {
         this.player = player;

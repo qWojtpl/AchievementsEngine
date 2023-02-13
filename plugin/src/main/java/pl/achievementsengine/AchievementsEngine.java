@@ -32,12 +32,12 @@ public final class AchievementsEngine extends JavaPlugin {
     @Override
     public void onEnable() {
         main = this; // Set main as this instance
+        this.dataHandler = new DataHandler();
         this.permissionManager = new PermissionManager();
         this.achievementManager = new AchievementManager();
         permissionManager.loadPermissions(); // Register permissions
         this.events = new Events();
         this.messages = new Messages();
-        this.dataHandler = new DataHandler();
         getServer().getPluginManager().registerEvents(events, this); // Register events
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
