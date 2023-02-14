@@ -209,6 +209,7 @@ messages:
 `useYAML` - When set to true plugin will be using YAML to save data<br>
 `useSQL` - When set to true plugin will be using SQL to save data<br>
 `saveInterval` - Interval between data saves (in seconds)<br>
+`logSave` - When set to true every save will send message to console<br>
 
 ## Default configuration:
 
@@ -217,6 +218,7 @@ config:
   useYAML: true
   useSQL: false
   saveInterval: 300 # 5 minutes
+  logSave: true
 
 sql:
   host: ''

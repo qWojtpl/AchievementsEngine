@@ -30,6 +30,7 @@ public class DataHandler {
     private int saveTask = -1;
     private boolean useYAML;
     private boolean useSQL;
+    private boolean logSave;
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
@@ -88,6 +89,7 @@ public class DataHandler {
             state.setInitialized(true); // Set state as initialized
         }
         if(useSQL) {
+            state.setInitialized(false);
             getSqlQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick}); // Add player to database
             AchievementsEngine.getInstance().getManager().loadCompleted(state); // Load player's completed achievements
             AchievementsEngine.getInstance().getManager().loadProgress(state); // Load player's progress
@@ -145,11 +147,13 @@ public class DataHandler {
 
     public void saveYAML(PlayerAchievementState state) { // Save only YAML for player
         if(!useYAML) return;
-        try {
-            playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
-        } catch (IOException e) {
-            AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
+            try {
+                playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
+            } catch (IOException e) {
+                AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+            }
+        });
     }
 
     public void saveSQL() { // Save only SQL (loop through SQL queue)
@@ -175,12 +179,15 @@ public class DataHandler {
     }
 
     public void saveAll() { // Save ALL data
+        if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data..");
         if(useYAML) {
-            for(String key : getPendingStates().keySet()) { // Loop through pending states
-                PlayerAchievementState state = getPendingStates().get(key);
-                saveYAML(state); // Save YAML for player
+            if(!getPendingStates().isEmpty()) {
+                for (String key : getPendingStates().keySet()) { // Loop through pending states
+                    PlayerAchievementState state = getPendingStates().get(key);
+                    saveYAML(state); // Save YAML for player
+                }
+                getPendingStates().clear(); // Clear pending states
             }
-            getPendingStates().clear(); // Clear pending states
         }
         if(useSQL) {
             saveSQL(); // Save SQL
@@ -306,6 +313,7 @@ public class DataHandler {
         this.saveInterval = yml.getInt("config.saveInterval"); // Save interval
         this.useYAML = yml.getBoolean("config.useYAML"); // Is using YAML?
         this.useSQL = yml.getBoolean("config.useSQL"); // Is using SQL?
+        this.logSave = yml.getBoolean("config.logSave"); // When set to true every save will send message to console
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
                 this::saveAll, 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
         if(useYAML && useSQL) { // Create warning

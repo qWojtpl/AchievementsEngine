@@ -54,7 +54,6 @@ public final class AchievementsEngine extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        dataHandler.saveAll();
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         getLogger().info("Bye!"); // Print to console
     }

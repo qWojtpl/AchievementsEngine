@@ -13,6 +13,10 @@ config:
 
   saveInterval: 300
 
+  # When set to true every save will send message to console
+
+  logSave: true
+
 sql:
   host: ''
   user: ''
