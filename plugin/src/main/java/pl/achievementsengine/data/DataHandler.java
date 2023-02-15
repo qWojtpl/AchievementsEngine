@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.A;
 import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
@@ -204,9 +203,9 @@ public class DataHandler {
                 data1.set(state1.getPlayer().getName(), null);
                 data1.save(dataFile1);
             } catch (IOException e) {
-                AchievementsEngine.getInstance().getLogger().info("Cannot transfer achievements from " + state1.getPlayer().getName()
+                AchievementsEngine.getInstance().getLogger().severe("Cannot transfer achievements from " + state1.getPlayer().getName()
                         + " to " + state2.getPlayer().getName());
-                AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
+                AchievementsEngine.getInstance().getLogger().severe("IO Exception: " + e);
             }
         }
         state2.setCompletedAchievements(new ArrayList<>(state1.getCompletedAchievements()));
@@ -229,12 +228,12 @@ public class DataHandler {
                 if(!directory.exists()) directory.mkdir(); // If directory doesn't exist - create it!
                 dataFile.createNewFile(); // Create player's file
             } catch(IOException e) {
-                AchievementsEngine.getInstance().getLogger().info("Cannot create " + p.getName() + ".yml");
-                AchievementsEngine.getInstance().getLogger().info("IO Exception: " + e);
+                AchievementsEngine.getInstance().getLogger().severe("Cannot create " + p.getName() + ".yml");
+                AchievementsEngine.getInstance().getLogger().severe("IO Exception: " + e);
             }
         } else {
             if(!dataFile.canRead() || !dataFile.canWrite()) { // Check if server can read and write to file
-                AchievementsEngine.getInstance().getLogger().info("Cannot create " + p.getName() + ".yml - File cannot be read or written");
+                AchievementsEngine.getInstance().getLogger().severe("Cannot use " + p.getName() + ".yml - File cannot be read or written");
             }
         }
         return dataFile;
@@ -255,6 +254,7 @@ public class DataHandler {
         for (String key : section.getKeys(false)) {
             if(key.length() > 128) { // Max key length is 128
                 AchievementsEngine.getInstance().getLogger().severe("Cannot load achievement " + key + " - achievement key is too long..");
+                continue;
             }
             if (yml.getString("achievements." + key + ".name") != null &&
                     yml.getBoolean("achievements." + key + ".enabled")) { // Check if name is not null and achievement is enabled

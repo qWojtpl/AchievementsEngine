@@ -48,7 +48,6 @@
 ```java
 - join        // Join event, eg. join 1 server
 - kill*       // Kill event, eg. kill 20 zombie named Super Zombie!!
-- interact    // Interact block event, eg. interact 50 stone_button
 - break       // Break block event, eg. break 64 dirt
 - place       // Place block event, eg. place 128 spruce_log
 - pickup*     // Pickup (how many items, not how many times) item event, eg. pickup 32 slime_ball

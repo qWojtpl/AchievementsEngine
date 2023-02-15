@@ -60,7 +60,7 @@ public class Events implements Listener {
 
     public void registerEvent(String event, Achievement achievement) {
         event = event.toLowerCase(); // Make event lowercase
-        List<Achievement> list = getEventAchievements(event, true); // Get list or add empty list to memory
+        List<Achievement> list = getEventAchievements(event, true); // Get list or add empty list to the memory
         list.add(achievement); // Add achievement ot list
     }
 
@@ -71,10 +71,12 @@ public class Events implements Listener {
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" "); // Split checkable
         AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
-        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1], false)) { // Loop through registered events which are same as checkable
+        // Loop through registered events which are same as checkable
+        for(Achievement a : getEventAchievements(ev[0] + " " + ev[1], false)) {
             am.Check(player, checkable, a);
         }
-        for(Achievement a : getEventAchievements(ev[0] + " *", false)) { // Loop through registered events which contains * (any)
+        // Loop through registered events which contains * (any)
+        for(Achievement a : getEventAchievements(ev[0] + " *", false)) {
             am.Check(player, checkable, a);
         }
         for(String key : getRegisteredEvents().keySet()) { // Loop through all registered events
@@ -98,14 +100,6 @@ public class Events implements Listener {
         if(event.getEntity().getKiller() != null) {
             checkForAchievementEvents(event.getEntity().getKiller(), "kill " + event.getEntity().getType().name()
                     + " named " + event.getEntity().getCustomName());
-        }
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if(event.getClickedBlock() != null) {
-            checkForAchievementEvents(event.getPlayer(), "interact " + event.getClickedBlock().getType().name());
-            checkForAchievementEvents(event.getPlayer(), "click " + event.getClickedBlock().getType().name());
         }
     }
 

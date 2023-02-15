@@ -30,6 +30,8 @@ public class Achievement {
         if(item != null) {
             if (Material.getMaterial(item.toUpperCase()) == null) { // If not found material, use bedrock
                 this.item = Material.BEDROCK;
+                AchievementsEngine.getInstance().getLogger().warning("Not found material: " + item.toUpperCase()
+                        + " in achievement " + id + ". Replaced with bedrock.");
             } else {
                 this.item = Material.getMaterial(item.toUpperCase());
             }
@@ -71,7 +73,8 @@ public class Achievement {
                 actionsFormat = actionsFormat + ", " + action;
             }
         }
-        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("complete-message"), name, description, eventsFormat, actionsFormat);
+        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("complete-message"),
+                name, description, eventsFormat, actionsFormat);
         String[] msg = message.split("%nl%");
         for(String m : msg) {
             state.getPlayer().sendMessage(m);
@@ -80,9 +83,12 @@ public class Achievement {
         state.getCompletedAchievements().add(this); // Add this achievement to player's completed achievements
         for (String action : actions) { // Trigger all achievement commands
             Bukkit.getScheduler().callSyncMethod(AchievementsEngine.getInstance(), () ->
-                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageFormat.format(action, state.getPlayer().getName(), name)));
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),
+                            MessageFormat.format(action, state.getPlayer().getName(), name)));
         }
-        AchievementsEngine.getInstance().getDataHandler().addCompletedAchievement(state, this); // Add this achievement to player's completed achievements (Save data)
-        AchievementsEngine.getInstance().getEvents().checkForAchievementEvents(state.getPlayer(), "complete " + this.ID); // Let the other achievements know that player completed this achievement
+        AchievementsEngine.getInstance().getDataHandler().addCompletedAchievement(
+                state, this); // Add this achievement to player's completed achievements (Save data)
+        AchievementsEngine.getInstance().getEvents().checkForAchievementEvents(state.getPlayer(),
+                "complete " + this.ID); // Let the other achievements know that player completed this achievement
     }
 }

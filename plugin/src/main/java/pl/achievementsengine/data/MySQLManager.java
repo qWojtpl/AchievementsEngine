@@ -144,9 +144,6 @@ public class MySQLManager {
                 log.severe("Error at loadCompleted(), SQL Exception: " + e);
             } finally {
                 state.setInitializeLevel(state.getInitializeLevel() + 1);
-                if(state.getInitializeLevel() >= 2) {
-                    state.setInitialized(true); // Mark state as initialized
-                }
             }
         });
     }
@@ -185,9 +182,6 @@ public class MySQLManager {
                 log.severe("Error at loadProgress(), SQL Exception: " + e);
             } finally {
                 state.setInitializeLevel(state.getInitializeLevel() + 1);
-                if(state.getInitializeLevel() >= 2) {
-                    state.setInitialized(true); // Mark state as initialized
-                }
             }
         });
     }

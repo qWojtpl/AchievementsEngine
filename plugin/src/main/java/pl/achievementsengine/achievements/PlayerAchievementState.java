@@ -58,7 +58,7 @@ public class PlayerAchievementState {
 
     public void setInitialized(boolean initialized) {
         this.initialized = initialized;
-        if(initialized) {
+        if(this.initializeLevel >= 2 && initialized) {
             for(CheckableObject co : getQueue()) {
                 AchievementsEngine.getInstance().getAchievementManager().Check(co.getPlayer(), co.getCheckable(), co.getAchievement());
             }

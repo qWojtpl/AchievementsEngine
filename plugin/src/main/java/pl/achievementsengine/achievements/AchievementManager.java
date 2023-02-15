@@ -28,11 +28,12 @@ public class AchievementManager {
         for(int j = 0; j < a.getEvents().size(); j++) { // Loop through all events from achievement
             String[] events = a.getEvents().get(j).split(" "); // Split one event into pieces eg. [kill] [1] [player]
             String[] givenEvents = checkable.split(" "); // Split checkable into pieces eg. [kill] [player]
+            // Check if events[0] equals givenEvents[0] ([kill] = [kill]) and events[2] equals (* - any) or givenEvents[1] ([Player] = [Player]) or events[2] contains *% - any like and events[2] contains givenEvents[1], events[1] is a number
             if(events[0].equalsIgnoreCase(givenEvents[0]) && (events[2].equalsIgnoreCase("*") || events[2].equalsIgnoreCase(givenEvents[1]) || (events[2].contains("*%") && givenEvents[1].toLowerCase().contains(events[2].replace("*%", "").toLowerCase()) ))) {
-                // Check if events[0] equals givenEvents[0] ([kill] = [kill]) and events[2] equals (* - any) or givenEvents[1] ([Player] = [Player]) or events[2] contains *% - any like and events[2] contains givenEvents[1], events[1] is a number
                 boolean match = false; // Mark if all external things (name, chat string) matches
                 if(events.length > 4) { // Check if event length is greater than 4 (event contains named or chat with space) - pickup 1 bedrock named BEDDI (at least 5 arguments)
-                    if (events[3].equals("named") && givenEvents[2].equals("named") && givenEvents.length > 3) { // Check if third argument is named and second argument of given event is "named" (checks if event provides named too), and given events contains at least 4 arguments - enchant diamond_sword named xyz
+                    // Check if third argument is named and second argument of given event is "named" (checks if event provides named too), and given events contains at least 4 arguments - enchant diamond_sword named xyz
+                    if (events[3].equals("named") && givenEvents[2].equals("named") && givenEvents.length > 3) {
                         String name = givenEvents[3];
                         for(int k = 5; k < events.length; k++) { // If name from event contains spaces - join it
                             events[4] = events[4] + " " + events[k];
@@ -59,11 +60,13 @@ public class AchievementManager {
                 } else {
                     match = true;
                 }
-                if(progress[j] < Integer.parseInt(events[1]) && match) { // Check if progress of event is less than required progress of this event
+                // Check if progress of event is less than required progress of this event
+                if(progress[j] < Integer.parseInt(events[1]) && match) {
                     progress[j]++; // Add one to progress
                     playerState.UpdateProgress(a, progress); // Update progress
                     if(a.isAnnounceProgress()) { // If achievement has showProgress enabled - show message on a chat
-                        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("progress-message"), a.getName());
+                        String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages()
+                                .getMessage("progress-message"), a.getName());
                         String[] msg = message.split("%nl%");
                         for(String m : msg) {
                             p.sendMessage(m);

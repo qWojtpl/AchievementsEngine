@@ -10,7 +10,6 @@ public class CheckableObject {
     private final String checkable;
     private final Achievement achievement;
 
-
     public CheckableObject(Player player, String checkable, Achievement achievement) {
         this.player = player;
         this.checkable = checkable;
