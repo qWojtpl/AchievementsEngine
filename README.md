@@ -63,6 +63,7 @@
 - throw       // Throw event, eg. throw 64 snowball, throw 10 trident
 - command     // Send command event (without arguments), eg. command 30 /ae
 - chat        // Send chat message event, eg. chat 10 Wiggle-Wiggle
+- breed       // Breed animals event, eg. breed 10 cow
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
 ```
 

@@ -11,10 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -206,6 +203,13 @@ public class Events implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         if(event.isCancelled()) return;
         checkForAchievementEvents(event.getPlayer(), "chat " + event.getMessage());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBreed(EntityBreedEvent event) {
+        if(event.isCancelled()) return;
+        if(!(event.getBreeder() instanceof Player)) return;
+        checkForAchievementEvents((Player) event.getBreeder(), "breed " + event.getEntity().getType().name());
     }
 
     @EventHandler
