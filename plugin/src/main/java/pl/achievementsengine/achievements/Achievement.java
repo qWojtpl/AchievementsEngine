@@ -20,13 +20,15 @@ public class Achievement {
     private final Material item; // GUI item
     private final boolean showProgress; // show achievement progress?
     private final boolean announceProgress;
+    private final int requiredProgress;
 
-    public Achievement(String id, String name, String description, List<String> events, List<String> actions, String item, boolean showProgress, boolean announceProgress) {
+    public Achievement(String id, String name, String description, List<String> events, List<String> actions, String item, boolean showProgress, boolean announceProgress, int requiredProgress) {
         this.ID = id;
         this.name = name;
         this.description = description;
         this.events = events;
         this.actions = actions;
+        this.requiredProgress = requiredProgress;
         if(item != null) {
             if (Material.getMaterial(item.toUpperCase()) == null) { // If not found material, use bedrock
                 this.item = Material.BEDROCK;

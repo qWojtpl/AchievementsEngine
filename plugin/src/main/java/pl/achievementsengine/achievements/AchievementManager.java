@@ -80,7 +80,10 @@ public class AchievementManager {
         for(int pr : progress) { // Loop through player's progress
             sum += pr; // Add player's progress to sum
         }
-        if(sum == max) a.Complete(playerState); // If sum of player's progresses equals max progress for this achievement - complete it!
+        if(a.getRequiredProgress() != 0) {
+            max = a.getRequiredProgress();
+        }
+        if(sum >= max) a.Complete(playerState); // If sum of player's progresses equals max progress for this achievement - complete it!
     }
 
     public Achievement checkIfAchievementExists(String name) {
