@@ -25,7 +25,7 @@ public class DataHandler {
     private final HashMap<String, PlayerAchievementState> pendingStates = new HashMap<>();
     private final List<String[]> sqlQueue = new ArrayList<>();
     private final HashMap<String, String[]> importantSQLQueue = new HashMap<>();
-    private final HashMap<PlayerAchievementState, List<Achievement>> updateProgressQueue = new HashMap<>();
+    private final HashMap<PlayerAchievementState, List<Achievement>> updateProgressQueue = new HashMap<>(); // For SQL
     private int saveInterval;
     private int saveTask = -1;
     private boolean useYAML;
@@ -97,6 +97,15 @@ public class DataHandler {
         }
     }
 
+    public void removeYAML(Player p) {
+        if(!isKeepPlayersInMemory()) {
+            PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+            if(pu.checkIfPlayerExists(p.getName()) == null) {
+                getPlayerYAML().remove(p.getName());
+            }
+        }
+    }
+
     public void addCompletedAchievement(PlayerAchievementState state, Achievement achievement) {
         if(useYAML) {
             addToPending(state); // Add state to pending to save
@@ -155,6 +164,7 @@ public class DataHandler {
                 } catch (IOException e) {
                     AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
                 }
+                removeYAML(state.getPlayer());
             });
         } else {
             try {
@@ -162,6 +172,7 @@ public class DataHandler {
             } catch (IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
             }
+            removeYAML(state.getPlayer());
         }
     }
 
@@ -200,14 +211,6 @@ public class DataHandler {
                     saveYAML(state, inAsync); // Save YAML for player
                 }
                 getPendingStates().clear(); // Clear pending states
-            }
-            if(!isKeepPlayersInMemory()) {
-                PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
-                for(String key : getPlayerYAML().keySet()) {
-                    if(pu.checkIfPlayerExists(key) == null) {
-                        getPlayerYAML().remove(key);
-                    }
-                }
             }
         }
         if(useSQL) {
