@@ -83,7 +83,7 @@ Before below fields add parent key<br>
 `item` - GUI item (default is bedrock)<br>
 `showProgress` - If true shows the progress in GUI and e<br>
 `announceProgress` - If true announce when player will progress in achievement by sending chat message to him<br>
-`requiredProgress` - Is a number. You can specify what sum of progress player need to complete this achievement. Set to 0 to disable. <br>
+`requiredProgress` - Is a number. You can specify what sum of progress player need to complete this achievement. Set to 0 to disable.<br>
 
 In this case player needs to mine total 10 of these ores
 Player can mine 5 iron ores and 5 gold ores to complete this achievement

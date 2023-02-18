@@ -19,8 +19,8 @@ public class PlayerAchievementState {
     private List<Achievement> completedAchievements; // Completed achievements
     @Setter
     private HashMap<Achievement, int[]> progress = new HashMap<>(); // Achievement progress
-    private boolean initialized;
     @Setter
+    private boolean initialized;
     private int initializeLevel = 0;
     private final List<CheckableObject> queue = new ArrayList<>();
 
@@ -56,9 +56,10 @@ public class PlayerAchievementState {
         dh.updateProgress(this, achievement);
     }
 
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-        if(this.initializeLevel >= 2 && initialized) {
+    public void setInitializeLevel(int level) {
+        this.initializeLevel = level;
+        if(this.initializeLevel >= 2) {
+            this.initialized = true;
             for(CheckableObject co : getQueue()) {
                 AchievementsEngine.getInstance().getAchievementManager().Check(co.getPlayer(), co.getCheckable(), co.getAchievement());
             }

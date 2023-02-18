@@ -54,6 +54,7 @@ public final class AchievementsEngine extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        getDataHandler().saveAll(false); // Save all data not in async (if plugin is disabled we can't register async)
         GUIHandler.CloseAllInventories(); // Close all registered inventories to prevent GUI item duping.
         getLogger().info("Bye!"); // Print to console
     }

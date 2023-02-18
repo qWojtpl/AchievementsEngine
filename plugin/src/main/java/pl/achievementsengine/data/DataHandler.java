@@ -36,7 +36,7 @@ public class DataHandler {
     }
 
     public void LoadConfig() {
-        saveAll(); // Save all data
+        saveAll(true); // Save all data
         if(saveTask != -1) { // If task is not -1 (default) cancel saveTask
             Bukkit.getScheduler().cancelTask(saveTask);
         }
@@ -144,21 +144,29 @@ public class DataHandler {
         }
     }
 
-    public void saveYAML(PlayerAchievementState state) { // Save only YAML for player
+    public void saveYAML(PlayerAchievementState state, boolean async) { // Save only YAML for player
         if(!useYAML) return;
-        Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
+        if(async) {
+            Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
+                try {
+                    playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
+                } catch (IOException e) {
+                    AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+                }
+            });
+        } else {
             try {
                 playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
             } catch (IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
             }
-        });
+        }
     }
 
-    public void saveSQL() { // Save only SQL (loop through SQL queue)
+    public void saveSQL(boolean async) { // Save only SQL (loop through SQL queue)
         if(!useSQL) return;
         for(String key : getImportantSQLQueue().keySet()) { // Firstly, we're looping through important queue
-            AchievementsEngine.getInstance().getManager().executeNow(key, getImportantSQLQueue().get(key)); // Execute it NOW - without async
+            AchievementsEngine.getInstance().getManager().execute(key, getImportantSQLQueue().get(key)); // Execute it NOW - without async
         }
         getImportantSQLQueue().clear(); // Clear important queue
         for(String[] sql : getSqlQueue()) { // Loop through normal SQL queue
@@ -166,38 +174,42 @@ public class DataHandler {
             for(int i = 1; i < sql.length; i++) {
                 args[i-1] = sql[i];
             }
-            AchievementsEngine.getInstance().getManager().execute(sql[0], args); // Execute in async
+            if(async) {
+                AchievementsEngine.getInstance().getManager().executeAsync(sql[0], args); // Execute in async
+            } else {
+                AchievementsEngine.getInstance().getManager().execute(sql[0], args);
+            }
         }
         getSqlQueue().clear(); // Clear queue
         for(PlayerAchievementState state : getUpdateProgressQueue().keySet()) { // Loop through update queue (get states)
             for(Achievement a : getUpdateProgressQueue().get(state)) { // Loop through list of achievements from state
-                AchievementsEngine.getInstance().getManager().updateProgress(state, a); // Update progress in database
+                AchievementsEngine.getInstance().getManager().updateProgress(state, a, async); // Update progress in database
             }
         }
         getUpdateProgressQueue().clear(); // Clear updateProgress queue
     }
 
-    public void saveAll() { // Save ALL data
+    public void saveAll(boolean inAsync) { // Save ALL data
         if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data..");
         if(useYAML) {
             if(!getPendingStates().isEmpty()) {
                 for (String key : getPendingStates().keySet()) { // Loop through pending states
                     PlayerAchievementState state = getPendingStates().get(key);
-                    saveYAML(state); // Save YAML for player
+                    saveYAML(state, inAsync); // Save YAML for player
                 }
                 getPendingStates().clear(); // Clear pending states
             }
         }
         if(useSQL) {
-            saveSQL(); // Save SQL
+            saveSQL(inAsync); // Save SQL
         }
     }
 
     public void transferAchievements(PlayerAchievementState state1, PlayerAchievementState state2) {
-        addToPending(state2);
-        File dataFile1 = createPlayerFile(state1.getPlayer());
-        File dataFile2 = createPlayerFile(state2.getPlayer());
         if(useYAML) {
+            addToPending(state2);
+            File dataFile1 = createPlayerFile(state1.getPlayer());
+            File dataFile2 = createPlayerFile(state2.getPlayer());
             YamlConfiguration data1 = playerYAML.get(state1.getPlayer().getName());
             try {
                 data1.set(state1.getPlayer().getName(), null);
@@ -207,6 +219,10 @@ public class DataHandler {
                         + " to " + state2.getPlayer().getName());
                 AchievementsEngine.getInstance().getLogger().severe("IO Exception: " + e);
             }
+        }
+        if(useSQL) {
+            getSqlQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT id_player FROM players WHERE nick=?)", state1.getPlayer().getName()});
+            getSqlQueue().add(new String[]{"DELETE FROM progress WHERE id_player=(SELECT id_player FROM players WHERE nick=?)", state1.getPlayer().getName()});
         }
         state2.setCompletedAchievements(new ArrayList<>(state1.getCompletedAchievements()));
         state2.setProgress(new HashMap<>(state1.getProgress()));
@@ -316,7 +332,7 @@ public class DataHandler {
         this.useSQL = yml.getBoolean("config.useSQL"); // Is using SQL?
         this.logSave = yml.getBoolean("config.logSave"); // When set to true every save will send message to console
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
-                this::saveAll, 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
+                () -> saveAll(true), 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
         if(useYAML && useSQL) { // Create warning
             AchievementsEngine.getInstance().getLogger().warning("ATTENTION! YOU'RE USING YAML AND SQL TO SAVE DATA. THIS MAY CAUSE MANY ERRORS.");
         }

@@ -33,7 +33,7 @@ public class AchievementManager {
                 boolean match = false; // Mark if all external things (name, chat string) matches
                 if(events.length > 4) { // Check if event length is greater than 4 (event contains named or chat with space) - pickup 1 bedrock named BEDDI (at least 5 arguments)
                     // Check if third argument is named and second argument of given event is "named" (checks if event provides named too), and given events contains at least 4 arguments - enchant diamond_sword named xyz
-                    if (events[3].equals("named") && givenEvents[2].equals("named") && givenEvents.length > 3) {
+                    if (events[3].equalsIgnoreCase("named") && givenEvents[2].equals("named") && givenEvents.length > 3) {
                         String name = givenEvents[3];
                         for(int k = 5; k < events.length; k++) { // If name from event contains spaces - join it
                             events[4] = events[4] + " " + events[k];
@@ -44,7 +44,7 @@ public class AchievementManager {
                         if(name.equals(events[4])) { // If name from given event equals name from event, then mark Match as true
                             match = true;
                         }
-                    } else if(events[0].equals("chat")){ // Check if event type is chat
+                    } else if(events[0].equalsIgnoreCase("chat")) { // Check if event type is chat
                         String givenMessage = givenEvents[1];
                         String message = events[2];
                         for(int k = 3; k < events.length; k++) { // If message from event contains spaces - join it

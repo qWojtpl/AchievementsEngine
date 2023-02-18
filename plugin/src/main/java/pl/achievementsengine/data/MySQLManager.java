@@ -25,22 +25,23 @@ public class MySQLManager {
 
     @SneakyThrows
     private void initiateDB() {
-        this.mainConnector = new DatabaseConnector(); // Get main connection
+        if(!AchievementsEngine.getInstance().getDataHandler().isUseSQL()) return;
+         this.mainConnector = new DatabaseConnector(); // Get main connection
         if(mainConnector.checkConnection()) {
             if(!existTable("players")) { // If table doesn't exist - create it NOW (not async)
-                executeNow("CREATE TABLE IF NOT EXISTS players ("+
+                execute("CREATE TABLE IF NOT EXISTS players ("+
                         " id_player INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " nick VARCHAR(16) NOT NULL UNIQUE" +
                         " );", null);
             }
             if(!existTable("achievements")) {
-                executeNow("CREATE TABLE IF NOT EXISTS achievements (" +
+                execute("CREATE TABLE IF NOT EXISTS achievements (" +
                         " id_achievement INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         " achievement_key VARCHAR(128) NOT NULL UNIQUE" +
                         " );", null);
             }
             if(!existTable("progress")) {
-                executeNow("CREATE TABLE IF NOT EXISTS progress (" +
+                execute("CREATE TABLE IF NOT EXISTS progress (" +
                         " id_player INT NOT NULL," +
                         " id_achievement INT NOT NULL," +
                         " event INT NOT NULL," +
@@ -51,7 +52,7 @@ public class MySQLManager {
                         " );", null);
             }
             if(!existTable("completed")) {
-                executeNow("CREATE TABLE IF NOT EXISTS completed (" +
+                execute("CREATE TABLE IF NOT EXISTS completed (" +
                         " id_player INT NOT NULL," +
                         " id_achievement INT NOT NULL," +
                         " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
@@ -76,7 +77,7 @@ public class MySQLManager {
         }
     }
 
-    public void execute(String query, String[] args) {
+    public void executeAsync(String query, String[] args) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
             if(!connector.checkConnection()) {
@@ -100,7 +101,7 @@ public class MySQLManager {
         });
     }
 
-    public void executeNow(String query, String[] args) {
+    public void execute(String query, String[] args) {
         if(!mainConnector.checkConnection()) {
             log.severe("Error at executeNow() - connection is null");
             return;
@@ -186,14 +187,18 @@ public class MySQLManager {
         });
     }
 
-    public void updateProgress(PlayerAchievementState state, Achievement a) {
+    public void updateProgress(PlayerAchievementState state, Achievement a, boolean inAsync) {
         for(int event = 0; event < a.getEvents().size(); event++) { // Loop through all achievement's events
             String query = "INSERT INTO progress VALUES((SELECT id_player FROM players WHERE nick=?), " +
                     "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?"; // SQL
             int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress
             String[] args = new String[]{state.getPlayer().getName(), a.getID(), String.valueOf(event),
                     String.valueOf(progress[event]), String.valueOf(progress[event])}; // Create arguments
-            execute(query, args); // Execute in async
+            if(inAsync) {
+                executeAsync(query, args); // Execute in async
+            } else {
+                execute(query, args);
+            }
         }
     }
 
