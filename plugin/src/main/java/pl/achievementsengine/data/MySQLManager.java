@@ -26,7 +26,7 @@ public class MySQLManager {
     @SneakyThrows
     private void initiateDB() {
         if(!AchievementsEngine.getInstance().getDataHandler().isUseSQL()) return;
-         this.mainConnector = new DatabaseConnector(); // Get main connection
+        this.mainConnector = new DatabaseConnector(); // Get main connection
         if(mainConnector.checkConnection()) {
             if(!existTable("players")) { // If table doesn't exist - create it NOW (not async)
                 execute("CREATE TABLE IF NOT EXISTS players ("+
@@ -102,6 +102,7 @@ public class MySQLManager {
     }
 
     public void execute(String query, String[] args) {
+        if(mainConnector == null) return;
         if(!mainConnector.checkConnection()) {
             log.severe("Error at executeNow() - connection is null");
             return;

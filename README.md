@@ -231,6 +231,7 @@ config:
   useSQL: false
   saveInterval: 300 # 5 minutes
   logSave: true
+  keepPlayersInMemory: false
 
 sql:
   host: ''

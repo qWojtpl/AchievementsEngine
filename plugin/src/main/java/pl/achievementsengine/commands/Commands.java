@@ -138,6 +138,7 @@ public class Commands implements CommandExecutor {
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
+        if(!checkStateInitialized(sender, state)) return;
         if (!state.getCompletedAchievements().contains(a)) {
             a.Complete(state);
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§aAdded " + args[2]
@@ -162,6 +163,7 @@ public class Commands implements CommandExecutor {
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
+        if(!checkStateInitialized(sender, state)) return;
         if (!args[2].equalsIgnoreCase("*")) {
             Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
             if (a == null) {
@@ -193,7 +195,8 @@ public class Commands implements CommandExecutor {
             return;
         }
         PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
-        if(pu.checkIfPlayerExists(args[1]) == null) {
+        Player p = pu.checkIfPlayerExists(args[1]);
+        if(p == null) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
@@ -202,7 +205,8 @@ public class Commands implements CommandExecutor {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCan't found achievement " + args[2] + "§c!");
             return;
         }
-        PlayerAchievementState state = AchievementsEngine.getInstance().getPlayerStates().get(args[1]);
+        PlayerAchievementState state = PlayerAchievementState.Create(p);
+        if(!checkStateInitialized(sender, state)) return;
         if(state.getCompletedAchievements().contains(a)) {
             sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cThis player already has this achievement completed. Use /ae remove instead.");
             return;
@@ -227,10 +231,21 @@ public class Commands implements CommandExecutor {
             return;
         }
         PlayerAchievementState state1 = PlayerAchievementState.Create(p1);
+        if(!checkStateInitialized(sender, state1)) return;
         PlayerAchievementState state2 = PlayerAchievementState.Create(p2);
+        if(!checkStateInitialized(sender, state2)) return;
         AchievementsEngine.getInstance().getDataHandler().transferAchievements(state1, state2);
         sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§aTransferred all achievements from "
                 + args[1] + "§a to " + args[2] + "§a!");
+    }
+
+    private boolean checkStateInitialized(CommandSender sender, PlayerAchievementState state) {
+        if(!state.isInitialized()) {
+            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") +
+                    "§cThis (or these) player(s) doesn't have initialized state (data is not downloaded), try again later.");
+            return false;
+        }
+        return true;
     }
 
 }

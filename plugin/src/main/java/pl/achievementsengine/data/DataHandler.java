@@ -9,6 +9,7 @@ import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
+import pl.achievementsengine.util.PlayerUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class DataHandler {
     private boolean useYAML;
     private boolean useSQL;
     private boolean logSave;
+    private boolean keepPlayersInMemory;
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
@@ -199,6 +201,14 @@ public class DataHandler {
                 }
                 getPendingStates().clear(); // Clear pending states
             }
+            if(!isKeepPlayersInMemory()) {
+                PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+                for(String key : getPlayerYAML().keySet()) {
+                    if(pu.checkIfPlayerExists(key) == null) {
+                        getPlayerYAML().remove(key);
+                    }
+                }
+            }
         }
         if(useSQL) {
             saveSQL(inAsync); // Save SQL
@@ -331,6 +341,7 @@ public class DataHandler {
         this.useYAML = yml.getBoolean("config.useYAML"); // Is using YAML?
         this.useSQL = yml.getBoolean("config.useSQL"); // Is using SQL?
         this.logSave = yml.getBoolean("config.logSave"); // When set to true every save will send message to console
+        this.keepPlayersInMemory = yml.getBoolean("config.keepPlayersInMemory"); // When set to true, all player's states (completed achievements, progress) etc. is saved in memory.
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
                 () -> saveAll(true), 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
         if(useYAML && useSQL) { // Create warning

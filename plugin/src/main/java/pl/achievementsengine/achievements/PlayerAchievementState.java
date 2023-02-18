@@ -42,6 +42,13 @@ public class PlayerAchievementState {
         return AchievementsEngine.getInstance().getPlayerStates().get(p.getName());
     }
 
+    public static void Remove(Player p) {
+        if(AchievementsEngine.getInstance().getDataHandler().isKeepPlayersInMemory()) return;
+        if(AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {
+            AchievementsEngine.getInstance().getPlayerStates().remove(p.getName());
+        }
+    }
+
     public void UpdateProgress(Achievement achievement, int[] progressArray) { // Update progress
         progress.remove(achievement); // Remove achievement progress
         progress.put(achievement, progressArray); // Add new achievement progress

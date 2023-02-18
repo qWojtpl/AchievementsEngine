@@ -12,10 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import pl.achievementsengine.AchievementsEngine;
@@ -90,6 +87,11 @@ public class Events implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerAchievementState.Create(event.getPlayer());
         checkForAchievementEvents(event.getPlayer(), "join server");
+    }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event) {
+        PlayerAchievementState.Remove(event.getPlayer());
     }
 
     @EventHandler
