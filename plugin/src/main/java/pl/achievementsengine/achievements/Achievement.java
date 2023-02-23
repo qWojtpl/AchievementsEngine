@@ -44,8 +44,13 @@ public class Achievement {
         this.announceProgress = announceProgress;
         for(String event : events) {
             String[] ev = event.split(" ");
-            AchievementsEngine.getInstance().getEvents().registerEvent(ev[0] + " " + ev[2], this);
-            AchievementsEngine.getInstance().getLogger().info("Registering event: " + ev[0] + " " + ev[2]);
+            String toRegister = ev[0] + " " + ev[2];
+            if(ev[0].equalsIgnoreCase("chat") || ev[0].equalsIgnoreCase("sign")) {
+                for(int i = 3; i < ev.length; i++) {
+                    toRegister = toRegister + " " + ev[i];
+                }
+            }
+            AchievementsEngine.getInstance().getEvents().registerEvent(toRegister, this);
         }
     }
 

@@ -65,6 +65,7 @@
 - chat        // Send chat message event, eg. chat 10 Wiggle-Wiggle
 - breed       // Breed animals event, eg. breed 10 cow
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
+- sign        // Edit sign event, eg. sign 10 This is my house
 ```
 
 <sup>* - event that supports names, eg. `kill 1 villager named Some Villager`</sup>

@@ -73,10 +73,10 @@ public class DataHandler {
                     if(!a.getID().equals(key)) { // If ID is not this achievement - skip
                         continue;
                     }
-                    if(data.getBoolean(nick + "." + key + ".completed")) { // Check if achievement is completed
+                    if(data.getBoolean(nick + "." + key + ".c")) { // Check if achievement is completed
                         state.getCompletedAchievements().add(a); // Add achievement to player's completed achievements
                     }
-                    List<Integer> progressList = data.getIntegerList(nick + "." + key + ".progress"); // Read progress
+                    List<Integer> progressList = data.getIntegerList(nick + "." + key + ".p"); // Read progress
                     int[] progress = new int[a.getEvents().size()]; // Initialize progress
                     int i = 0; // Set iterator
                     for(int value : progressList) {
@@ -110,7 +110,7 @@ public class DataHandler {
         if(useYAML) {
             addToPending(state); // Add state to pending to save
             YamlConfiguration data = playerYAML.get(state.getPlayer().getName()); // Get YAML
-            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", true); // Mark achievement as completed in YAML
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".c", true); // Mark achievement as completed in YAML
         }
         if(useSQL) {
             getSqlQueue().add(new String[]{"INSERT IGNORE INTO completed VALUES((SELECT id_player FROM players WHERE nick=?), " +
@@ -125,7 +125,7 @@ public class DataHandler {
         if(useYAML) {
             addToPending(state); // Add state to pending to save
             YamlConfiguration data = playerYAML.get(state.getPlayer().getName()); // Get YAML
-            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".completed", false); // Mark achievement as not completed in YAML
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".c", false); // Mark achievement as not completed in YAML
         }
         if(useSQL) {
             getSqlQueue().add(new String[]{"DELETE FROM completed WHERE id_player=(SELECT id_player FROM players WHERE nick=?) " +
@@ -145,7 +145,7 @@ public class DataHandler {
                 newProgress.add(progress[i]);
             }
             YamlConfiguration data = playerYAML.get(state.getPlayer().getName()); // Get YAML
-            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".progress", newProgress); // Put that list to YAML
+            data.set(state.getPlayer().getName() + "." + achievement.getID() + ".p", newProgress); // Put that list to YAML
         }
         if(useSQL) {
             if(!getUpdateProgressQueue().containsKey(state)) { // If updateProgressQueue doesn't contain state

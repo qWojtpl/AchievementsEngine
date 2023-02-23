@@ -28,7 +28,7 @@ public class PermissionManager {
 
     public Permission getPermission(String permission) {
         if(!this.permissions.containsKey(permission)) {
-            AchievementsEngine.getInstance().getLogger().info("Trying to access permission that not exists (" + permission + ")! " +
+            AchievementsEngine.getInstance().getLogger().info("Trying to access permission which doesn't exists (" + permission + ")! " +
                     "Please report it here: https://github.com/qWojtpl/AchievementsEngine/issues");
             return null;
         }

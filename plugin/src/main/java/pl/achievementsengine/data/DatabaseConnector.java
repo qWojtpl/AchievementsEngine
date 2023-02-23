@@ -52,7 +52,7 @@ public class DatabaseConnector {
         }
     }
 
-    public synchronized Connection getConnection() {
+    public Connection getConnection() {
         try {
             if(connection == null || connection.isClosed()) {
                 initialize(); // Initialize connection

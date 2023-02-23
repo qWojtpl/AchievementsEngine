@@ -37,7 +37,6 @@ public final class AchievementsEngine extends JavaPlugin {
         this.dataHandler = new DataHandler();
         this.permissionManager = new PermissionManager();
         this.achievementManager = new AchievementManager();
-        permissionManager.loadPermissions(); // Register permissions
         this.events = new Events();
         this.messages = new Messages();
         this.playerUtil = new PlayerUtil();
@@ -45,6 +44,7 @@ public final class AchievementsEngine extends JavaPlugin {
         getCommand("achievementsengine").setExecutor(new Commands()); // Register command
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         dataHandler.LoadConfig(); // Load configuration files
+        permissionManager.loadPermissions(); // Register permissions
         this.manager = new MySQLManager();
         getLogger().info("Loaded."); // Print to console
         for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players

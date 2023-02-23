@@ -19,7 +19,8 @@ config:
 
   # When set to true, all player's states (completed achievements, progress) etc. is saved in memory.
   # When set to false all these data is removing from memory and will be downloaded again if
-  # player will join the server
+  # player will join the server - every join player will have fresh data.
+  # I recommend setting it to false if server doesn't have too much RAM or have many players.
 
   keepPlayersInMemory: false
 

@@ -69,7 +69,8 @@ public class MySQLManager {
     private boolean existTable(String table) {
         String database = mainConnector.getDatabase();
         try(Connection connection = mainConnector.getConnection();
-        ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) { // Thanks CrySis for sharing this way to do it <3
+        // Thanks CrySis for sharing this way to do it <3
+        ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) {
             return tables.next();
         } catch(SQLException e) {
             log.severe("SQL Exception: " + e);
