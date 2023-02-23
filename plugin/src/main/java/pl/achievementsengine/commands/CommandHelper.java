@@ -41,24 +41,27 @@ public class CommandHelper implements TabCompleter {
                 completions.add("2");
             }
         } else if(args.length == 3) {
-            if(args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("reset")) {
-                for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
-                    completions.add(a.getID());
-                }
-            } else if(args[0].equalsIgnoreCase("remove")) {
-                PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
-                Player argumentPlayer = pu.checkIfPlayerExists(args[1]);
-                if(argumentPlayer != null) {
-                    PlayerAchievementState state = PlayerAchievementState.Create(argumentPlayer);
-                    for(Achievement a : state.getCompletedAchievements()) {
+            PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+            Player argumentPlayer = pu.checkIfPlayerExists(args[1]);
+            if(argumentPlayer != null) {
+                PlayerAchievementState state = PlayerAchievementState.Create(argumentPlayer);
+                if (args[0].equalsIgnoreCase("complete") || args[0].equalsIgnoreCase("reset")) {
+                    for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
+                        if (!state.getCompletedAchievements().contains(a)) {
+                            completions.add(a.getID());
+                        }
+                    }
+                    completions.add("*");
+                } else if (args[0].equalsIgnoreCase("remove")) {
+                    for (Achievement a : state.getCompletedAchievements()) {
                         completions.add(a.getID());
                     }
                     completions.add("*");
-                }
-            } else if(args[0].equalsIgnoreCase("transfer")) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    completions.add(p.getName());
-                }
+                } else if (args[0].equalsIgnoreCase("transfer")) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        completions.add(p.getName());
+                    }
+                }  
             }
         }
         return StringUtil.copyPartialMatches(args[args.length-1], completions, new ArrayList<>());
