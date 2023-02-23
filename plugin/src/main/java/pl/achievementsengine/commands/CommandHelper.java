@@ -61,7 +61,7 @@ public class CommandHelper implements TabCompleter {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         completions.add(p.getName());
                     }
-                }  
+                }
             }
         }
         return StringUtil.copyPartialMatches(args[args.length-1], completions, new ArrayList<>());
