@@ -223,6 +223,8 @@ messages:
 `useSQL` - When set to true plugin will be using SQL to save data<br>
 `saveInterval` - Interval between data saves (in seconds)<br>
 `logSave` - When set to true every save will send message to console<br>
+`keepPlayersInMemory` - When set to true, all player's states (completed achievements, progress) etc. is saved in memory. When set to false it destroys when player left the server<br>
+`disableOnException` - If set to true then when SQL exception appear the plugin will be disabled<br>
 
 ## Default configuration:
 
@@ -233,6 +235,7 @@ config:
   saveInterval: 300 # 5 minutes
   logSave: true
   keepPlayersInMemory: false
+  disableOnException: true
 
 sql:
   host: ''

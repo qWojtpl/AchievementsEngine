@@ -9,7 +9,7 @@ config:
 
   # Set save interval.
   # After every <saveInterval> seconds SQL will be executed or YAML will be saved
-  # SQL is running on async, YAML is not - I recommend using at least 300 seconds (5 minutes)
+  # SQL and YAML is running on async - I recommend using at least 300 seconds (5 minutes)
 
   saveInterval: 300
 
@@ -23,6 +23,11 @@ config:
   # I recommend setting it to false if server doesn't have too much RAM or have many players.
 
   keepPlayersInMemory: false
+
+  # If set to true then when SQL exception appear the plugin will be disabled.
+  # If set to false when SQL exception appear nothing will happen - only error will be sent to console
+
+  disableOnException: true
 
 sql:
   host: ''

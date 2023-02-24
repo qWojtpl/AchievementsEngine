@@ -65,6 +65,7 @@ public class Events implements Listener {
     }
 
     public void checkForAchievementEvents(Player player, String checkable) {
+        AchievementsEngine.getInstance().getLogger().info("Checking for: " + checkable);
         String[] ev = checkable.split(" "); // Split checkable
         AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
         // Loop through registered events which are same as checkable
@@ -73,6 +74,7 @@ public class Events implements Listener {
             toCheck = checkable;
         }
         for(Achievement a : getEventAchievements(toCheck, false)) {
+            AchievementsEngine.getInstance().getLogger().info("Checking for Achievement: " + a.getID());
             am.Check(player, checkable, a);
         }
         // Loop through registered events which contains * (any)

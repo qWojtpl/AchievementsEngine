@@ -73,16 +73,34 @@ public class MySQLManager {
         ResultSet tables = connection.getMetaData().getTables(database, null, table, new String[]{"TABLE"})) {
             return tables.next();
         } catch(SQLException e) {
-            log.severe("SQL Exception: " + e);
+            generateException("existTable()", "META CHECK", new String[]{"TABLE: " + table}, e.toString());
             return false;
         }
+    }
+
+    public void generateException(String section, String query, String[] args, String exception) {
+        log.severe("----------------------------------");
+        log.severe("    Error at " + section);
+        log.severe("    While executing query: " + query);
+        if(args != null) {
+            if (args.length > 0) {
+                String arguments = args[0];
+                for (int i = 1; i < args.length; i++) {
+                    arguments = arguments + ", " + args[i];
+                }
+                log.severe("    Arguments: " + arguments);
+            }
+        }
+        log.severe("    SQL Exception: " + exception);
+        log.severe("----------------------------------");
+        AchievementsEngine.getInstance().getDataHandler().foundException();
     }
 
     public void executeAsync(String query, String[] args) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
             if(!connector.checkConnection()) {
-                log.severe("Error at execute() - connection is null");
+                generateException("executeAsync()", query, args, "Connection is null");
                 return;
             }
             try(Connection connection = connector.getConnection();
@@ -97,7 +115,7 @@ public class MySQLManager {
                     connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
-                log.severe("Error at execute(), SQL Exception: " + e);
+                generateException("executeAsync()", query, args, e.toString());
             }
         });
     }
@@ -105,7 +123,7 @@ public class MySQLManager {
     public void execute(String query, String[] args) {
         if(mainConnector == null) return;
         if(!mainConnector.checkConnection()) {
-            log.severe("Error at executeNow() - connection is null");
+            generateException("executeNow()", query, args, "Connection is null");
             return;
         }
         try(Connection connection = mainConnector.getConnection();
@@ -117,19 +135,19 @@ public class MySQLManager {
             }
             preparedStatement.executeUpdate(); // Execute update
         } catch(SQLException e) {
-            log.severe("Error at executeNow(), SQL Exception: " + e);
+            generateException("executeNow()", query, args, e.toString());
         }
     }
 
     public void loadCompleted(PlayerAchievementState state) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
-            if(!connector.checkConnection()) {
-                log.severe("Error at loadCompleted() - connection is null");
-                return;
-            }
             String query = "SELECT DISTINCT achievement_key FROM completed JOIN players USING (id_player) " +
                     "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
+            if(!connector.checkConnection()) {
+                generateException("loadCompleted()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, "Connection is null");
+                return;
+            }
             try(Connection connection = connector.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, state.getPlayer().getName());
@@ -140,13 +158,12 @@ public class MySQLManager {
                                 rs.getString("achievement_key"))); // Load completed achievements
                     }
                 }
+                state.setInitializeLevel(state.getInitializeLevel() + 1);
                 if(!connector.getConnection().isClosed()) {
                     connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
-                log.severe("Error at loadCompleted(), SQL Exception: " + e);
-            } finally {
-                state.setInitializeLevel(state.getInitializeLevel() + 1);
+                generateException("loadCompleted()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, e.toString());
             }
         });
     }
@@ -154,12 +171,12 @@ public class MySQLManager {
     public void loadProgress(PlayerAchievementState state) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
-            if(!connector.checkConnection()) {
-                log.severe("Error at loadProgress() - connection is null");
-                return;
-            }
             String query = "SELECT DISTINCT achievement_key, event, progress FROM progress JOIN players USING (id_player) " +
                     "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
+            if(!connector.checkConnection()) {
+                generateException("loadProgress()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, "Connection is null");
+                return;
+            }
             try(Connection connection = connector.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setString(1, state.getPlayer().getName());
@@ -178,13 +195,12 @@ public class MySQLManager {
                         state.getProgress().put(a, progress); // Put progress to state
                     }
                 }
+                state.setInitializeLevel(state.getInitializeLevel() + 1);
                 if(!connector.getConnection().isClosed()) {
                     connector.getConnection().close(); // Close connection
                 }
             } catch(SQLException e) {
-                log.severe("Error at loadProgress(), SQL Exception: " + e);
-            } finally {
-                state.setInitializeLevel(state.getInitializeLevel() + 1);
+                generateException("loadProgress()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, e.toString());
             }
         });
     }

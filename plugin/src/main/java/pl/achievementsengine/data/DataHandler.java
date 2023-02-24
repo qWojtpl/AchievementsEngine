@@ -26,12 +26,15 @@ public class DataHandler {
     private final List<String[]> sqlQueue = new ArrayList<>();
     private final HashMap<String, String[]> importantSQLQueue = new HashMap<>();
     private final HashMap<PlayerAchievementState, List<Achievement>> updateProgressQueue = new HashMap<>(); // For SQL
+
+    // Config fields
     private int saveInterval;
     private int saveTask = -1;
     private boolean useYAML;
     private boolean useSQL;
     private boolean logSave;
     private boolean keepPlayersInMemory;
+    private boolean disableOnException;
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
@@ -50,6 +53,13 @@ public class DataHandler {
         loadConfig(); // Load config
         loadAchievementsFile(); // Load achievements
         loadMessagesFile(); // Load messages
+        PlayerAchievementState.CreateForOnline();
+    }
+
+    public void foundException() {
+        if(disableOnException) {
+            AchievementsEngine.getInstance().disablePlugin();
+        }
     }
 
     public void addToPending(PlayerAchievementState state) {
@@ -345,6 +355,7 @@ public class DataHandler {
         this.useSQL = yml.getBoolean("config.useSQL"); // Is using SQL?
         this.logSave = yml.getBoolean("config.logSave"); // When set to true every save will send message to console
         this.keepPlayersInMemory = yml.getBoolean("config.keepPlayersInMemory"); // When set to true, all player's states (completed achievements, progress) etc. is saved in memory.
+        this.disableOnException = yml.getBoolean("config.disableOnException"); // If set to true then when SQL exception appear the plugin will be disabled
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
                 () -> saveAll(true), 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
         if(useYAML && useSQL) { // Create warning

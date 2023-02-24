@@ -42,6 +42,12 @@ public class PlayerAchievementState {
         return AchievementsEngine.getInstance().getPlayerStates().get(p.getName());
     }
 
+    public static void CreateForOnline() {
+        for(Player p : AchievementsEngine.getInstance().getServer().getOnlinePlayers()) { // Create state to all players
+            PlayerAchievementState.Create(p);
+        }
+    }
+
     public static void Remove(Player p) {
         if(AchievementsEngine.getInstance().getDataHandler().isKeepPlayersInMemory()) return;
         if(AchievementsEngine.getInstance().getPlayerStates().containsKey(p.getName())) {

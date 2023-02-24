@@ -42,7 +42,7 @@ public class AchievementManager {
                 }
             }
             if(event[2].equalsIgnoreCase("*")) { // If event is * (eg. kill 10 *, fish 10 *)
-                event[2] = givenEvent[1]; // Set event[2] to second element of checkable (eg. checkable is "break bedrock" so "break *" -> "break bedrock")
+                event[2] = givenEvent[1]; // Set event[2] to second element of checkable (fe. checkable is "break bedrock" so "break *" -> "break bedrock")
             }
             if(event[2].contains("*%")) { // If event[2] contains ANY LIKE
                 if(!checkable.contains(event[2].replace("*%", ""))) {

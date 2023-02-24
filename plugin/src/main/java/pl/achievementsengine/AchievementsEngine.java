@@ -1,7 +1,6 @@
 package pl.achievementsengine;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.achievementsengine.achievements.AchievementManager;
@@ -47,9 +46,6 @@ public final class AchievementsEngine extends JavaPlugin {
         permissionManager.loadPermissions(); // Register permissions
         this.manager = new MySQLManager();
         getLogger().info("Loaded."); // Print to console
-        for(Player p : Bukkit.getServer().getOnlinePlayers()) { // Create state to all players
-            PlayerAchievementState.Create(p);
-        }
     }
 
     @Override
@@ -59,7 +55,8 @@ public final class AchievementsEngine extends JavaPlugin {
         getLogger().info("Bye!"); // Print to console
     }
 
-    public void DisablePlugin() {
+    public void disablePlugin() {
+        getLogger().warning("Forcing plugin disable...");
         getServer().getPluginManager().disablePlugin(this);
     }
 
