@@ -54,7 +54,6 @@ public class Events implements Listener {
     }
 
     public void registerEvent(String event, Achievement achievement) {
-        AchievementsEngine.getInstance().getLogger().info("Registering event: " + event);
         event = event.toLowerCase(); // Make event lowercase
         List<Achievement> list = getEventAchievements(event, true); // Get list or add empty list to the memory
         list.add(achievement); // Add achievement ot list
@@ -65,7 +64,6 @@ public class Events implements Listener {
     }
 
     public void checkForAchievementEvents(Player player, String checkable) {
-        AchievementsEngine.getInstance().getLogger().info("Checking for: " + checkable);
         String[] ev = checkable.split(" "); // Split checkable
         AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
         // Loop through registered events which are same as checkable
@@ -74,7 +72,6 @@ public class Events implements Listener {
             toCheck = checkable;
         }
         for(Achievement a : getEventAchievements(toCheck, false)) {
-            AchievementsEngine.getInstance().getLogger().info("Checking for Achievement: " + a.getID());
             am.Check(player, checkable, a);
         }
         // Loop through registered events which contains * (any)
@@ -240,7 +237,9 @@ public class Events implements Listener {
         if(event.getLines().length > 0) {
             String message = event.getLine(0);
             for (int i = 1; i < event.getLines().length; i++) {
-                message = message + " " + event.getLine(i);
+                if(event.getLine(i).length() > 0 && !event.getLine(i).equals(" ")) {
+                    message = message + " " + event.getLine(i);
+                }
             }
             checkForAchievementEvents(event.getPlayer(), "sign " + message);
         }

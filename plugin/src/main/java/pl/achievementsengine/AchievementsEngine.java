@@ -33,7 +33,8 @@ public final class AchievementsEngine extends JavaPlugin {
     @Override
     public void onEnable() {
         main = this; // Set main as this instance
-        this.dataHandler = new DataHandler();
+        this.manager = new MySQLManager();
+        this.dataHandler = new DataHandler(manager);
         this.permissionManager = new PermissionManager();
         this.achievementManager = new AchievementManager();
         this.events = new Events();
@@ -44,7 +45,7 @@ public final class AchievementsEngine extends JavaPlugin {
         getCommand("achievementsengine").setTabCompleter(new CommandHelper()); // Register tab completer
         dataHandler.LoadConfig(); // Load configuration files
         permissionManager.loadPermissions(); // Register permissions
-        this.manager = new MySQLManager();
+        manager.create();
         getLogger().info("Loaded."); // Print to console
     }
 

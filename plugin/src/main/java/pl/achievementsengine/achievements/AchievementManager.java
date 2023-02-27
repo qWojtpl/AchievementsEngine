@@ -27,7 +27,6 @@ public class AchievementManager {
         int required = 0, sum = 0; // Required achievement progress to complete and player's progress sum
         checkable = checkable.toLowerCase(); // Make checkable lowercase
         String[] givenEvent = checkable.split(" "); // Split checkable
-        AchievementsEngine.getInstance().getLogger().info(checkable);
         for(int i = 0; i < a.getEvents().size(); i++) { // Loop through all achievement's events
             String[] event = a.getEvents().get(i).toLowerCase().split(" "); // Split event and make it lowercase
             required += Integer.parseInt(event[1]); // Add this event required progress to required

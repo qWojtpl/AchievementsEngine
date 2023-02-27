@@ -13,11 +13,11 @@ import java.util.logging.Logger;
 @Getter
 public class MySQLManager {
 
-    private final Logger log;
-    private final AchievementsEngine plugin;
+    private Logger log;
+    private AchievementsEngine plugin;
     private DatabaseConnector mainConnector;
 
-    public MySQLManager() {
+    public void create() {
         this.plugin = AchievementsEngine.getInstance();
         this.log = plugin.getLogger();
         initiateDB();
@@ -62,6 +62,7 @@ public class MySQLManager {
             }
         } else {
             log.warning("Cannot initiate database");
+            AchievementsEngine.getInstance().getDataHandler().foundException();
         }
         if(mainConnector.checkConnection()) mainConnector.getConnection().close(); // Close connection
     }

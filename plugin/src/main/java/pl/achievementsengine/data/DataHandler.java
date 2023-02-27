@@ -26,6 +26,7 @@ public class DataHandler {
     private final List<String[]> sqlQueue = new ArrayList<>();
     private final HashMap<String, String[]> importantSQLQueue = new HashMap<>();
     private final HashMap<PlayerAchievementState, List<Achievement>> updateProgressQueue = new HashMap<>(); // For SQL
+    private final MySQLManager manager;
 
     // Config fields
     private int saveInterval;
@@ -38,6 +39,10 @@ public class DataHandler {
 
     public HashMap<String, String> getSQLInfo() {
         return this.SQLInfo;
+    }
+
+    public DataHandler(MySQLManager manager) {
+        this.manager = manager;
     }
 
     public void LoadConfig() {
@@ -102,8 +107,8 @@ public class DataHandler {
         if(useSQL) {
             state.setInitialized(false);
             getSqlQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick}); // Add player to database
-            AchievementsEngine.getInstance().getManager().loadCompleted(state); // Load player's completed achievements
-            AchievementsEngine.getInstance().getManager().loadProgress(state); // Load player's progress
+            getManager().loadCompleted(state); // Load player's completed achievements
+            getManager().loadProgress(state); // Load player's progress
         }
     }
 
@@ -189,7 +194,7 @@ public class DataHandler {
     public void saveSQL(boolean async) { // Save only SQL (loop through SQL queue)
         if(!useSQL) return;
         for(String key : getImportantSQLQueue().keySet()) { // Firstly, we're looping through important queue
-            AchievementsEngine.getInstance().getManager().execute(key, getImportantSQLQueue().get(key)); // Execute it NOW - without async
+            getManager().execute(key, getImportantSQLQueue().get(key)); // Execute it NOW - without async
         }
         getImportantSQLQueue().clear(); // Clear important queue
         for(String[] sql : getSqlQueue()) { // Loop through normal SQL queue
@@ -198,15 +203,15 @@ public class DataHandler {
                 args[i-1] = sql[i];
             }
             if(async) {
-                AchievementsEngine.getInstance().getManager().executeAsync(sql[0], args); // Execute in async
+                getManager().executeAsync(sql[0], args); // Execute in async
             } else {
-                AchievementsEngine.getInstance().getManager().execute(sql[0], args);
+                getManager().execute(sql[0], args);
             }
         }
         getSqlQueue().clear(); // Clear queue
         for(PlayerAchievementState state : getUpdateProgressQueue().keySet()) { // Loop through update queue (get states)
             for(Achievement a : getUpdateProgressQueue().get(state)) { // Loop through list of achievements from state
-                AchievementsEngine.getInstance().getManager().updateProgress(state, a, async); // Update progress in database
+                getManager().updateProgress(state, a, async); // Update progress in database
             }
         }
         getUpdateProgressQueue().clear(); // Clear updateProgress queue
@@ -357,7 +362,8 @@ public class DataHandler {
         this.keepPlayersInMemory = yml.getBoolean("config.keepPlayersInMemory"); // When set to true, all player's states (completed achievements, progress) etc. is saved in memory.
         this.disableOnException = yml.getBoolean("config.disableOnException"); // If set to true then when SQL exception appear the plugin will be disabled
         this.saveTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(AchievementsEngine.getInstance(),
-                () -> saveAll(true), 20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
+                () -> saveAll(true),
+                20L * saveInterval, 20L * saveInterval); // Create task that will save data every x seconds
         if(useYAML && useSQL) { // Create warning
             AchievementsEngine.getInstance().getLogger().warning("ATTENTION! YOU'RE USING YAML AND SQL TO SAVE DATA. THIS MAY CAUSE MANY ERRORS.");
         }
