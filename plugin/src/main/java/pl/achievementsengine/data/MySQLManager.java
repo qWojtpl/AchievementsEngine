@@ -155,8 +155,14 @@ public class MySQLManager {
                 ResultSet rs = preparedStatement.executeQuery(); // Execute query
                 if(rs != null) {
                     while (rs.next()) {
-                        state.getCompletedAchievements().add(AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
-                                rs.getString("achievement_key"))); // Load completed achievements
+                        Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(
+                                rs.getString("achievement_key"));
+                        if(a == null) {
+                            AchievementsEngine.getInstance().getLogger().warning("Trying to load achievement with key " +
+                                    rs.getString("achievement_key") + " which doesn't exist!");
+                            continue;
+                        }
+                        state.getCompletedAchievements().add(a); // Load completed achievements
                     }
                 }
                 state.setInitializeLevel(state.getInitializeLevel() + 1);
@@ -187,9 +193,9 @@ public class MySQLManager {
                         Achievement a = AchievementsEngine.getInstance().getAchievementManager()
                                 .checkIfAchievementExists(rs.getString("achievement_key")); // Get achievement
                         if(a == null) { // If achievement is null..
-                            AchievementsEngine.getInstance().getLogger().severe("Trying to load achievement with key " +
+                            AchievementsEngine.getInstance().getLogger().warning("Trying to load achievement with key " +
                                     rs.getString("achievement_key") + " which doesn't exist!");
-                            return;
+                            continue;
                         }
                         int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress or initialize it
                         progress[rs.getInt("event")] = rs.getInt("progress"); // Load progress for event

@@ -213,6 +213,7 @@ public class Events implements Listener {
         if(!(event.getEntity().getShooter() instanceof Player)) return;
         Player p = (Player) event.getEntity().getShooter();
         if(event.getEntity() instanceof Trident) {
+            //((Trident) event.getEntity()).getItem().getItemMeta().getDisplayName();
             checkForAchievementEvents(p, "throw trident");
         } else if(event.getEntity() instanceof Snowball) {
             checkForAchievementEvents(p, "throw snowball");
