@@ -55,9 +55,6 @@ public class Commands implements CommandExecutor {
         } else {
             ShowHelp(sender, 1);
         }
-//        for(String key : AchievementsEngine.getInstance().getEvents().getRegisteredEvents().keySet()) {
-//            sender.sendMessage(key);
-//        }
         return true;
     }
 

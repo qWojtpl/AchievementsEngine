@@ -94,7 +94,7 @@ public class GUIHandler {
             }
             if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty
                 if(state.getCompletedAchievements().contains(a)) { // If player's state completed achievement contains achievement
-                    desc = desc + "%nl%" + ChatColor.GREEN + messages.getMessage("completed"); // Add "completed" to description
+                    desc = desc + "%nl%§a" + messages.getMessage("completed"); // Add "completed" to description
                     glow = true; // Make item glow
                 }
             }

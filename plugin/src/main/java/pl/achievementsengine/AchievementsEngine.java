@@ -29,6 +29,7 @@ public final class AchievementsEngine extends JavaPlugin {
     private DataHandler dataHandler;
     private PlayerUtil playerUtil;
     private final HashMap<String, PlayerAchievementState> playerStates = new HashMap<>(); // List of all player states
+    private boolean forcedDisable;
 
     @Override
     public void onEnable() {
@@ -57,6 +58,8 @@ public final class AchievementsEngine extends JavaPlugin {
     }
 
     public void disablePlugin() {
+        if(forcedDisable) return;
+        forcedDisable = true;
         getLogger().warning("Forcing plugin disable...");
         getServer().getPluginManager().disablePlugin(this);
     }
