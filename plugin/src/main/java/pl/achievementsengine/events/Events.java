@@ -5,6 +5,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Trident;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -253,6 +254,12 @@ public class Events implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
+    public void onEat(PlayerItemConsumeEvent event) {
+        if(event.isCancelled()) return;
+        checkForAchievementEvents(event.getPlayer(), "eat " + event.getItem().getType().name());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrag(InventoryDragEvent event) {
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
@@ -264,6 +271,7 @@ public class Events implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
+        if(event.isCancelled()) return;
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
                 int currentStart = gui.getCurrentStart();
@@ -295,7 +303,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onClose(InventoryCloseEvent event) { // Remove inventory from registered inventories on close
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // Check if looped inventory equals closed inventory
