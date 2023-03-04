@@ -66,6 +66,7 @@
 - breed       // Breed animals event, eg. breed 10 cow
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
 - sign        // Edit sign event, eg. sign 10 This is my house
+- furnace     // Take from furnace event, eg. furnace 15 glass (glass is a product)
 ```
 
 <sup>* - event that supports names, eg. `kill 1 villager named Some Villager`</sup>

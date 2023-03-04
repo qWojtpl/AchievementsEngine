@@ -61,7 +61,7 @@ public class MySQLManager {
                         " );", null);
             }
         } else {
-            log.warning("Cannot initiate database");
+            log.severe("Cannot initiate database");
             AchievementsEngine.getInstance().getDataHandler().foundException();
         }
         if(mainConnector.checkConnection()) mainConnector.getConnection().close(); // Close connection

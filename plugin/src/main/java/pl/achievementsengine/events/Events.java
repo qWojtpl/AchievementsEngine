@@ -114,7 +114,6 @@ public class Events implements Listener {
     public void onBreak(BlockBreakEvent event) {
         if(event.isCancelled()) return;
         checkForAchievementEvents(event.getPlayer(), "break " + event.getBlock().getType().name());
-        checkForAchievementEvents(event.getPlayer(), "destroy " + event.getBlock().getType().name());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -253,7 +252,7 @@ public class Events implements Listener {
         checkForAchievementEvents((Player) event.getBreeder(), "breed " + event.getEntity().getType().name());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onDrag(InventoryDragEvent event) {
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
@@ -263,7 +262,7 @@ public class Events implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // If player's inventory is in registered inventories
@@ -281,12 +280,22 @@ public class Events implements Listener {
                         break;
                 }
                 event.setCancelled(true); // Cancel click event
-                break; // Exit loop
+                return;
+            }
+        }
+        if(event.getInventory().getType().equals(InventoryType.FURNACE)) {
+            if(event.getSlot() == 2) {
+                ItemStack item = event.getInventory().getItem(2);
+                if (item != null) {
+                    for (int i = 0; i < item.getAmount(); i++) {
+                        checkForAchievementEvents((Player) event.getWhoClicked(), "furnace " + item.getType().name());
+                    }
+                }
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onClose(InventoryCloseEvent event) { // Remove inventory from registered inventories on close
         for(GUIHandler gui : GUIHandler.getRegisteredInventories()) { // Loop through registered inventories
             if (event.getInventory().equals(gui.getInventory())) { // Check if looped inventory equals closed inventory
