@@ -52,7 +52,7 @@ public class AchievementManager {
             }
             String eventCheck = event[0];
             for(int j = 2; j < event.length; j++) {
-                eventCheck = eventCheck + " " + event[j];
+                eventCheck += " " + event[j];
             }
             if(!eventCheck.equalsIgnoreCase(checkable)) continue;
             sum += 1;

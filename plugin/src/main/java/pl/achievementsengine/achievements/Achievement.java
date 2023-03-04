@@ -47,7 +47,7 @@ public class Achievement {
             String toRegister = ev[0] + " " + ev[2];
             if(ev[0].equalsIgnoreCase("chat") || ev[0].equalsIgnoreCase("sign")) {
                 for(int i = 3; i < ev.length; i++) {
-                    toRegister = toRegister + " " + ev[i];
+                    toRegister += " " + ev[i];
                 }
             }
             AchievementsEngine.getInstance().getEvents().registerEvent(toRegister, this);
@@ -67,7 +67,7 @@ public class Achievement {
             for(String event : events) {
                 i++;
                 if(i == 1) continue;
-                eventsFormat = eventsFormat + ", " + event;
+                eventsFormat += ", " + event;
             }
         }
         String actionsFormat = "";
@@ -77,7 +77,7 @@ public class Achievement {
             for(String action : actions) {
                 i++;
                 if(i == 1) continue;
-                actionsFormat = actionsFormat + ", " + action;
+                actionsFormat += ", " + action;
             }
         }
         String message = MessageFormat.format(AchievementsEngine.getInstance().getMessages().getMessage("complete-message"),

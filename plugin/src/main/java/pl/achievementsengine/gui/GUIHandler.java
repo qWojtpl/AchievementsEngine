@@ -1,7 +1,6 @@
 package pl.achievementsengine.gui;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -87,7 +86,7 @@ public class GUIHandler {
             if(a.isShowProgress()) { // If achievement has turned on showProgress
                 desc = desc + "%nl%" + messages.getMessage("progress"); // Add "Progress:" to description
                 for (int k = 0; k < a.getEvents().size(); k++) { // Loop through events
-                    desc = desc + "%nl%" + messages.getMessage("progress-field-prefix") + a.getEvents().get(k) +
+                    desc += "%nl%" + messages.getMessage("progress-field-prefix") + a.getEvents().get(k) +
                             "§b: " + state.getProgress().getOrDefault(a, new int[a.getEvents().size()])[k] +
                             "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
                 }

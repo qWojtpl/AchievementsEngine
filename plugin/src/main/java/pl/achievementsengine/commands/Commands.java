@@ -116,7 +116,7 @@ public class Commands implements CommandExecutor {
                 for (String s : a.getEvents()) {
                     i++;
                     if(i == 1) continue;
-                    events = events + ", " + s;
+                    events += ", " + s;
                 }
             }
             sender.sendMessage("§e" + a.getID() + "§2§l#§r" + a.getName() + ": " + a.getDescription());

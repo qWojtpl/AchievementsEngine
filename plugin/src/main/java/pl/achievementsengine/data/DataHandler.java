@@ -303,7 +303,7 @@ public class DataHandler {
             if (yml.getString("achievements." + key + ".name") != null &&
                     yml.getBoolean("achievements." + key + ".enabled")) { // Check if name is not null and achievement is enabled
                 if(useSQL && !first) {
-                    query = query + ", ";
+                    query += ", ";
                 }
                 first = false;
                 AchievementsEngine.getInstance().getAchievementManager().getAchievements().add(
@@ -317,7 +317,7 @@ public class DataHandler {
                                 yml.getInt("achievements." + key + ".requiredProgress"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
-                    query = query + "(default, ?)";
+                    query += "(default, ?)";
                     arguments[i] = key;
                     i++;
                 }

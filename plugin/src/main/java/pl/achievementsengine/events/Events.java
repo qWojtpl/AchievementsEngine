@@ -239,7 +239,7 @@ public class Events implements Listener {
             String message = event.getLine(0);
             for (int i = 1; i < event.getLines().length; i++) {
                 if(event.getLine(i).length() > 0 && !event.getLine(i).equals(" ")) {
-                    message = message + " " + event.getLine(i);
+                    message += " " + event.getLine(i);
                 }
             }
             checkForAchievementEvents(event.getPlayer(), "sign " + message);

@@ -87,7 +87,7 @@ public class MySQLManager {
             if (args.length > 0) {
                 String arguments = args[0];
                 for (int i = 1; i < args.length; i++) {
-                    arguments = arguments + ", " + args[i];
+                    arguments += ", " + args[i];
                 }
                 log.severe("    Arguments: " + arguments);
             }
@@ -99,6 +99,17 @@ public class MySQLManager {
 
     public void executeAsync(String query, String[] args) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
+            if(AchievementsEngine.getInstance().isForcedDisable()) {
+                AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
+                if(args.length > 0) {
+                    String arguments = args[0];
+                    for(int i = 1; i < args.length; i++) {
+                        arguments += ", " + args[i];
+                    }
+                    AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + arguments);
+                }
+                return;
+            }
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
             if(!connector.checkConnection()) {
                 generateException("executeAsync()", query, args, "Connection is null");
@@ -123,6 +134,17 @@ public class MySQLManager {
 
     public void execute(String query, String[] args) {
         if(mainConnector == null) return;
+        if(AchievementsEngine.getInstance().isForcedDisable()) {
+            AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
+            if(args.length > 0) {
+                String arguments = args[0];
+                for(int i = 1; i < args.length; i++) {
+                    arguments += ", " + args[i];
+                }
+                AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + arguments);
+            }
+            return;
+        }
         if(!mainConnector.checkConnection()) {
             generateException("executeNow()", query, args, "Connection is null");
             return;
@@ -142,9 +164,14 @@ public class MySQLManager {
 
     public void loadCompleted(PlayerAchievementState state) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
-            DatabaseConnector connector = new DatabaseConnector(); // Create connection
             String query = "SELECT DISTINCT achievement_key FROM completed JOIN players USING (id_player) " +
                     "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
+            if(AchievementsEngine.getInstance().isForcedDisable()) {
+                AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
+                AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + state.getPlayer().getName());
+                return;
+            }
+            DatabaseConnector connector = new DatabaseConnector(); // Create connection
             if(!connector.checkConnection()) {
                 generateException("loadCompleted()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, "Connection is null");
                 return;
@@ -177,9 +204,14 @@ public class MySQLManager {
 
     public void loadProgress(PlayerAchievementState state) {
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
-            DatabaseConnector connector = new DatabaseConnector(); // Create connection
             String query = "SELECT DISTINCT achievement_key, event, progress FROM progress JOIN players USING (id_player) " +
                     "JOIN achievements USING(id_achievement) WHERE players.nick = ?"; // SQL query
+            if(AchievementsEngine.getInstance().isForcedDisable()) {
+                AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
+                AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + state.getPlayer().getName());
+                return;
+            }
+            DatabaseConnector connector = new DatabaseConnector(); // Create connection
             if(!connector.checkConnection()) {
                 generateException("loadProgress()", query, new String[]{"PLAYER: " + state.getPlayer().getName()}, "Connection is null");
                 return;

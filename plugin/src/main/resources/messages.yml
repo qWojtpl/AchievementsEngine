@@ -1,12 +1,12 @@
 messages:
-  prefix: '§2[§6AchievementsEngine§2] '
-  gui-title: Achievements (Page {0}/{1})
-  gui-next: §f§lNext page
-  gui-previous: §f§lPrevious page
-  complete-message: '§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked:
-    {0}%nl%%nl%§6§k--------------'
-  progress-message: §aYou made progress in achievement {0}§a!
-  progress: '§6§lProgress:'
-  progress-field-prefix: §7§l- §b
-  completed: §aCOMPLETED!
-  not-downloaded: '§cWhoaa! Not too fast? Your data is not downloaded yet, please try again later!'
+  prefix: "§2[§6AchievementsEngine§2] "
+  gui-title: "Achievements (Page {0}/{1})"
+  gui-next: "§f§lNext page"
+  gui-previous: "§f§lPrevious page"
+  complete-message: "§6§k--------------%nl%%nl%§a§lNew achievement!%nl%§a§lUnlocked:
+    {0}%nl%%nl%§6§k--------------"
+  progress-message: "§aYou made progress in achievement {0}§a!"
+  progress: "§6§lProgress:"
+  progress-field-prefix: "§7§l- §b"
+  completed: "§aCOMPLETED!"
+  not-downloaded: "§cWhoaa! Not too fast? Your data is not downloaded yet, please try again later!"

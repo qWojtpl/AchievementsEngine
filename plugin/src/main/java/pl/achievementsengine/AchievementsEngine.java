@@ -1,7 +1,6 @@
 package pl.achievementsengine;
 
 import lombok.Getter;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import pl.achievementsengine.achievements.AchievementManager;
 import pl.achievementsengine.achievements.PlayerAchievementState;
