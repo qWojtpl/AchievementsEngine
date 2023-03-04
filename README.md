@@ -182,9 +182,6 @@ achievements:
 
 ## YML Fields:
 
-<b>
-Every field must be child of "messages"<br>
-</b>
 <br>
 
 `prefix` - Commands prefix.<br>
@@ -197,6 +194,10 @@ Every field must be child of "messages"<br>
 `progress-field-prefix`: Prefix in GUI progress list<br>
 `completed` - Completed (text in GUI)<br>
 `not-downloaded` - Let the user know that his data is not downloaded yet (mostly for SQL)<br>
+
+<br>
+
+`event-translation` - Syntax: `eventName: translation` - shows event differently in GUIHandler when showProgress is set to true<br> 
 
 ## Default configuration:
 
@@ -213,6 +214,30 @@ messages:
   progress-field-prefix: §7§l- §b
   completed: §aCOMPLETED!
   not-downloaded: '§cWhoaa! Not too fast? Your data is not downloaded yet, please try again later!'
+
+event-translation:
+  named: "named"
+  join: "Join"
+  kill: "Kill"
+  break: "Break"
+  place: "Place"
+  pickup: "Pickup"
+  T_pickup: "Pickup (times)"
+  drop: "Drop"
+  T_drop: "Drop (times)"
+  craft: "Craft"
+  T_craft: "Craft (times)"
+  enchant: "Enchant"
+  fish: "Fish"
+  catch: "Catch"
+  shoot: "Shoot"
+  throw: "Throw"
+  command: "Command"
+  chat: "Chat"
+  breed: "Breed"
+  complete: "Complete"
+  sign: "Sign"
+  furnace: "Furnace"
 ```
 
 </details>
