@@ -9,6 +9,7 @@ import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.AchievementsEngine;
 import pl.achievementsengine.gui.GUIHandler;
 import pl.achievementsengine.achievements.PlayerAchievementState;
+import pl.achievementsengine.util.Messages;
 import pl.achievementsengine.util.PlayerUtil;
 
 import java.io.File;
@@ -330,15 +331,24 @@ public class DataHandler {
 
     public void loadMessagesFile() {
         File msgFile = new File(AchievementsEngine.getInstance().getDataFolder(), "messages.yml"); // Get file
-        if (!msgFile.exists()) { // If file doesn't exist, create default file
+        if(!msgFile.exists()) { // If file doesn't exist, create default file
             AchievementsEngine.getInstance().saveResource("messages.yml", false);
         }
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(msgFile); // Load YAML
         ConfigurationSection section = yml.getConfigurationSection("messages"); // Get section
-        if(section == null) return; // If section doesn't exist - return
-        AchievementsEngine.getInstance().getMessages().clearMessages(); // Clear messages
-        for (String key : section.getKeys(false)) {
-            AchievementsEngine.getInstance().getMessages().addMessage(key, yml.getString("messages." + key)); // Add message to list
+        Messages messages = AchievementsEngine.getInstance().getMessages();
+        if(section != null) {
+            messages.clearMessages(); // Clear messages
+            for(String key : section.getKeys(false)) {
+                messages.addMessage(key, yml.getString("messages." + key)); // Add message to list
+            }
+        }
+        section = yml.getConfigurationSection("event-translation");
+        if(section != null) {
+            messages.clearEventTranslations();
+            for(String key : section.getKeys(false)) {
+                messages.addEventTranslation(key, yml.getString("event-translation." + key));
+            }
         }
     }
 

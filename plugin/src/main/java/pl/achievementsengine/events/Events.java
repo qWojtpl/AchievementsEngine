@@ -286,8 +286,8 @@ public class Events implements Listener {
         if(event.getInventory().getType().equals(InventoryType.FURNACE)) {
             if(event.getSlot() == 2) {
                 ItemStack item = event.getInventory().getItem(2);
-                if (item != null) {
-                    for (int i = 0; i < item.getAmount(); i++) {
+                if(item != null) {
+                    for(int i = 0; i < item.getAmount(); i++) {
                         checkForAchievementEvents((Player) event.getWhoClicked(), "furnace " + item.getType().name());
                     }
                 }

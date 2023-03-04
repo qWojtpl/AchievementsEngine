@@ -85,10 +85,18 @@ public class GUIHandler {
             boolean glow = false; // Mark if item is glowing
             if(a.isShowProgress()) { // If achievement has turned on showProgress
                 desc = desc + "%nl%" + messages.getMessage("progress"); // Add "Progress:" to description
-                for (int k = 0; k < a.getEvents().size(); k++) { // Loop through events
-                    desc += "%nl%" + messages.getMessage("progress-field-prefix") + a.getEvents().get(k) +
+                for(int k = 0; k < a.getEvents().size(); k++) { // Loop through events
+                    String[] splitEvent = a.getEvents().get(k).split(" ");
+                    String event = splitEvent[0].replaceFirst(splitEvent[0], messages.getEventTranslation(splitEvent[0]));
+                    for(int l = 2; l < splitEvent.length; l++) {
+                        if(splitEvent[l].equalsIgnoreCase("named")) {
+                            splitEvent[l] = messages.getEventTranslation("named");
+                        }
+                        event += " " + splitEvent[l];
+                    }
+                    desc += "%nl%" + messages.getMessage("progress-field-prefix") + event +
                             "§b: " + state.getProgress().getOrDefault(a, new int[a.getEvents().size()])[k] +
-                            "/" + a.getEvents().get(k).split(" ")[1]; // Create field. (progress)/(max)
+                            "/" + splitEvent[1]; // Create field. (progress)/(max)
                 }
             }
             if(!state.getCompletedAchievements().isEmpty()) { // If player's state completed achievements is not empty
