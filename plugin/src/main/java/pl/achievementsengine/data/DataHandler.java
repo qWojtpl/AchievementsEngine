@@ -315,7 +315,8 @@ public class DataHandler {
                                 yml.getString("achievements." + key + ".item"),
                                 yml.getBoolean("achievements." + key + ".showProgress"),
                                 yml.getBoolean("achievements." + key + ".announceProgress"),
-                                yml.getInt("achievements." + key + ".requiredProgress"))); // Create new achievement from yml
+                                yml.getInt("achievements." + key + ".requiredProgress"),
+                                yml.getString("achievements." + key + ".world"))); // Create new achievement from yml
                 AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
                 if(useSQL) {
                     query += "(default, ?)";

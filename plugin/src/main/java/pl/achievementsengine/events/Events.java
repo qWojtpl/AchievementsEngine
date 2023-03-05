@@ -1,11 +1,7 @@
 package pl.achievementsengine.events;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
-import org.bukkit.entity.Trident;
-import org.bukkit.event.Event;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -57,6 +53,7 @@ public class Events implements Listener {
     public void registerEvent(String event, Achievement achievement) {
         event = event.toLowerCase(); // Make event lowercase
         List<Achievement> list = getEventAchievements(event, true); // Get list or add empty list to the memory
+        if(list.contains(achievement)) return;
         list.add(achievement); // Add achievement ot list
     }
 

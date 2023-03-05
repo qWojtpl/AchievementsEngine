@@ -17,6 +17,9 @@ public class AchievementManager {
     public void Check(Player p, String checkable, Achievement a) {
         PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
         if(!p.hasPermission(permissionManager.getPermission("ae.use"))) return; // Check if player has permission
+        if(a.getWorld() != null) {
+            if(!p.getWorld().getName().equalsIgnoreCase(a.getWorld())) return;
+        }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if(!state.isInitialized()) {
             state.getQueue().add(new CheckableObject(p, checkable, a)); // Add this to queue
