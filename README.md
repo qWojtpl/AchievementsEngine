@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/FRDyMxv.png">
+  <img src="https://cdn.discordapp.com/attachments/816647374239694849/1082429620911099994/68747470733a2f2f692e696d6775722e636f6d2f465244794d78762e706e67.png">
 </p>
 
 <div style="display:inline-block">
@@ -282,6 +282,6 @@ sql:
 `/ae reload`                         - Reload config `ae.reload`<br>
 `/ae achievements`                   - Print all achievements and requirements to complete `ae.achievements`<br>
 `/ae complete <nick> <achievement>`  - Complete achievement for some player `ae.complete`<br>
-`/ae remove <nick> <achievement>`    - Remove player"s completed achievement `ae.remove`<br>
-`/ae reset <nick> <achievement>`     - Reset player"s achievement progress `ae.reset`<br>
-`/ae transfer <from> <to>`           - Transfer player"s completed achievements and progress to other player `ae.transfer`<br>
+`/ae remove <nick> <achievement>`    - Remove player's completed achievement `ae.remove`<br>
+`/ae reset <nick> <achievement>`     - Reset player's achievement progress `ae.reset`<br>
+`/ae transfer <from> <to>`           - Transfer player's completed achievements and progress to other player `ae.transfer`<br>
