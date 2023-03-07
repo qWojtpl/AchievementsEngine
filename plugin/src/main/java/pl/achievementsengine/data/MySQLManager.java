@@ -8,6 +8,8 @@ import pl.achievementsengine.achievements.Achievement;
 import pl.achievementsengine.achievements.PlayerAchievementState;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Getter
@@ -16,6 +18,7 @@ public class MySQLManager {
     private Logger log;
     private AchievementsEngine plugin;
     private DatabaseConnector mainConnector;
+    private boolean updating;
 
     public void create() {
         this.plugin = AchievementsEngine.getInstance();
@@ -97,44 +100,55 @@ public class MySQLManager {
         AchievementsEngine.getInstance().getDataHandler().foundException();
     }
 
-    public void executeAsync(String query, String[] args) {
+    public void saveAsyncSQL() {
+        if(updating) return;
+        DataHandler dh = AchievementsEngine.getInstance().getDataHandler();
+        List<String[]> queue = new ArrayList<>(dh.getSqlQueue());
+        if(queue.size() == 0) return;
         Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> { // Run in async
-            if(AchievementsEngine.getInstance().isForcedDisable()) {
-                AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
-                if(args.length > 0) {
-                    String arguments = args[0];
-                    for(int i = 1; i < args.length; i++) {
-                        arguments += ", " + args[i];
-                    }
-                    AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + arguments);
-                }
-                return;
-            }
+            updating = true;
             DatabaseConnector connector = new DatabaseConnector(); // Create connection
-            if(!connector.checkConnection()) {
-                generateException("executeAsync()", query, args, "Connection is null");
-                return;
-            }
-            try(Connection connection = connector.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                if(args != null) { // Load arguments for preparedStatement
+            for(String[] sql : queue) { // Loop through normal SQL queue
+                String query = sql[0];
+                String[] args = new String[sql.length-1];
+                for(int i = 1; i < sql.length; i++) {
+                    args[i-1] = sql[i];
+                }
+                if(AchievementsEngine.getInstance().isForcedDisable()) {
+                    AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
+                    if(args.length > 0) {
+                        String arguments = args[0];
+                        for(int i = 1; i < args.length; i++) {
+                            arguments += ", " + args[i];
+                        }
+                        AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + arguments);
+                    }
+                }
+                if(!connector.checkConnection()) {
+                    generateException("saveAsyncSQL()", query, args, "Connection is null");
+                    continue;
+                }
+                if(!AchievementsEngine.getInstance().isEnabled()) {
+                    return;
+                }
+                dh.getSqlQueue().remove(0);
+                try(Connection connection = connector.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                     for (int i = 0; i < args.length; i++) {
                         preparedStatement.setString(i + 1, args[i]);
                     }
+                    preparedStatement.executeUpdate(); // Execute update
+                } catch(SQLException e) {
+                    generateException("saveAsyncSQL()", query, args, e.toString());
                 }
-                preparedStatement.executeUpdate(); // Execute update
-                if(!connector.getConnection().isClosed()) {
-                    connector.getConnection().close(); // Close connection
-                }
-            } catch(SQLException e) {
-                generateException("executeAsync()", query, args, e.toString());
             }
+            updating = false;
         });
     }
 
     public void execute(String query, String[] args) {
         if(mainConnector == null) return;
-        if(AchievementsEngine.getInstance().isForcedDisable()) {
+        if(AchievementsEngine.getInstance().isForcedDisable() && AchievementsEngine.getInstance().isDropQueue()) {
             AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
             if(args.length > 0) {
                 String arguments = args[0];
@@ -243,20 +257,4 @@ public class MySQLManager {
             }
         });
     }
-
-    public void updateProgress(PlayerAchievementState state, Achievement a, boolean inAsync) {
-        for(int event = 0; event < a.getEvents().size(); event++) { // Loop through all achievement's events
-            String query = "INSERT INTO progress VALUES((SELECT id_player FROM players WHERE nick=?), " +
-                    "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?"; // SQL
-            int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress
-            String[] args = new String[]{state.getPlayer().getName(), a.getID(), String.valueOf(event),
-                    String.valueOf(progress[event]), String.valueOf(progress[event])}; // Create arguments
-            if(inAsync) {
-                executeAsync(query, args); // Execute in async
-            } else {
-                execute(query, args);
-            }
-        }
-    }
-
 }

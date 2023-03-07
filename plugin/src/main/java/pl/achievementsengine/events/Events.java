@@ -93,11 +93,6 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onLeave(PlayerQuitEvent event) {
-        PlayerAchievementState.Remove(event.getPlayer());
-    }
-
-    @EventHandler
     public void onKill(EntityDeathEvent event) {
         if(event.getEntity().getKiller() != null) {
             String checkable = "kill " + event.getEntity().getType().name();

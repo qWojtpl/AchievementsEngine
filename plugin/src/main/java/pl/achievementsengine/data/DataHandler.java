@@ -107,18 +107,9 @@ public class DataHandler {
         }
         if(useSQL) {
             state.setInitialized(false);
-            getSqlQueue().add(new String[]{"INSERT IGNORE INTO players VALUES(default, ?)", nick}); // Add player to database
+            getImportantSQLQueue().put("INSERT IGNORE INTO players VALUES(default, ?)", new String[]{nick}); // Add player to database
             getManager().loadCompleted(state); // Load player's completed achievements
             getManager().loadProgress(state); // Load player's progress
-        }
-    }
-
-    public void removeYAML(Player p) {
-        if(!isKeepPlayersInMemory()) {
-            PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
-            if(pu.checkIfPlayerExists(p.getName()) == null) {
-                getPlayerYAML().remove(p.getName());
-            }
         }
     }
 
@@ -167,7 +158,9 @@ public class DataHandler {
             if(!getUpdateProgressQueue().containsKey(state)) { // If updateProgressQueue doesn't contain state
                 getUpdateProgressQueue().put(state, new ArrayList<>()); // Assign empty list to player's state
             }
-            getUpdateProgressQueue().get(state).add(achievement); // Add achievement to list
+            if(!getUpdateProgressQueue().get(state).contains(achievement)) {
+                getUpdateProgressQueue().get(state).add(achievement); // Add achievement to list
+            }
         }
     }
 
@@ -180,7 +173,6 @@ public class DataHandler {
                 } catch (IOException e) {
                     AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
                 }
-                removeYAML(state.getPlayer());
             });
         } else {
             try {
@@ -188,7 +180,6 @@ public class DataHandler {
             } catch (IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
             }
-            removeYAML(state.getPlayer());
         }
     }
 
@@ -198,21 +189,33 @@ public class DataHandler {
             getManager().execute(key, getImportantSQLQueue().get(key)); // Execute it NOW - without async
         }
         getImportantSQLQueue().clear(); // Clear important queue
-        for(String[] sql : getSqlQueue()) { // Loop through normal SQL queue
-            String[] args = new String[sql.length-1]; // Create args (-1 because [0] is query)
-            for(int i = 1; i < sql.length; i++) {
-                args[i-1] = sql[i];
-            }
-            if(async) {
-                getManager().executeAsync(sql[0], args); // Execute in async
-            } else {
+        addProgressToQueue();
+        if(async) {
+            getManager().saveAsyncSQL();
+        } else {
+            //List<String[]> queue = new ArrayList<>(getSqlQueue());
+            for(String[] sql : getSqlQueue()) { // Loop through normal SQL queue
+                String[] args = new String[sql.length - 1]; // Create args (-1 because [0] is query)
+                for (int i = 1; i < sql.length; i++) {
+                    args[i-1] = sql[i];
+                }
                 getManager().execute(sql[0], args);
             }
+            getSqlQueue().clear(); // Clear queue
         }
-        getSqlQueue().clear(); // Clear queue
-        for(PlayerAchievementState state : getUpdateProgressQueue().keySet()) { // Loop through update queue (get states)
-            for(Achievement a : getUpdateProgressQueue().get(state)) { // Loop through list of achievements from state
-                getManager().updateProgress(state, a, async); // Update progress in database
+    }
+
+    public void addProgressToQueue() {
+        for(PlayerAchievementState state : getUpdateProgressQueue().keySet()) {
+            for(Achievement a : getUpdateProgressQueue().get(state)) {
+                for (int event = 0; event < a.getEvents().size(); event++) { // Loop through all achievement's events
+                    String query = "INSERT INTO progress VALUES((SELECT id_player FROM players WHERE nick=?), " +
+                            "(SELECT id_achievement FROM achievements WHERE achievement_key=?), ?, ?) ON DUPLICATE KEY UPDATE progress=?"; // SQL
+                    int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress
+                    String[] args = new String[]{query, state.getPlayer().getName(), a.getID(), String.valueOf(event),
+                            String.valueOf(progress[event]), String.valueOf(progress[event])}; // Create arguments
+                    getSqlQueue().add(args);
+                }
             }
         }
         getUpdateProgressQueue().clear(); // Clear updateProgress queue
@@ -222,7 +225,7 @@ public class DataHandler {
         if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data..");
         if(useYAML) {
             if(!getPendingStates().isEmpty()) {
-                for (String key : getPendingStates().keySet()) { // Loop through pending states
+                for(String key : getPendingStates().keySet()) { // Loop through pending states
                     PlayerAchievementState state = getPendingStates().get(key);
                     saveYAML(state, inAsync); // Save YAML for player
                 }
@@ -231,6 +234,16 @@ public class DataHandler {
         }
         if(useSQL) {
             saveSQL(inAsync); // Save SQL
+        }
+        if(!keepPlayersInMemory) {
+            PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+            HashMap<String, PlayerAchievementState> states = new HashMap<>(AchievementsEngine.getInstance().getPlayerStates());
+            for(String player : states.keySet()) {
+                if(pu.checkIfPlayerExists(player) == null) {
+                    getPlayerYAML().remove(player);
+                    AchievementsEngine.getInstance().getPlayerStates().remove(player);
+                }
+            }
         }
     }
 
