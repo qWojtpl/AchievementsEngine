@@ -46,8 +46,8 @@ public class MySQLManager {
                         " id_achievement INT NOT NULL," +
                         " event INT NOT NULL," +
                         " progress INT NOT NULL," +
-                        " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
-                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)," +
+                        " FOREIGN KEY (id_player) REFERENCES players(id_player) ON DELETE CASCADE," +
+                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement) ON DELETE CASCADE," +
                         " UNIQUE(id_player, id_achievement, event)" +
                         " );", null);
             }
@@ -55,8 +55,8 @@ public class MySQLManager {
                 execute("CREATE TABLE IF NOT EXISTS completed (" +
                         " id_player INT NOT NULL," +
                         " id_achievement INT NOT NULL," +
-                        " FOREIGN KEY (id_player) REFERENCES players(id_player)," +
-                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement)," +
+                        " FOREIGN KEY (id_player) REFERENCES players(id_player) ON DELETE CASCADE," +
+                        " FOREIGN KEY (id_achievement) REFERENCES achievements(id_achievement) ON DELETE CASCADE," +
                         " UNIQUE(id_player, id_achievement)" +
                         " );", null);
             }

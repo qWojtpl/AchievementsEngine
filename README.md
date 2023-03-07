@@ -278,7 +278,7 @@ sql:
 # Commands & Permissions
 
 `/ae`                                - Show achievements list, permission to receive any achievement `ae.use`<br> 
-`/ae help`                           - Permission that let using below commands (and /ae help) `ae.manage`<br> 
+`/ae help`                           - Shows help page, permission that let using below commands (and /ae help) `ae.manage`<br> 
 `/ae reload`                         - Reload config `ae.reload`<br>
 `/ae achievements`                   - Print all achievements and requirements to complete `ae.achievements`<br>
 `/ae complete <nick> <achievement>`  - Complete achievement for some player `ae.complete`<br>
