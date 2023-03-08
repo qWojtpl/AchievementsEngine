@@ -45,26 +45,16 @@ public class AchievementManager {
             }
             if(event[2].equalsIgnoreCase("*")) { // If event is * (eg. kill 10 *, fish 10 *)
                 event[2] = givenEvent[1]; // Set event[2] to second element of checkable (fe. checkable is "break bedrock" so "break *" -> "break bedrock")
-                if(givenEvent[0].equalsIgnoreCase("chat") || givenEvent[0].equalsIgnoreCase("sign")) {
-                    for(int j = 2; j < givenEvent.length; j++) {
-                        event[2] += " " + givenEvent[j];
-                    }
-                }
             }
             if(event[2].contains("*%")) { // If event[2] contains ANY LIKE ([0]break [1]10 [2]*%_ore)
                 if(!checkable.contains(event[2].replace("*%", ""))) {
                     continue;
                 } else { // If checkable contains event[2] (replaced *% with nothing)
                     event[2] = givenEvent[1];
-                    if(givenEvent[0].equalsIgnoreCase("chat") || givenEvent[0].equalsIgnoreCase("sign")) {
-                        for(int j = 2; j < givenEvent.length; j++) {
-                            event[2] += " " + givenEvent[j];
-                        }
-                    }
                 }
             }
             String eventCheck = event[0];
-            for(int j = 2; j < event.length; j++) {
+            for (int j = 2; j < event.length; j++) {
                 eventCheck += " " + event[j];
             }
             if(!eventCheck.equalsIgnoreCase(checkable)) continue;

@@ -65,7 +65,7 @@
 - chat        // Send chat message event, eg. chat 10 Wiggle-Wiggle
 - breed       // Breed animals event, eg. breed 10 cow
 - complete    // Complete achievement event, eg. complete 1 <other achievement key>
-- sign        // Edit sign event, eg. sign 10 This is my house
+- sign        // Edit sign event, eg. sign 10 This_is_my_house
 - furnace     // Take from furnace event, eg. furnace 15 glass (glass is a product)
 - eat         // Eat event, eg. eat 64 apple
 ```

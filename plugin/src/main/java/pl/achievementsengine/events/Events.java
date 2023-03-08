@@ -221,7 +221,7 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
         if(event.isCancelled()) return;
-        checkForAchievementEvents(event.getPlayer(), "chat " + event.getMessage());
+        checkForAchievementEvents(event.getPlayer(), "chat " + event.getMessage().replace(" ", "_"));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -231,10 +231,10 @@ public class Events implements Listener {
             String message = event.getLine(0);
             for (int i = 1; i < event.getLines().length; i++) {
                 if(event.getLine(i).length() > 0 && !event.getLine(i).equals(" ")) {
-                    message += " " + event.getLine(i);
+                    message += "_" + event.getLine(i);
                 }
             }
-            checkForAchievementEvents(event.getPlayer(), "sign " + message);
+            checkForAchievementEvents(event.getPlayer(), "sign " + message.replace(" ", "_"));
         }
     }
 

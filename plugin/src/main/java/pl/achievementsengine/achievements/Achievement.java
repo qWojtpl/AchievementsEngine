@@ -49,11 +49,6 @@ public class Achievement {
         for(String event : events) {
             String[] ev = event.split(" ");
             String toRegister = ev[0] + " " + ev[2];
-            if(ev[0].equalsIgnoreCase("chat") || ev[0].equalsIgnoreCase("sign")) {
-                for(int i = 3; i < ev.length; i++) {
-                    toRegister += " " + ev[i];
-                }
-            }
             AchievementsEngine.getInstance().getEvents().registerEvent(toRegister, this);
         }
     }
