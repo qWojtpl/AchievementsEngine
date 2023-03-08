@@ -231,17 +231,25 @@ public class DataHandler {
                 }
                 getPendingStates().clear(); // Clear pending states
             }
+            flushPlayers();
         }
         if(useSQL) {
             saveSQL(inAsync); // Save SQL
         }
+    }
+
+    public void flushPlayers() {
         if(!keepPlayersInMemory) {
             PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
             HashMap<String, PlayerAchievementState> states = new HashMap<>(AchievementsEngine.getInstance().getPlayerStates());
             for(String player : states.keySet()) {
                 if(pu.checkIfPlayerExists(player) == null) {
-                    getPlayerYAML().remove(player);
-                    AchievementsEngine.getInstance().getPlayerStates().remove(player);
+                    if(useYAML) {
+                        getPlayerYAML().remove(player);
+                    }
+                    if(useSQL) {
+                        AchievementsEngine.getInstance().getPlayerStates().remove(player);
+                    }
                 }
             }
         }

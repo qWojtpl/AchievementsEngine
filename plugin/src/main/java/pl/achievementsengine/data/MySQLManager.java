@@ -123,6 +123,7 @@ public class MySQLManager {
                         }
                         AchievementsEngine.getInstance().getLogger().severe("   -> Args: " + arguments);
                     }
+                    continue;
                 }
                 if(!connector.checkConnection()) {
                     generateException("saveAsyncSQL()", query, args, "Connection is null");
@@ -142,13 +143,14 @@ public class MySQLManager {
                     generateException("saveAsyncSQL()", query, args, e.toString());
                 }
             }
+            dh.flushPlayers();
             updating = false;
         });
     }
 
     public void execute(String query, String[] args) {
         if(mainConnector == null) return;
-        if(AchievementsEngine.getInstance().isForcedDisable() && AchievementsEngine.getInstance().isDropQueue()) {
+        if(AchievementsEngine.getInstance().isForcedDisable()) {
             AchievementsEngine.getInstance().getLogger().severe("Dropping from queue: " + query);
             if(args.length > 0) {
                 String arguments = args[0];
@@ -244,6 +246,11 @@ public class MySQLManager {
                             continue;
                         }
                         int[] progress = state.getProgress().getOrDefault(a, new int[a.getEvents().size()]); // Get progress or initialize it
+                        if(rs.getInt("event") >= progress.length) {
+                            AchievementsEngine.getInstance().getLogger().warning("Trying to load progress which is out of bounds " +
+                                    "(achievement: " + a.getID() + ", index: " + rs.getInt("event") + ")");
+                            continue;
+                        }
                         progress[rs.getInt("event")] = rs.getInt("progress"); // Load progress for event
                         state.getProgress().put(a, progress); // Put progress to state
                     }

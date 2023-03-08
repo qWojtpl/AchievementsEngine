@@ -38,19 +38,29 @@ public class AchievementManager {
             if(!event[0].equalsIgnoreCase(givenEvent[0])) continue; // If first element is not the same (break != break, kill != kill) - skip
             if(givenEvent.length > 3) {
                 if(givenEvent[2].equalsIgnoreCase("named")) {
-                    if(!a.getEvents().get(i).contains(" named ") && checkable.contains(" named ")) {
+                    if(!a.getEvents().get(i).contains(" named ") && checkable.contains(" named ")) { // If given contains named, but source event doesn't
                         checkable = givenEvent[0] + " " + givenEvent[1];
                     }
                 }
             }
             if(event[2].equalsIgnoreCase("*")) { // If event is * (eg. kill 10 *, fish 10 *)
                 event[2] = givenEvent[1]; // Set event[2] to second element of checkable (fe. checkable is "break bedrock" so "break *" -> "break bedrock")
+                if(givenEvent[0].equalsIgnoreCase("chat") || givenEvent[0].equalsIgnoreCase("sign")) {
+                    for(int j = 2; j < givenEvent.length; j++) {
+                        event[2] += " " + givenEvent[j];
+                    }
+                }
             }
-            if(event[2].contains("*%")) { // If event[2] contains ANY LIKE
+            if(event[2].contains("*%")) { // If event[2] contains ANY LIKE ([0]break [1]10 [2]*%_ore)
                 if(!checkable.contains(event[2].replace("*%", ""))) {
                     continue;
-                } else {
+                } else { // If checkable contains event[2] (replaced *% with nothing)
                     event[2] = givenEvent[1];
+                    if(givenEvent[0].equalsIgnoreCase("chat") || givenEvent[0].equalsIgnoreCase("sign")) {
+                        for(int j = 2; j < givenEvent.length; j++) {
+                            event[2] += " " + givenEvent[j];
+                        }
+                    }
                 }
             }
             String eventCheck = event[0];
