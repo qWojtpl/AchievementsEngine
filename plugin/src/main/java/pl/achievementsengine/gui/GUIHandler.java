@@ -55,8 +55,12 @@ public class GUIHandler {
         float c = (float) state.getCompletedAchievements().size() / (float) achievements.size() * 100.0F; // Get completed percent
         int completed = Math.round(c); // Round percent to integer
         Messages messages = AchievementsEngine.getInstance().getMessages();
+        String completedColor = "";
+        if(completed >= 100) {
+            completedColor = "§a§l";
+        }
         inventory = Bukkit.createInventory(null, size, MessageFormat.format(messages.getMessage("gui-title")
-                + " " + completed + "%", current, max)); // Create inventory
+                + completedColor + " " + completed + "%", current, max)); // Create inventory
         for(int i = 0; i < size; i++) { // Create black background
             AddItem(i, Material.BLACK_STAINED_GLASS_PANE, 1, " ", " ", false);
         }

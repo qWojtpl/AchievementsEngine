@@ -47,7 +47,7 @@ public class DataHandler {
     }
 
     public void LoadConfig() {
-        saveAll(true); // Save all data
+        saveAll(false); // Save all data
         if(saveTask != -1) { // If task is not -1 (default) cancel saveTask
             Bukkit.getScheduler().cancelTask(saveTask);
         }
