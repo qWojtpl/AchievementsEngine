@@ -66,9 +66,6 @@ public class Events implements Listener {
         AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
         // Loop through registered events which are same as checkable
         String toCheck = ev[0] + " " + ev[1];
-        if(ev[0].equalsIgnoreCase("chat") || ev[0].equalsIgnoreCase("sign")) {
-            toCheck = checkable;
-        }
         for(Achievement a : getEventAchievements(toCheck, false)) {
             am.Check(player, checkable, a);
         }

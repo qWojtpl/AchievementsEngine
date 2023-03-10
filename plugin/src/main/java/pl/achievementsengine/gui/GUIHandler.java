@@ -1,5 +1,6 @@
 package pl.achievementsengine.gui;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
 public class GUIHandler {
 
     private Inventory inventory; // inventory for object
@@ -131,18 +133,6 @@ public class GUIHandler {
         item.setItemMeta(meta);
 
         inventory.setItem(slot, item); // Add item to GUI
-    }
-
-    public Inventory getInventory() {
-        return this.inventory;
-    }
-
-    public Player getPlayer() {
-        return this.player;
-    }
-
-    public int getCurrentStart() {
-        return this.currentStart;
     }
 
     public int setCurrentStart(int start) {

@@ -15,17 +15,19 @@ import java.util.List;
 
 public class Commands implements CommandExecutor {
 
+    public final AchievementsEngine plugin = AchievementsEngine.getInstance();
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if(sender instanceof Player) { // Check if sender is player
-            PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+            PermissionManager permissionManager = plugin.getPermissionManager();
             if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.use"))) return true;
             PlayerAchievementState state = PlayerAchievementState.Create((Player) sender);
             if(!state.isInitialized()) {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("not-downloaded"));
+                sender.sendMessage(plugin.getMessages().getMessage("not-downloaded"));
                 return true;
             }
-            if(args.length == 0) { // If not arguments given - open GUI
+            if(args.length == 0) { // If no arguments given - open GUI
                 GUIHandler.New((Player) sender, 0);
                 return true;
             } else if(!sender.hasPermission(permissionManager.getPermission("ae.manage"))) { // If arguments given but player don't have permission - open GUI
@@ -75,20 +77,19 @@ public class Commands implements CommandExecutor {
                 break;
             default:
                 sender.sendMessage("§cNot found page §e" + page + "§c..");
-                break;
         }
         sender.sendMessage("§2<----------> §6Showing page " + page + " / 2 §2<---------->");
     }
 
     private void c_Reload(CommandSender sender) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.reload"))) return;
-        AchievementsEngine.getInstance().getDataHandler().LoadConfig();
-        sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§aReloaded!");
+        plugin.getDataHandler().LoadConfig();
+        sender.sendMessage(plugin.getMessages().getMessage("prefix") + "§aReloaded!");
     }
 
     private void c_Help(CommandSender sender, String[] args) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.manage"))) return;
         if(args.length < 2) {
             ShowHelp(sender, 1);
@@ -98,17 +99,17 @@ public class Commands implements CommandExecutor {
         try {
             page = Integer.parseInt(args[1]);
         } catch(NumberFormatException e) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") + "§cCorrect usage: /ae help <page:int>");
+            sender.sendMessage(plugin.getMessages().getMessage("prefix") + "§cCorrect usage: /ae help <page:int>");
         } finally {
             ShowHelp(sender, page);
         }
     }
 
     private void c_Achievements(CommandSender sender) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.achievements"))) return;
         sender.sendMessage("§2<----------> §6AchievementsEngine §2<---------->");
-        for (Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
+        for (Achievement a : plugin.getAchievementManager().getAchievements()) {
             String events = "";
             if(a.getEvents().size() > 0) {
                 events = a.getEvents().get(0);
@@ -126,77 +127,77 @@ public class Commands implements CommandExecutor {
     }
 
     private void c_Complete(CommandSender sender, String[] args) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.complete"))) return;
         if(args.length != 3) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCorrect usage: /ae complete <player:Player> <id:String>");
             return;
         }
-        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        PlayerUtil pu = plugin.getPlayerUtil();
         Player p = pu.checkIfPlayerExists(args[1]);
         if(p == null) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if (!checkStateInitialized(sender, state)) return;
         if(!args[2].equalsIgnoreCase("*")) {
-            Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
+            Achievement a = plugin.getAchievementManager().checkIfAchievementExists(args[2]);
             if (a == null) {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cCan't found achievement " + args[2] + "§c!");
                 return;
             }
             if (!state.getCompletedAchievements().contains(a)) {
                 a.Complete(state);
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§aAdded " + args[2] + " §ato " + args[1] + "'s completed achievements!");
             } else {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cPlayer " + args[1] + " §calready has achievement " + args[2] + " §ccompleted!");
             }
         } else {
-            for(Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
+            for(Achievement a : plugin.getAchievementManager().getAchievements()) {
                 if(state.getCompletedAchievements().contains(a)) continue;
                 a.Complete(state);
             }
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§aAdded all achievements" + "§a to " + args[1] + "'s completed achievements!");
         }
     }
 
     private void c_Remove(CommandSender sender, String[] args) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.remove"))) return;
         if (args.length != 3) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCorrect usage: /ae remove <player:Player> <id:String>");
             return;
         }
-        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        PlayerUtil pu = plugin.getPlayerUtil();
         Player p = pu.checkIfPlayerExists(args[1]);
         if (p == null) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if(!checkStateInitialized(sender, state)) return;
         if (!args[2].equalsIgnoreCase("*")) {
-            Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
+            Achievement a = plugin.getAchievementManager().checkIfAchievementExists(args[2]);
             if (a == null) {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cCan't found achievement " + args[2] + "§c!");
                 return;
             }
             if (state.getCompletedAchievements().contains(a)) {
                 state.RemoveAchievement(a);
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§aRemoved " + args[2] + "§a from " + args[1] + "'s completed achievements!");
             } else {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cPlayer " + args[1] + " §cdon't have achievement " + args[2] + " §ccompleted!");
             }
         } else {
@@ -204,68 +205,68 @@ public class Commands implements CommandExecutor {
             for (Achievement a : completed) {
                 state.RemoveAchievement(a);
             }
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") +
+            sender.sendMessage(plugin.getMessages().getMessage("prefix") +
                     "§aRemoved all " + args[1] + "'s completed achievements!");
         }
     }
 
     private void c_Reset(CommandSender sender, String[] args) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.reset"))) return;
         if(args.length != 3) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCorrect usage: /ae reset <player:Player> <id:String>");
             return;
         }
-        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        PlayerUtil pu = plugin.getPlayerUtil();
         Player p = pu.checkIfPlayerExists(args[1]);
         if(p == null) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCan't found player " + args[1] + "§c, maybe it's offline?");
             return;
         }
         PlayerAchievementState state = PlayerAchievementState.Create(p);
         if(!checkStateInitialized(sender, state)) return;
         if(!args[2].equalsIgnoreCase("*")) {
-            Achievement a = AchievementsEngine.getInstance().getAchievementManager().checkIfAchievementExists(args[2]);
+            Achievement a = plugin.getAchievementManager().checkIfAchievementExists(args[2]);
             if (a == null) {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cCan't found achievement " + args[2] + "§c!");
                 return;
             }
             if(state.getCompletedAchievements().contains(a)) {
-                sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+                sender.sendMessage(plugin.getMessages().getMessage("prefix")
                         + "§cThis player already has this achievement completed. Use /ae remove instead.");
                 return;
             }
             state.getProgress().put(a, new int[a.getEvents().size()]);
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§aReset " + args[1] + "§a's progress in " + args[2] + "§a!");
-            AchievementsEngine.getInstance().getDataHandler().updateProgress(state, a);
+            plugin.getDataHandler().updateProgress(state, a);
         } else {
-            for(Achievement a : AchievementsEngine.getInstance().getAchievementManager().getAchievements()) {
+            for(Achievement a : plugin.getAchievementManager().getAchievements()) {
                 if(state.getCompletedAchievements().contains(a)) continue;
                 state.getProgress().put(a, new int[a.getEvents().size()]);
-                AchievementsEngine.getInstance().getDataHandler().updateProgress(state, a);
+                plugin.getDataHandler().updateProgress(state, a);
             }
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§aReset all " + args[1] + "§a's progress in not-completed achievements!");
         }
     }
 
     private void c_Transfer(CommandSender sender, String[] args) {
-        PermissionManager permissionManager = AchievementsEngine.getInstance().getPermissionManager();
+        PermissionManager permissionManager = plugin.getPermissionManager();
         if(!permissionManager.checkIfSenderHasPermission(sender, permissionManager.getPermission("ae.transfer"))) return;
         if(args.length != 3 || args[1].equals(args[2])) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCorrect usage: /ae transfer <from:Player> <to:Player>");
             return;
         }
-        PlayerUtil pu = AchievementsEngine.getInstance().getPlayerUtil();
+        PlayerUtil pu = plugin.getPlayerUtil();
         Player p1 = pu.checkIfPlayerExists(args[1]);
         Player p2 = pu.checkIfPlayerExists(args[2]);
         if(p1 == null || p2 == null) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+            sender.sendMessage(plugin.getMessages().getMessage("prefix")
                     + "§cCannot found player(s)..");
             return;
         }
@@ -273,14 +274,14 @@ public class Commands implements CommandExecutor {
         if(!checkStateInitialized(sender, state1)) return;
         PlayerAchievementState state2 = PlayerAchievementState.Create(p2);
         if(!checkStateInitialized(sender, state2)) return;
-        AchievementsEngine.getInstance().getDataHandler().transferAchievements(state1, state2);
-        sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix")
+        plugin.getDataHandler().transferAchievements(state1, state2);
+        sender.sendMessage(plugin.getMessages().getMessage("prefix")
                 + "§aTransferred all achievements from " + args[1] + "§a to " + args[2] + "§a!");
     }
 
     private boolean checkStateInitialized(CommandSender sender, PlayerAchievementState state) {
         if(!state.isInitialized()) {
-            sender.sendMessage(AchievementsEngine.getInstance().getMessages().getMessage("prefix") +
+            sender.sendMessage(plugin.getMessages().getMessage("prefix") +
                     "§cThis (or these) player(s) doesn't have initialized state (data is not downloaded), try again later.");
             return false;
         }

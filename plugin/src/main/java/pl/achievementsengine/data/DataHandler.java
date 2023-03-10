@@ -164,7 +164,7 @@ public class DataHandler {
         }
     }
 
-    public void saveYAML(PlayerAchievementState state, boolean async) { // Save only YAML for player
+    public void saveYAML(PlayerAchievementState state, boolean async, boolean flush) { // Save only YAML for player
         if(!useYAML) return;
         if(async) {
             Bukkit.getScheduler().runTaskAsynchronously(AchievementsEngine.getInstance(), () -> {
@@ -173,12 +173,18 @@ public class DataHandler {
                 } catch (IOException e) {
                     AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
                 }
+                if(flush) {
+                    flushPlayers();
+                }
             });
         } else {
             try {
                 playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
             } catch (IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+            }
+            if(flush) {
+                flushPlayers();
             }
         }
     }
@@ -202,6 +208,7 @@ public class DataHandler {
                 getManager().execute(sql[0], args);
             }
             getSqlQueue().clear(); // Clear queue
+            flushPlayers();
         }
     }
 
@@ -225,13 +232,14 @@ public class DataHandler {
         if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data..");
         if(useYAML) {
             if(!getPendingStates().isEmpty()) {
+                int i = 0;
                 for(String key : getPendingStates().keySet()) { // Loop through pending states
                     PlayerAchievementState state = getPendingStates().get(key);
-                    saveYAML(state, inAsync); // Save YAML for player
+                    saveYAML(state, inAsync, (i == getPendingStates().size()-1)); // Save YAML for player
+                    i++;
                 }
                 getPendingStates().clear(); // Clear pending states
             }
-            flushPlayers();
         }
         if(useSQL) {
             saveSQL(inAsync); // Save SQL
@@ -251,6 +259,9 @@ public class DataHandler {
                         AchievementsEngine.getInstance().getPlayerStates().remove(player);
                     }
                 }
+            }
+            if(logSave) {
+                AchievementsEngine.getInstance().getLogger().info("Flushing players...");
             }
         }
     }
