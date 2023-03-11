@@ -57,7 +57,7 @@ public class GUIHandler {
         Messages messages = AchievementsEngine.getInstance().getMessages();
         String completedColor = "";
         if(completed >= 100) {
-            completedColor = "§a§l";
+            completedColor = "§2§l";
         }
         inventory = Bukkit.createInventory(null, size, MessageFormat.format(messages.getMessage("gui-title")
                 + completedColor + " " + completed + "%", current, max)); // Create inventory

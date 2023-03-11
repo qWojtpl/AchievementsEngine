@@ -24,8 +24,8 @@ config:
 
   keepPlayersInMemory: false
 
-  # If set to true then when SQL exception appear the plugin will be disabled.
-  # If set to false when SQL exception appear nothing will happen - only error will be sent to console
+  # If set to true then when SQL or IO exception appear the plugin will be disabled.
+  # If set to false when SQL/IO exception appear nothing will happen - only error will be sent to console
 
   disableOnException: true
 

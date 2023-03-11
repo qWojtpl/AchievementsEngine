@@ -172,6 +172,7 @@ public class DataHandler {
                     playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
                 } catch (IOException e) {
                     AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+                    foundException();
                 }
                 if(flush) {
                     flushPlayers();
@@ -182,6 +183,7 @@ public class DataHandler {
                 playerYAML.get(state.getPlayer().getName()).save(createPlayerFile(state.getPlayer())); // Get player's YAML and save it to file
             } catch (IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("IO exception: Cannot save player data (" + state.getPlayer().getName() + ")");
+                foundException();
             }
             if(flush) {
                 flushPlayers();
@@ -279,6 +281,7 @@ public class DataHandler {
                 AchievementsEngine.getInstance().getLogger().severe("Cannot transfer achievements from " + state1.getPlayer().getName()
                         + " to " + state2.getPlayer().getName());
                 AchievementsEngine.getInstance().getLogger().severe("IO Exception: " + e);
+                foundException();
             }
         }
         if(useSQL) {
@@ -307,6 +310,7 @@ public class DataHandler {
             } catch(IOException e) {
                 AchievementsEngine.getInstance().getLogger().severe("Cannot create " + p.getName() + ".yml");
                 AchievementsEngine.getInstance().getLogger().severe("IO Exception: " + e);
+                foundException();
             }
         } else {
             if(!dataFile.canRead() || !dataFile.canWrite()) { // Check if server can read and write to file
