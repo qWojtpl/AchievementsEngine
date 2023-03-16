@@ -231,7 +231,8 @@ public class DataHandler {
     }
 
     public void saveAll(boolean inAsync) { // Save ALL data
-        if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data..");
+        if(logSave) AchievementsEngine.getInstance().getLogger().info("Saving data.. " +
+                "(" + getPendingStates().size() + " YAMLs, " + getSqlQueue().size() + " SQL queries)");
         if(useYAML) {
             if(!getPendingStates().isEmpty()) {
                 int i = 0;

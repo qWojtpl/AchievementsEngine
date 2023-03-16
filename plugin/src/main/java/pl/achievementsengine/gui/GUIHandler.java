@@ -97,6 +97,8 @@ public class GUIHandler {
                     for(int l = 2; l < splitEvent.length; l++) {
                         if(splitEvent[l].equalsIgnoreCase("named")) {
                             splitEvent[l] = messages.getEventTranslation("named");
+                        } else if(splitEvent[l].equalsIgnoreCase("*")) {
+                            splitEvent[l] = messages.getEventTranslation("any");
                         }
                         event += " " + splitEvent[l];
                     }
