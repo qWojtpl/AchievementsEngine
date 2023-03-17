@@ -130,6 +130,13 @@ public class GUIHandler {
         ItemStack item = new ItemStack(material, amount); // Create item
         ItemMeta meta = item.getItemMeta();
 
+        if(lore == null) {
+            lore = "Default lore%nl%Add lore in achievements.yml!";
+        }
+        if(name == null) {
+            name = "Default name";
+        }
+
         meta.setDisplayName(name); // Set name
         meta.setLore(Arrays.asList(lore.split("%nl%")));
         if(isGlowing) { // Create glow effect
