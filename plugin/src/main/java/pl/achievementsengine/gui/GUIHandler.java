@@ -50,7 +50,7 @@ public class GUIHandler {
             }
         }
         int current = currentStart/28+1; // Current page
-        int max = achievements.size()/28+1; // Max pages
+        int max = achievements.size()/29+1; // Max pages
         PlayerAchievementState state = PlayerAchievementState.Create(player); // Get state
         float c = (float) state.getCompletedAchievements().size() / (float) achievements.size() * 100.0F; // Get completed percent
         int completed = Math.round(c); // Round percent to integer
