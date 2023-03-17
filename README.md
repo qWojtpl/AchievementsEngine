@@ -218,6 +218,7 @@ messages:
   not-downloaded: '§cWhoaa! Not too fast? Your data is not downloaded yet, please try again later!'
 
 event-translation:
+  any: "Any item/entity/block"
   named: "named"
   join: "Join"
   kill: "Kill"
@@ -240,6 +241,7 @@ event-translation:
   complete: "Complete"
   sign: "Sign"
   furnace: "Furnace"
+  eat: "Eat"
 ```
 
 </details>
