@@ -354,13 +354,19 @@ public class DataHandler {
                                 yml.getBoolean("achievements." + key + ".announceProgress"),
                                 yml.getInt("achievements." + key + ".requiredProgress"),
                                 yml.getString("achievements." + key + ".world"))); // Create new achievement from yml
-                AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
+                if(section.getKeys(false).size() <= 16) {
+                    AchievementsEngine.getInstance().getLogger().info("Loaded achievement: " + key);
+                }
                 if(useSQL) {
                     query += "(default, ?)";
                     arguments[i] = key;
                     i++;
                 }
             }
+        }
+        if(section.getKeys(false).size() > 16) {
+            AchievementsEngine.getInstance().getLogger().info("Loaded ("
+                    + section.getKeys(false).size() + ") achievements!");
         }
         if(useSQL) {
             getImportantSQLQueue().put(query, arguments); // If using SQL - add achievements to important queue

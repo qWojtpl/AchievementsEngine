@@ -280,7 +280,8 @@ public class Events implements Listener {
                 return;
             }
         }
-        if(event.getInventory().getType().equals(InventoryType.FURNACE)) {
+        InventoryType invType = event.getInventory().getType();
+        if(invType.equals(InventoryType.FURNACE) || invType.equals(InventoryType.BLAST_FURNACE) || invType.equals(InventoryType.SMOKER)) {
             if(event.getSlot() == 2) {
                 ItemStack item = event.getInventory().getItem(2);
                 if(item != null) {
