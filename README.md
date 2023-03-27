@@ -25,7 +25,7 @@
 <p>Add achievements to your Minecraft server.</p>
 <p>Tested minecraft versions: </p> 
 
-`Spigot 1.18.2`
+`1.18.2` `1.19.3`
 
 # Installation
 

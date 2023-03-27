@@ -258,9 +258,7 @@ public class DataHandler {
                     if(useYAML) {
                         getPlayerYAML().remove(player);
                     }
-                    if(useSQL) {
-                        AchievementsEngine.getInstance().getPlayerStates().remove(player);
-                    }
+                    AchievementsEngine.getInstance().getPlayerStates().remove(player);
                 }
             }
             if(logSave) {
