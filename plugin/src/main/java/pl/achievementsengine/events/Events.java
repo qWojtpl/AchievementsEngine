@@ -63,6 +63,7 @@ public class Events implements Listener {
 
     public void checkForAchievementEvents(Player player, String checkable) {
         String[] ev = checkable.split(" "); // Split checkable
+        if(ev.length < 2) return;
         AchievementManager am = AchievementsEngine.getInstance().getAchievementManager(); // Get achievement manager
         // Loop through registered events which are same as checkable
         String toCheck = ev[0] + " " + ev[1];
@@ -224,15 +225,13 @@ public class Events implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onSign(SignChangeEvent event) {
         if(event.isCancelled()) return;
-        if(event.getLines().length > 0) {
-            String message = event.getLine(0);
-            for (int i = 1; i < event.getLines().length; i++) {
-                if(event.getLine(i).length() > 0 && !event.getLine(i).equals(" ")) {
-                    message += "_" + event.getLine(i);
-                }
+        String message = event.getLine(0);
+        for(int i = 1; i < event.getLines().length; i++) {
+            if(event.getLine(i).length() > 0 && !event.getLine(i).equals(" ")) {
+                message += "_" + event.getLine(i);
             }
-            checkForAchievementEvents(event.getPlayer(), "sign " + message.replace(" ", "_"));
         }
+        checkForAchievementEvents(event.getPlayer(), "sign " + message.replace(" ", "_"));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

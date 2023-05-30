@@ -201,7 +201,6 @@ public class DataHandler {
         if(async) {
             getManager().saveAsyncSQL();
         } else {
-            //List<String[]> queue = new ArrayList<>(getSqlQueue());
             for(String[] sql : getSqlQueue()) { // Loop through normal SQL queue
                 String[] args = new String[sql.length - 1]; // Create args (-1 because [0] is query)
                 for (int i = 1; i < sql.length; i++) {
