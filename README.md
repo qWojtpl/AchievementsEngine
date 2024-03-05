@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn.discordapp.com/attachments/816647374239694849/1082429620911099994/68747470733a2f2f692e696d6775722e636f6d2f465244794d78762e706e67.png">
+  <img src="images/logo.png">
 </p>
 
 <div style="display:inline-block">
